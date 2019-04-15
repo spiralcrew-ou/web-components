@@ -1,0 +1,24 @@
+@import "./mixins";
+@include mdc-card-core-styles;
+
+.card-header {
+  
+  padding-left: 16px;
+  padding-right: 16px;
+}
+.card-content {
+  padding: 16px;
+}
+
+.mdc-card {
+  //height: 350px;
+  width: 350px;
+}
+
+.card-secondary-text { 
+  padding: 16px;
+}
+
+.fav-selected { 
+  color: red;
+}
