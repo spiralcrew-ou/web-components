@@ -18,3 +18,5 @@ SASS_PATH=node_modules npm run build
 ```shell
 npm publish 
 ```
+
+*note* For further information please check https://leonardoleenen.gitbook.io/collectiveone/ 
