@@ -22,6 +22,11 @@ export class COApp {
     this.dispatchRegisterUser(user)
   }
 
+  @Method()
+  isAuthenticated() {
+    return Object.keys(this.store.getState().loggedUser).length != 0
+  }
+
   dispatchNewIniciative: Action 
   dispatchRegisterUser: Action
 

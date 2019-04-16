@@ -1,6 +1,6 @@
+const URL_SERVER = "http://192.168.0.193:5001/collectiveone-dev/us-central1"
+// const URL_SERVER = "https://us-central1-collectiveone-dev.cloudfunctions.net"
 
-// const URL_SERVER = "http://192.168.0.193:5001/collectiveone-dev/us-central1"
-const URL_SERVER = "https://us-central1-collectiveone-dev.cloudfunctions.net"
 export const createIniciative = (iniciative,user) => {
     
     if (Object.keys(user).length===0)
@@ -16,7 +16,10 @@ export const createIniciative = (iniciative,user) => {
         }
     }
     return dispatch => {
-        dispatch({ type: 'NEW_INICIATIVE', iniciative: i })
+        fetch(URL_SERVER + '/newIniciative',{method:'POST','content-type': 'application/json',body:JSON.stringify(i)}).
+        then(res => res.json().then(data => {
+            dispatch({ type: 'NEW_INICIATIVE', iniciative: data })
+        }))
     }
 }
 

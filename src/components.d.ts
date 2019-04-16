@@ -13,6 +13,7 @@ import '@stencil/redux';
 export namespace Components {
 
   interface CoApp {
+    'isAuthenticated': () => boolean;
     'newIniciative': (iniciative: any) => void;
     'registerUser': (user: any) => void;
   }
