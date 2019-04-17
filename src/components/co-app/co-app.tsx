@@ -5,7 +5,7 @@ import {createIniciative, registerUser} from '../../actions.js';
 
 @Component({
   tag: 'co-app',
-  styleUrl: 'co-app.css',
+  styleUrl: 'co-app.scss',
   //shadow: true
 })
 export class COApp {

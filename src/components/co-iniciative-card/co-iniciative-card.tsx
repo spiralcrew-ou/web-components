@@ -47,9 +47,6 @@ export class COIniciativeCard {
   }
 
   render() {
-
-   
-
     return (
       <div class="mdc-card">
       

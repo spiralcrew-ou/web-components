@@ -18,9 +18,12 @@
   },
   "dependencies": {
     "@material/card": "^1.1.0",
+    "@material/fab": "^1.1.1",
+    "@material/menu": "^1.1.1",
     "@stencil/redux": "^0.1.1",
     "@stencil/sass": "^0.1.1",
     "material-components-web": "^1.0.1",
+    "medium-editor": "^5.23.3",
     "moment": "^2.24.0",
     "redux": "^4.0.1",
     "redux-logger": "^3.0.6",

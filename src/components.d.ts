@@ -19,6 +19,9 @@ export namespace Components {
   }
   interface CoAppAttributes extends StencilHTMLAttributes {}
 
+  interface CoEditor {}
+  interface CoEditorAttributes extends StencilHTMLAttributes {}
+
   interface CoIniciativeCard {
     'author': object;
     'cc': string;
@@ -104,6 +107,7 @@ export namespace Components {
 declare global {
   interface StencilElementInterfaces {
     'CoApp': Components.CoApp;
+    'CoEditor': Components.CoEditor;
     'CoIniciativeCard': Components.CoIniciativeCard;
     'CoIniciativeList': Components.CoIniciativeList;
     'CoNotificationBadge': Components.CoNotificationBadge;
@@ -113,6 +117,7 @@ declare global {
 
   interface StencilIntrinsicElements {
     'co-app': Components.CoAppAttributes;
+    'co-editor': Components.CoEditorAttributes;
     'co-iniciative-card': Components.CoIniciativeCardAttributes;
     'co-iniciative-list': Components.CoIniciativeListAttributes;
     'co-notification-badge': Components.CoNotificationBadgeAttributes;
@@ -125,6 +130,12 @@ declare global {
   var HTMLCoAppElement: {
     prototype: HTMLCoAppElement;
     new (): HTMLCoAppElement;
+  };
+
+  interface HTMLCoEditorElement extends Components.CoEditor, HTMLStencilElement {}
+  var HTMLCoEditorElement: {
+    prototype: HTMLCoEditorElement;
+    new (): HTMLCoEditorElement;
   };
 
   interface HTMLCoIniciativeCardElement extends Components.CoIniciativeCard, HTMLStencilElement {}
@@ -159,6 +170,7 @@ declare global {
 
   interface HTMLElementTagNameMap {
     'co-app': HTMLCoAppElement
+    'co-editor': HTMLCoEditorElement
     'co-iniciative-card': HTMLCoIniciativeCardElement
     'co-iniciative-list': HTMLCoIniciativeListElement
     'co-notification-badge': HTMLCoNotificationBadgeElement
@@ -168,6 +180,7 @@ declare global {
 
   interface ElementTagNameMap {
     'co-app': HTMLCoAppElement;
+    'co-editor': HTMLCoEditorElement;
     'co-iniciative-card': HTMLCoIniciativeCardElement;
     'co-iniciative-list': HTMLCoIniciativeListElement;
     'co-notification-badge': HTMLCoNotificationBadgeElement;
