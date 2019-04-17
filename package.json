@@ -1,6 +1,6 @@
 {
   "name": "collectiveone-webcomponents",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "CollectiveOne WebComponent",
   "module": "dist/esm/index.js",
   "main": "dist/index.js",

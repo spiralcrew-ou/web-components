@@ -7,6 +7,16 @@
 
 ## Methods
 
+### `isAuthenticated() => boolean`
+
+
+
+#### Returns
+
+Type: `boolean`
+
+
+
 ### `newIniciative(iniciative: any) => void`
 
 
