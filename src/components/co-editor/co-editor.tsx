@@ -1,9 +1,12 @@
-import { Component } from '@stencil/core';
-import MediumEditor from 'medium-editor'
+import { Component, Prop } from '@stencil/core';
+import EditorJS from '@editorjs/editorjs';
 import { MDCMenu } from '@material/menu';
+import Header from '@editorjs/header'; 
+import List from '@editorjs/list'; 
+
 
 let menu = null
-
+let editor = null
 
 @Component({
   tag: 'co-editor',
@@ -11,6 +14,10 @@ let menu = null
   shadow: false
 })
 export class MyComponent {
+
+  @Prop() iniciativeId: string 
+  @Prop() documentId: string
+  @Prop() revision: string = 'draft'
 
   fixMenu = () => {
     const menu = document.querySelector('.mdc-menu')
@@ -27,22 +34,35 @@ export class MyComponent {
     menu.open = !menu.open
   }
 
+  save = () => {
+    editor.save().then( outputdata => {
+      console.log(outputdata)
+    })
+  }
+
   componentDidLoad = () => {
     menu = new MDCMenu(document.querySelector('.mdc-menu'))
-    
-
-    var editor = new MediumEditor('.editable', {
-      placeholder: {
-        text: 'Please, click to start'
-      }
-    })
-    window['editor'] = editor
+    editor = new EditorJS({
+      holderId: 'codex-editor',
+      autofocus: true,
+      tools: { 
+        header: {
+          class: Header, 
+          inlineToolbar: ['link'] 
+        }, 
+        list: { 
+          class: List, 
+          inlineToolbar: true 
+        } 
+      }, 
+    });
+   
   }
 
   render() {
     return (
       <div>
-        <div class="editable"></div>
+        <div id="codex-editor" class="mdc-elevation--z"></div>
 
 
         <button id="menu-button" class="mdc-fab app-fab--absolute" aria-label="Favorite" onClick={this.handleOpen}>
@@ -59,7 +79,7 @@ export class MyComponent {
               <i class="material-icons mdc-list-item__graphic" aria-hidden="true">merge_type</i>
               <span class="mdc-list-item__text">Merge</span>
             </li>
-            <li class="mdc-list-item" role="menuitem">
+            <li class="mdc-list-item" role="menuitem" onClick={this.save}>
               <i class="material-icons mdc-list-item__graphic" aria-hidden="true">done</i>
               <span class="mdc-list-item__text">Save</span>
             </li>
@@ -72,11 +92,13 @@ export class MyComponent {
               <span class="mdc-list-item__text">Settings</span>
             </li>
             <li class="mdc-list-item" role="menuitem">
+              <i class="material-icons mdc-list-item__graphic" aria-hidden="true">swap_vert</i>
+              <span class="mdc-list-item__text">Change Perspective</span>
+            </li>
+            <li class="mdc-list-item" role="menuitem">
               <i class="material-icons mdc-list-item__graphic" aria-hidden="true">publish</i>
               <span class="mdc-list-item__text">Publish</span>
             </li>
-            
-            
           </ul>
         </div>
 

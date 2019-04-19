@@ -1,10 +1,31 @@
 @import "@material/fab/mdc-fab";
+@import "@material/elevation/mdc-elevation";
 @import "@material/list/mdc-list";
 @import "@material/menu-surface/mdc-menu-surface";
 @import "@material/menu/mdc-menu";
 @import "@material/typography/mdc-typography";
 
+.app-fab--absolute {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  background: $mdc-theme-primary;
+  z-index: 10;
+}
 
+.my-menu { 
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+}
+@media(min-width: 1024px) { 
+  .app-fab--absolute {
+      bottom: 1.5rem;
+      right: 1.5rem;
+  }
+}
+
+/*
 .editor {
     font-family: $mdc-typography-font-family
 }
@@ -277,3 +298,4 @@ p {
   
   .medium-editor-hidden {
     display: none; }
+    */

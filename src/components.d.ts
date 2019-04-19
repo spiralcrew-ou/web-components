@@ -19,8 +19,16 @@ export namespace Components {
   }
   interface CoAppAttributes extends StencilHTMLAttributes {}
 
-  interface CoEditor {}
-  interface CoEditorAttributes extends StencilHTMLAttributes {}
+  interface CoEditor {
+    'documentId': string;
+    'iniciativeId': string;
+    'revision': string;
+  }
+  interface CoEditorAttributes extends StencilHTMLAttributes {
+    'documentId'?: string;
+    'iniciativeId'?: string;
+    'revision'?: string;
+  }
 
   interface CoIniciativeCard {
     'author': object;
