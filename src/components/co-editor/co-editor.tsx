@@ -77,7 +77,7 @@ export class COEditor {
         const newLine = {
           id: uuidv4(),
           type: 'co-paragraph',
-          content: 'Este es nuevo'
+          content: ''
         }
 
         if (ev.key === 'Enter') {

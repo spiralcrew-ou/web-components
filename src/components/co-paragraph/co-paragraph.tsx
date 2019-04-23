@@ -17,6 +17,11 @@ export class COParagraph {
     }
 
     render() {
-        return <div id={"CO-ELID-" + this.block_id} class='mdc-typography--body1' contenteditable='true' onClick={this.activeFocusHandler}>{this.content}</div>
+        return <div 
+                    id={"CO-ELID-" + this.block_id} 
+                    class='mdc-typography--body1' 
+                    contenteditable='true'
+                    data-placeholder='Please write something here'
+                    onClick={this.activeFocusHandler}>{this.content}</div>
     }
 }
