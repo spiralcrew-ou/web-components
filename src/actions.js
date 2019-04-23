@@ -23,6 +23,17 @@ export const createIniciative = (iniciative,user) => {
     }
 }
 
+/*
+export const addDocumentToIniciative = (iniciative, documentType, content ) => {
+
+}
+
+export const updateDocument = document => {
+
+}
+
+export const */
+
 export const updateIniciativeFav = iniciative => {
     return dispatch => {
         dispatch({ type: 'UPDATE_INICIATIVE_FAV', iniciative})

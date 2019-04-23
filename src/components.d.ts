@@ -82,6 +82,56 @@ export namespace Components {
     'url'?: string;
   }
 
+  interface CoParagraph {
+    'block_id': string;
+    'content': string;
+  }
+  interface CoParagraphAttributes extends StencilHTMLAttributes {
+    'block_id'?: string;
+    'content'?: string;
+    'onActiveBlock'?: (event: CustomEvent) => void;
+  }
+
+  interface CoSubtitle1 {
+    'block_id': string;
+    'content': string;
+  }
+  interface CoSubtitle1Attributes extends StencilHTMLAttributes {
+    'block_id'?: string;
+    'content'?: string;
+    'onActiveBlock'?: (event: CustomEvent) => void;
+  }
+
+  interface CoSubtitle2 {
+    'block_id': string;
+    'content': string;
+  }
+  interface CoSubtitle2Attributes extends StencilHTMLAttributes {
+    'block_id'?: string;
+    'content'?: string;
+    'onActiveBlock'?: (event: CustomEvent) => void;
+  }
+
+  interface CoTitle1 {
+    'block_id': string;
+    'content': string;
+  }
+  interface CoTitle1Attributes extends StencilHTMLAttributes {
+    'block_id'?: string;
+    'content'?: string;
+    'onActiveBlock'?: (event: CustomEvent) => void;
+  }
+
+  interface CoTitle2 {
+    'block_id': string;
+    'content': string;
+  }
+  interface CoTitle2Attributes extends StencilHTMLAttributes {
+    'block_id'?: string;
+    'content'?: string;
+    'onActiveBlock'?: (event: CustomEvent) => void;
+  }
+
   interface MyComponent {
     /**
     * The first name
@@ -120,6 +170,11 @@ declare global {
     'CoIniciativeList': Components.CoIniciativeList;
     'CoNotificationBadge': Components.CoNotificationBadge;
     'CoNotificationItem': Components.CoNotificationItem;
+    'CoParagraph': Components.CoParagraph;
+    'CoSubtitle1': Components.CoSubtitle1;
+    'CoSubtitle2': Components.CoSubtitle2;
+    'CoTitle1': Components.CoTitle1;
+    'CoTitle2': Components.CoTitle2;
     'MyComponent': Components.MyComponent;
   }
 
@@ -130,6 +185,11 @@ declare global {
     'co-iniciative-list': Components.CoIniciativeListAttributes;
     'co-notification-badge': Components.CoNotificationBadgeAttributes;
     'co-notification-item': Components.CoNotificationItemAttributes;
+    'co-paragraph': Components.CoParagraphAttributes;
+    'co-subtitle1': Components.CoSubtitle1Attributes;
+    'co-subtitle2': Components.CoSubtitle2Attributes;
+    'co-title1': Components.CoTitle1Attributes;
+    'co-title2': Components.CoTitle2Attributes;
     'my-component': Components.MyComponentAttributes;
   }
 
@@ -170,6 +230,36 @@ declare global {
     new (): HTMLCoNotificationItemElement;
   };
 
+  interface HTMLCoParagraphElement extends Components.CoParagraph, HTMLStencilElement {}
+  var HTMLCoParagraphElement: {
+    prototype: HTMLCoParagraphElement;
+    new (): HTMLCoParagraphElement;
+  };
+
+  interface HTMLCoSubtitle1Element extends Components.CoSubtitle1, HTMLStencilElement {}
+  var HTMLCoSubtitle1Element: {
+    prototype: HTMLCoSubtitle1Element;
+    new (): HTMLCoSubtitle1Element;
+  };
+
+  interface HTMLCoSubtitle2Element extends Components.CoSubtitle2, HTMLStencilElement {}
+  var HTMLCoSubtitle2Element: {
+    prototype: HTMLCoSubtitle2Element;
+    new (): HTMLCoSubtitle2Element;
+  };
+
+  interface HTMLCoTitle1Element extends Components.CoTitle1, HTMLStencilElement {}
+  var HTMLCoTitle1Element: {
+    prototype: HTMLCoTitle1Element;
+    new (): HTMLCoTitle1Element;
+  };
+
+  interface HTMLCoTitle2Element extends Components.CoTitle2, HTMLStencilElement {}
+  var HTMLCoTitle2Element: {
+    prototype: HTMLCoTitle2Element;
+    new (): HTMLCoTitle2Element;
+  };
+
   interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {}
   var HTMLMyComponentElement: {
     prototype: HTMLMyComponentElement;
@@ -183,6 +273,11 @@ declare global {
     'co-iniciative-list': HTMLCoIniciativeListElement
     'co-notification-badge': HTMLCoNotificationBadgeElement
     'co-notification-item': HTMLCoNotificationItemElement
+    'co-paragraph': HTMLCoParagraphElement
+    'co-subtitle1': HTMLCoSubtitle1Element
+    'co-subtitle2': HTMLCoSubtitle2Element
+    'co-title1': HTMLCoTitle1Element
+    'co-title2': HTMLCoTitle2Element
     'my-component': HTMLMyComponentElement
   }
 
@@ -193,6 +288,11 @@ declare global {
     'co-iniciative-list': HTMLCoIniciativeListElement;
     'co-notification-badge': HTMLCoNotificationBadgeElement;
     'co-notification-item': HTMLCoNotificationItemElement;
+    'co-paragraph': HTMLCoParagraphElement;
+    'co-subtitle1': HTMLCoSubtitle1Element;
+    'co-subtitle2': HTMLCoSubtitle2Element;
+    'co-title1': HTMLCoTitle1Element;
+    'co-title2': HTMLCoTitle2Element;
     'my-component': HTMLMyComponentElement;
   }
 
