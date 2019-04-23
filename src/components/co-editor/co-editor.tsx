@@ -89,7 +89,7 @@ export class COEditor {
           ev.preventDefault()
         }
 
-        if ((ev.key === 'Backspace')  && (document.getElementById('CO-ELID-' + this.blockActiveId).innerHTML.length===1)){
+        if ((ev.key === 'Backspace')  && (document.getElementById('CO-ELID-' + this.blockActiveId).innerHTML.length<=1)){
           const dummy = Object.assign([],this.blocks)
           this.blocks = dummy.filter( e => e.id != this.blockActiveId)      
         }
