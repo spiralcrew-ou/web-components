@@ -3,7 +3,7 @@ import { Component, Prop, Event, EventEmitter } from '@stencil/core';
 @Component({
   tag: 'co-title2',
   styleUrl: 'co-title2.scss',
-  shadow: true
+  shadow: false
 })
 export class COTitle2 {
 

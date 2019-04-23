@@ -20,6 +20,19 @@
   bottom: 1rem;
   right: 1rem;
 }
+
+.mdc-icon-button::before, .mdc-icon-button::after {
+
+  width: auto;
+  height: auto;
+}
+
+.mdc-icon-button {
+  width: auto;
+  height: auto;
+  padding-bottom: 0px;
+padding-top: 0px}
+
 @media(min-width: 1024px) { 
   .app-fab--absolute {
       bottom: 1.5rem;
