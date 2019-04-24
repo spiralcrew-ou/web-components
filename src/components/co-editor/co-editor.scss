@@ -20,18 +20,23 @@
   bottom: 1rem;
   right: 1rem;
 }
-
-.mdc-icon-button::before, .mdc-icon-button::after {
-
-  width: auto;
-  height: auto;
-}
-
 .mdc-icon-button {
   width: auto;
   height: auto;
   padding-bottom: 0px;
-padding-top: 0px}
+  padding-top: 0px;
+}
+  .mdc-icon-button::before, .mdc-icon-button::after{
+  border-radius: 3px;
+  background: -moz-linear-gradient(-45deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(-45deg, rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(135deg, rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6000000', endColorstr='#00000000',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin: auto;
+}
 
 @media(min-width: 1024px) { 
   .app-fab--absolute {

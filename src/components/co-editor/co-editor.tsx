@@ -51,9 +51,10 @@ export class COEditor {
   componentWillLoad = () => {
     this.blocks = [{
       id: uuidv4(),
-      type: 'co-title1',
+      type: 'co-title2',
       content: 'Washington D. C.'
     },
+    
     {
       id: uuidv4(),
       type: 'co-paragraph',
