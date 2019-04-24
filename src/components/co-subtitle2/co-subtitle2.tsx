@@ -15,6 +15,8 @@ export class COSubTitle2 {
         this.activeBlock.emit(this.block_id)
     }
     render() {
-        return <div class='mdc-typography--subtitle2' contenteditable='true' onClick={this.activeFocusHandler}>{this.content}</div>
+        return <div 
+            id={"CO-ELID-" + this.block_id} 
+            class='mdc-typography--subtitle2' contenteditable='true' onClick={this.activeFocusHandler}>{this.content}</div>
     }
 }
