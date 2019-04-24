@@ -1,7 +1,10 @@
 import { Component, Prop, State, Listen } from '@stencil/core';
 import { MDCMenu } from '@material/menu';
 import { uuidv4 } from '../../utils/utils';
-import {fetchIniciative} from '../../actions'
+import {fetchIniciative} from '../../actions';
+import {MDCTopAppBar} from "@material/top-app-bar";
+import {MDCDrawer} from "@material/drawer";
+
 
 let menu = null
 let toolbar = null
@@ -26,6 +29,15 @@ export class COEditor {
     const _left = window.innerWidth - menu.getBoundingClientRect().width - 50
     menu.setAttribute("style", "left: " + _left + "px");
   }
+  handleDrawer =() =>{
+    const drawer = MDCDrawer.attachTo(document.querySelector('.mdc-drawer'));
+    const topAppBar = MDCTopAppBar.attachTo(document.getElementById('app-bar'));
+    topAppBar.setScrollTarget(document.getElementById('main-content'));
+    topAppBar.listen('MDCTopAppBar:nav', () => {
+    drawer.open = !drawer.open;
+    });
+  }
+
 
   handleOpen = () => {
     menu.hoistMenuToBody()
@@ -75,6 +87,8 @@ export class COEditor {
   save = () => {
     this.blocks.map(e => this.syncBlock(e.id))
   }
+
+  
 
   componentWillLoad = () => {
     
@@ -163,11 +177,12 @@ export class COEditor {
     // this.syncBlock(this.blockActiveId)
   }
 
+  
   componentDidLoad = () => {
     menu = new MDCMenu(document.querySelector('.context_menu'))
     toolbar = new MDCMenu(document.querySelector('.editorToolbar'))
   }
-
+  
 
   renderToolbar = () => {
     return <div class="editorToolbar mdc-menu mdc-menu-surface">
@@ -220,51 +235,97 @@ export class COEditor {
     // <div class='block' draggable={true} onDragOver={event => this.allowDrop(event)} onDrop={event => this.drop(event)} onDragStart = {this.drag} onMouseDown={() => this.currentBlock = block}></div>
     return (
       <div>
-        {this.blocks.map(block => (
-          <div class="block">
-            <button class="mdc-icon-button material-icons ghost" onClick={ e => this.handleOpenToolbar(e,block)}>menu</button>
-            {this.renderBlock(block)}
-            <button class="mdc-icon-button material-icons ghost">more_vert</button>
+        <aside class="mdc-drawer mdc-drawer--dismissible mdc-top-app-bar--fixed-adjust">
+        <div class="mdc-drawer__header">
+            <h3 class="mdc-drawer__title">Comments</h3>
+            
           </div>
-        ))}
+            <div class="mdc-drawer__content">
+              <div class="mdc-list">
+                <span>
+                <i class="material-icons mdc-list-item__graphic" aria-hidden="true">info</i>  
+                </span>
+                <span>
+                <i class="material-icons mdc-list-item__graphic" aria-hidden="true">comment</i>  
+                </span>
+                
+              </div>
 
-        {this.renderToolbar()}
-        <button id="menu-button" class="mdc-fab app-fab--absolute" aria-label="Favorite" onClick={this.handleOpen}>
-          <span class="mdc-fab__icon material-icons" >create</span>
-        </button>
+              <div class="mdc-card demo-card demo-ui-control">
+                <div class="mdc-card__primary-action demo-card__primary-action" tabindex="0">
+                  <div class="demo-card__primary">
+                  <h3 class=" mdc-typography mdc-typography--caption">by Leonardo G. Leenen</h3>
+                    <p class=" mdc-typography mdc-typography--body2">Imagen de satélite mostrando la deforestación en una región del Mato Grosso, el estado brasileño que sufre las pérdidas recientes más graves. La deforestación en Brasil es uno de los grandes problemas ecológicos que el país enfrenta en la actualidad. Según el científico Ronaldo Hernández,</p>
+                   <span class=" mdc-typography mdc-typography--caption">24 de abril</span>
+                  </div>
+                </div>
+                <div class="mdc-card__actions">
+                  <div class="mdc-card__action-icons">
+                  <button class="mdc-icon-button material-icons mdc-card__action mdc-card__action--icon--unbounded" >comment</button>
+                  </div>
+                </div>
+              </div>
+              
+              
+            </div>
 
-        <div class="context_menu mdc-menu mdc-menu-surface ">
-          <ul class="mdc-list mdc-typography--body1" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1" >
-            <li class="mdc-list-item" role="menuitem">
-              <i class="material-icons mdc-list-item__graphic" aria-hidden="true">call_split</i>
-              <span class="mdc-list-item__text">New Version</span>
-            </li>
-            <li class="mdc-list-item" role="menuitem">
-              <i class="material-icons mdc-list-item__graphic" aria-hidden="true">merge_type</i>
-              <span class="mdc-list-item__text">Merge</span>
-            </li>
-            <li class="mdc-list-item" role="menuitem" onClick={this.save}>
-              <i class="material-icons mdc-list-item__graphic" aria-hidden="true">done</i>
-              <span class="mdc-list-item__text">Save</span>
-            </li>
-            <li class="mdc-list-item" role="menuitem">
-              <i class="material-icons mdc-list-item__graphic" aria-hidden="true">share</i>
-              <span class="mdc-list-item__text">Share</span>
-            </li>
-            <li class="mdc-list-item" role="menuitem">
-              <i class="material-icons mdc-list-item__graphic" aria-hidden="true">tune</i>
-              <span class="mdc-list-item__text">Settings</span>
-            </li>
-            <li class="mdc-list-item" role="menuitem">
-              <i class="material-icons mdc-list-item__graphic" aria-hidden="true">swap_vert</i>
-              <span class="mdc-list-item__text">Change Perspective</span>
-            </li>
-            <li class="mdc-list-item" role="menuitem">
-              <i class="material-icons mdc-list-item__graphic" aria-hidden="true">publish</i>
-              <span class="mdc-list-item__text">Publish</span>
-            </li>
-          </ul>
-        </div>
+          </aside>
+
+          <div class="mdc-drawer-app-content mdc-top-app-bar--fixed-adjust ">
+            <main class="main-content" id="main-content">
+            {this.blocks.map(block => (
+                  <div class="block">
+                    <button class="mdc-icon-button material-icons ghost" onClick={ e => this.handleOpenToolbar(e,block)}>menu</button>
+                    {this.renderBlock(block)}
+                    <button class="mdc-icon-button material-icons ghost"   onClick={this.handleDrawer} id="app-bar">
+                      <a  class="demo-menu material-icons mdc-top-app-bar__navigation-icon">menu</a>
+                    </button>
+                  </div>
+            ))}
+
+                
+
+                {this.renderToolbar()}
+                <button id="menu-button" class="mdc-fab app-fab--absolute" aria-label="Favorite" onClick={this.handleOpen}>
+                  <span class="mdc-fab__icon material-icons" >create</span>
+                </button>
+
+                <div class="context_menu mdc-menu mdc-menu-surface ">
+                  <ul class="mdc-list mdc-typography--body1" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1" >
+                    <li class="mdc-list-item" role="menuitem">
+                      <i class="material-icons mdc-list-item__graphic" aria-hidden="true">call_split</i>
+                      <span class="mdc-list-item__text">New Version</span>
+                    </li>
+                    <li class="mdc-list-item" role="menuitem">
+                      <i class="material-icons mdc-list-item__graphic" aria-hidden="true">merge_type</i>
+                      <span class="mdc-list-item__text">Merge</span>
+                    </li>
+                    <li class="mdc-list-item" role="menuitem" onClick={this.save}>
+                      <i class="material-icons mdc-list-item__graphic" aria-hidden="true">done</i>
+                      <span class="mdc-list-item__text">Save</span>
+                    </li>
+                    <li class="mdc-list-item" role="menuitem">
+                      <i class="material-icons mdc-list-item__graphic" aria-hidden="true">share</i>
+                      <span class="mdc-list-item__text">Share</span>
+                    </li>
+                    <li class="mdc-list-item" role="menuitem">
+                      <i class="material-icons mdc-list-item__graphic" aria-hidden="true">tune</i>
+                      <span class="mdc-list-item__text">Settings</span>
+                    </li>
+                    <li class="mdc-list-item" role="menuitem">
+                      <i class="material-icons mdc-list-item__graphic" aria-hidden="true">swap_vert</i>
+                      <span class="mdc-list-item__text">Change Perspective</span>
+                    </li>
+                    <li class="mdc-list-item" role="menuitem">
+                      <i class="material-icons mdc-list-item__graphic" aria-hidden="true">publish</i>
+                      <span class="mdc-list-item__text">Publish</span>
+                    </li>
+                  </ul>
+                </div>
+            </main>
+          </div>
+      
+         
 
       </div>)
   }
