@@ -15,6 +15,10 @@ export class COTitle1 {
         this.activeBlock.emit(this.block_id)
     }
     render() {
-        return <div class='mdc-typography--headline1' contenteditable='true' onClick={this.activeFocusHandler}>{this.content}</div>
+        return <div 
+            id={"CO-ELID-" + this.block_id} 
+            class='mdc-typography--headline1' 
+            contenteditable='true' 
+            onClick={this.activeFocusHandler}>{this.content}</div>
     }
 }

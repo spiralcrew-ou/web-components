@@ -1,6 +1,7 @@
 import { Component, Prop, State, Listen } from '@stencil/core';
 import { MDCMenu } from '@material/menu';
 import { uuidv4 } from '../../utils/utils';
+import {fetchIniciative} from '../../actions'
 
 let menu = null
 let toolbar = null
@@ -21,14 +22,14 @@ export class COEditor {
   @State() currentBlock: any
 
   fixMenu = () => {
-    const menu = document.querySelector('.mdc-menu')
+    const menu = document.querySelector('.context_menu')
     const _left = window.innerWidth - menu.getBoundingClientRect().width - 50
     menu.setAttribute("style", "left: " + _left + "px");
   }
 
   handleOpen = () => {
     menu.hoistMenuToBody()
-    const el = document.querySelector('.mdc-menu')
+    const el = document.querySelector('.context_menu')
     const _x = window.innerWidth - el.getBoundingClientRect().width - 40
     const _y = window.innerHeight - el.getBoundingClientRect().height - 90
     menu.setAbsolutePosition(_x, _y)
@@ -36,6 +37,8 @@ export class COEditor {
   }
 
   handleOpenToolbar = (e,block) => {
+    console.log(e.x, e.y)
+    console.log(toolbar.open)
     this.currentBlock = block
     toolbar.hoistMenuToBody()
     toolbar.setAbsolutePosition(e.x, e.y)
@@ -49,11 +52,34 @@ export class COEditor {
     this.blocks = dummy
   }
 
-  save = () => {
+  allowDrop = ev => {
+    ev.preventDefault();
+    // console.log(ev.target.id)
+  }
 
+  drag = (ev) =>  {
+    ev.dataTransfer.setData("text", ev.target.id)
+    // console.log(ev)
+  }
+
+  
+  drop = ev =>  {
+    ev.preventDefault();
+   
+    const dummy = Object.assign([], this.blocks.filter( e => e.id !=this.currentBlock.id))
+    const index = this.blocks.findIndex(e => e.id === ev.target.attributes.id.nodeValue)
+    dummy.splice(index,0,this.currentBlock)
+    this.blocks = dummy 
+   }
+
+  save = () => {
+    this.blocks.map(e => this.syncBlock(e.id))
   }
 
   componentWillLoad = () => {
+    
+    this.blocks = fetchIniciative().documents
+    /*
     this.blocks = [{
       id: uuidv4(),
       type: 'co-title2',
@@ -95,11 +121,20 @@ export class COEditor {
       type: 'co-paragraph',
       content: `Thomas Jefferson recibió a James Madison y a Alexander Hamilton para celebrar una cena en la que acordaron que la capital del nuevo país debía estar en uno de los llamados «estados sureños». Esta decisión fue tomada a causa de las deudas de la Guerra de la Independencia6​ (los estados del sur en gran parte habían pagado sus deudas de guerra; la colectivización de la deuda era una ventaja para los estados del norte, por lo que la capital se llevó al sur). La distribución de la ciudad fue llevada a cabo en su mayor parte por el arquitecto francés Pierre Charles L'Enfant,7​ un ingeniero y urbanista que en un primer momento llegó a las colonias americanas británicas como ingeniero militar del marqués de La Fayette. L'Enfant preparó un plan básico para Washington D. C. en 1791; edificando la ciudad en el estilo Barroco, que era el estilo dominante en muchas de las ciudades que se planificaron en la época en Europa y en Estados Unidos. `
     },
-    ]
+    ]*/
+  }
+
+  syncBlock = blockId => {
+    console.log('CO-ELID-' + blockId)
+    const dummy = Object.assign([], this.blocks)
+    const index = this.blocks.findIndex(e => e.id ===  blockId)
+    dummy[index].content= document.getElementById('CO-ELID-' + blockId).innerHTML
+    this.blocks = dummy
   }
 
   @Listen('keydown')
   handleKeyDown(ev: KeyboardEvent) {
+    console.log(ev.key)
     const newLine = {
       id: uuidv4(),
       type: 'co-paragraph',
@@ -112,30 +147,30 @@ export class COEditor {
       dummy[index].content.replace(/\n/g, '')
       dummy.splice(index + 1, 0, newLine)
       this.blocks = dummy
-      ev.preventDefault()
+      // ev.preventDefault()
     }
 
     if ((ev.key === 'Backspace') && (document.getElementById('CO-ELID-' + this.blockActiveId).innerHTML.length <= 1)) {
       const dummy = Object.assign([], this.blocks)
       this.blocks = dummy.filter(e => e.id != this.blockActiveId)
     }
-
   }
 
   @Listen('activeBlock')
   handleBlockActive(ev: CustomEvent) {
 
     this.blockActiveId = ev.detail
+    // this.syncBlock(this.blockActiveId)
   }
 
   componentDidLoad = () => {
-    menu = new MDCMenu(document.querySelector('.mdc-menu'))
+    menu = new MDCMenu(document.querySelector('.context_menu'))
     toolbar = new MDCMenu(document.querySelector('.editorToolbar'))
   }
 
 
   renderToolbar = () => {
-    return <div class="editorToolbar mdc-menu mdc-menu-surface ">
+    return <div class="editorToolbar mdc-menu mdc-menu-surface">
       <ul class="mdc-list mdc-typography--body1" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1" >
         <li class="mdc-list-item" role="menuitem" onClick={ () => this.changeFormat('co-title1')}>
           <i class="material-icons mdc-list-item__graphic" aria-hidden="true">format_size</i>
@@ -181,10 +216,12 @@ export class COEditor {
   }
 
   render() {
+
+    // <div class='block' draggable={true} onDragOver={event => this.allowDrop(event)} onDrop={event => this.drop(event)} onDragStart = {this.drag} onMouseDown={() => this.currentBlock = block}></div>
     return (
       <div>
         {this.blocks.map(block => (
-          <div class='block'>
+          <div class="block">
             <button class="mdc-icon-button material-icons ghost" onClick={ e => this.handleOpenToolbar(e,block)}>menu</button>
             {this.renderBlock(block)}
             <button class="mdc-icon-button material-icons ghost">more_vert</button>
@@ -196,7 +233,7 @@ export class COEditor {
           <span class="mdc-fab__icon material-icons" >create</span>
         </button>
 
-        <div class="mdc-menu mdc-menu-surface ">
+        <div class="context_menu mdc-menu mdc-menu-surface ">
           <ul class="mdc-list mdc-typography--body1" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1" >
             <li class="mdc-list-item" role="menuitem">
               <i class="material-icons mdc-list-item__graphic" aria-hidden="true">call_split</i>
