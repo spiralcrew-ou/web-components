@@ -1,0 +1,29 @@
+@import "@material/fab/mdc-fab";
+@import "@material/typography/mdc-typography";
+@import "../../globals/variables.scss";
+@import "@material/icon-button/mdc-icon-button";
+@import "@material/textfield/mdc-text-field";
+
+.app-fab--absolute {
+  position: fixed;
+  bottom: 33px;
+  margin:auto;
+  color:#ee001f;
+  border-radius: 4px;
+  border: 1px solid #0000001f;
+  background: transparent;
+  margin: auto 33%;
+
+}
+.content{
+    padding-left: 28px;
+    padding-right: 28px;
+    margin-top: 160px;
+}
+
+@media(min-width: 1024px) {
+   .app-fab--absolute {
+    bottom: 1.5rem;
+    right: 1.5rem;
+  }
+}
