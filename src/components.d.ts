@@ -62,6 +62,9 @@ export namespace Components {
     'sharedWithMe'?: boolean;
   }
 
+  interface CoNewPerspective {}
+  interface CoNewPerspectiveAttributes extends StencilHTMLAttributes {}
+
   interface CoNotificationBadge {}
   interface CoNotificationBadgeAttributes extends StencilHTMLAttributes {}
 
@@ -168,6 +171,7 @@ declare global {
     'CoEditor': Components.CoEditor;
     'CoIniciativeCard': Components.CoIniciativeCard;
     'CoIniciativeList': Components.CoIniciativeList;
+    'CoNewPerspective': Components.CoNewPerspective;
     'CoNotificationBadge': Components.CoNotificationBadge;
     'CoNotificationItem': Components.CoNotificationItem;
     'CoParagraph': Components.CoParagraph;
@@ -183,6 +187,7 @@ declare global {
     'co-editor': Components.CoEditorAttributes;
     'co-iniciative-card': Components.CoIniciativeCardAttributes;
     'co-iniciative-list': Components.CoIniciativeListAttributes;
+    'co-new-perspective': Components.CoNewPerspectiveAttributes;
     'co-notification-badge': Components.CoNotificationBadgeAttributes;
     'co-notification-item': Components.CoNotificationItemAttributes;
     'co-paragraph': Components.CoParagraphAttributes;
@@ -216,6 +221,12 @@ declare global {
   var HTMLCoIniciativeListElement: {
     prototype: HTMLCoIniciativeListElement;
     new (): HTMLCoIniciativeListElement;
+  };
+
+  interface HTMLCoNewPerspectiveElement extends Components.CoNewPerspective, HTMLStencilElement {}
+  var HTMLCoNewPerspectiveElement: {
+    prototype: HTMLCoNewPerspectiveElement;
+    new (): HTMLCoNewPerspectiveElement;
   };
 
   interface HTMLCoNotificationBadgeElement extends Components.CoNotificationBadge, HTMLStencilElement {}
@@ -271,6 +282,7 @@ declare global {
     'co-editor': HTMLCoEditorElement
     'co-iniciative-card': HTMLCoIniciativeCardElement
     'co-iniciative-list': HTMLCoIniciativeListElement
+    'co-new-perspective': HTMLCoNewPerspectiveElement
     'co-notification-badge': HTMLCoNotificationBadgeElement
     'co-notification-item': HTMLCoNotificationItemElement
     'co-paragraph': HTMLCoParagraphElement
@@ -286,6 +298,7 @@ declare global {
     'co-editor': HTMLCoEditorElement;
     'co-iniciative-card': HTMLCoIniciativeCardElement;
     'co-iniciative-list': HTMLCoIniciativeListElement;
+    'co-new-perspective': HTMLCoNewPerspectiveElement;
     'co-notification-badge': HTMLCoNotificationBadgeElement;
     'co-notification-item': HTMLCoNotificationItemElement;
     'co-paragraph': HTMLCoParagraphElement;

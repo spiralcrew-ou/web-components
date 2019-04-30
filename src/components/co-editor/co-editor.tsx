@@ -2,12 +2,10 @@ import { Component, Prop, State, Listen } from '@stencil/core';
 import { MDCMenu } from '@material/menu';
 import { uuidv4 } from '../../utils/utils';
 import {fetchIniciative} from '../../actions';
-import {MDCTopAppBar} from "@material/top-app-bar";
-import {MDCDrawer} from "@material/drawer";
-
 
 let menu = null
 let toolbar = null
+let toolbarRight =null
 
 
 @Component({
@@ -29,15 +27,18 @@ export class COEditor {
     const _left = window.innerWidth - menu.getBoundingClientRect().width - 50
     menu.setAttribute("style", "left: " + _left + "px");
   }
-  handleDrawer =() =>{
-    const drawer = MDCDrawer.attachTo(document.querySelector('.mdc-drawer'));
-    const topAppBar = MDCTopAppBar.attachTo(document.getElementById('app-bar'));
-    topAppBar.setScrollTarget(document.getElementById('main-content'));
-    topAppBar.listen('MDCTopAppBar:nav', () => {
-    drawer.open = !drawer.open;
-    });
+
+
+  handleOpenToolbarRight = (e,block) => {
+    console.log(e.x, e.y)
+    console.log(toolbarRight.open)
+    this.currentBlock = block
+    toolbarRight.hoistMenuToBody()
+    toolbarRight.setAbsolutePosition(e.x, e.y)
+    toolbarRight.open = !toolbarRight.open
   }
 
+ 
 
   handleOpen = () => {
     menu.hoistMenuToBody()
@@ -48,6 +49,7 @@ export class COEditor {
     menu.open = !menu.open
   }
 
+
   handleOpenToolbar = (e,block) => {
     console.log(e.x, e.y)
     console.log(toolbar.open)
@@ -55,6 +57,15 @@ export class COEditor {
     toolbar.hoistMenuToBody()
     toolbar.setAbsolutePosition(e.x, e.y)
     toolbar.open = !toolbar.open
+  }
+
+  handleMenuRight= () => {
+    menu.hoistMenuToBody()
+    const el = document.querySelector('.context_menu')
+    const _x = window.innerWidth - el.getBoundingClientRect().width - 40
+    const _y = window.innerHeight - el.getBoundingClientRect().height - 90
+    menu.setAbsolutePosition(_x, _y)
+    menu.open = !menu.open
   }
 
   changeFormat = (newType) => {
@@ -181,31 +192,50 @@ export class COEditor {
   componentDidLoad = () => {
     menu = new MDCMenu(document.querySelector('.context_menu'))
     toolbar = new MDCMenu(document.querySelector('.editorToolbar'))
+    toolbarRight = new MDCMenu(document.querySelector('.editorToolbarRight'))
   }
   
 
   renderToolbar = () => {
-    return <div class="editorToolbar mdc-menu mdc-menu-surface">
+    return <div class="editorToolbar mdc-menu mdc-menu-surface" >
       <ul class="mdc-list mdc-typography--body1" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1" >
         <li class="mdc-list-item" role="menuitem" onClick={ () => this.changeFormat('co-title1')}>
-          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">format_size</i>
           <span class="mdc-list-item__text">Title1</span>
         </li>
         <li class="mdc-list-item" role="menuitem" onClick={ () => this.changeFormat('co-title2')}>
-          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">format_size</i>
           <span class="mdc-list-item__text">Title2</span>
         </li>
         <li class="mdc-list-item" role="menuitem" onClick={ () => this.changeFormat('co-subtitle1')}>
-          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">format_size</i>
           <span class="mdc-list-item__text">Subtitle1</span>
         </li>
         <li class="mdc-list-item" role="menuitem" onClick={ () => this.changeFormat('co-subtitle2')}>
-          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">format_size</i>
           <span class="mdc-list-item__text">Subtitle2</span>
         </li>
         <li class="mdc-list-item" role="menuitem" onClick={ () => this.changeFormat('co-paragraph')}>
-          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">format_textdirection_l_to_r</i>
           <span class="mdc-list-item__text">Paragraph</span>
+        </li>
+      </ul>
+    </div>
+  }
+
+  renderToolbarRight = () => {
+    return <div class="editorToolbarRight mdc-menu mdc-menu-surface" >
+      <ul class="mdc-list mdc-typography--body1" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1" >
+         <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
+            New Version
+            <i class="mdc-list-item__meta material-icons " aria-hidden="true">call_split</i>
+        </li>
+        <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
+           Merge
+          <i class="mdc-list-item__meta material-icons " aria-hidden="true">merge_type</i>
+        </li>
+        <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
+          Change Perspective
+          <i class="mdc-list-item__meta material-icons " aria-hidden="true">swap_vert</i>
+        </li>
+        <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
+          Comments
+          <i class="mdc-list-item__meta material-icons " aria-hidden="true">comment</i>
         </li>
       </ul>
     </div>
@@ -235,55 +265,20 @@ export class COEditor {
     // <div class='block' draggable={true} onDragOver={event => this.allowDrop(event)} onDrop={event => this.drop(event)} onDragStart = {this.drag} onMouseDown={() => this.currentBlock = block}></div>
     return (
       <div>
-        <aside class="mdc-drawer mdc-drawer--dismissible mdc-top-app-bar--fixed-adjust">
-        <div class="mdc-drawer__header">
-            <h3 class="mdc-drawer__title">Comments</h3>
-            
-          </div>
-            <div class="mdc-drawer__content">
-              <div class="mdc-list">
-                <span>
-                <i class="material-icons mdc-list-item__graphic" aria-hidden="true">info</i>  
-                </span>
-                <span>
-                <i class="material-icons mdc-list-item__graphic" aria-hidden="true">comment</i>  
-                </span>
-                
-              </div>
-
-              <div class="mdc-card demo-card demo-ui-control">
-                <div class="mdc-card__primary-action demo-card__primary-action" tabindex="0">
-                  <div class="demo-card__primary">
-                  <h3 class=" mdc-typography mdc-typography--caption">by Leonardo G. Leenen</h3>
-                    <p class=" mdc-typography mdc-typography--body2">Imagen de satélite mostrando la deforestación en una región del Mato Grosso, el estado brasileño que sufre las pérdidas recientes más graves. La deforestación en Brasil es uno de los grandes problemas ecológicos que el país enfrenta en la actualidad. Según el científico Ronaldo Hernández,</p>
-                   <span class=" mdc-typography mdc-typography--caption">24 de abril</span>
-                  </div>
-                </div>
-                <div class="mdc-card__actions">
-                  <div class="mdc-card__action-icons">
-                  <button class="mdc-icon-button material-icons mdc-card__action mdc-card__action--icon--unbounded" >comment</button>
-                  </div>
-                </div>
-              </div>
-              
-              
-            </div>
-
-          </aside>
-
-          <div class="mdc-drawer-app-content mdc-top-app-bar--fixed-adjust ">
-            <main class="main-content" id="main-content">
+        <main class="main-content" id="main-content">
             {this.blocks.map(block => (
                   <div class="block">
-                    <button class="mdc-icon-button material-icons ghost" onClick={ e => this.handleOpenToolbar(e,block)}>menu</button>
+                    <button class="mdc-icon-button material-icons ghost" onClick={ e => this.handleOpenToolbar(e,block)}>format_size</button>
                     {this.renderBlock(block)}
-                    <button class="mdc-icon-button material-icons ghost"   onClick={this.handleDrawer} id="app-bar">
-                      <a  class="demo-menu material-icons mdc-top-app-bar__navigation-icon">menu</a>
+                    <button class="mdc-icon-button material-icons ghost" onClick={ e => this.handleOpenToolbarRight(e,block)} >
+                      <a  class="demo-menu material-icons mdc-top-app-bar__navigation-icon">more_vert</a>
                     </button>
+                    
                   </div>
             ))}
 
-                
+
+{this.renderToolbarRight()}
 
                 {this.renderToolbar()}
                 <button id="menu-button" class="mdc-fab app-fab--absolute" aria-label="Favorite" onClick={this.handleOpen}>
@@ -292,38 +287,47 @@ export class COEditor {
 
                 <div class="context_menu mdc-menu mdc-menu-surface ">
                   <ul class="mdc-list mdc-typography--body1" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1" >
-                    <li class="mdc-list-item" role="menuitem">
-                      <i class="material-icons mdc-list-item__graphic" aria-hidden="true">call_split</i>
-                      <span class="mdc-list-item__text">New Version</span>
+                    <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
+                     New Version
+                      <i class="mdc-list-item__meta material-icons " aria-hidden="true">call_split</i>
                     </li>
-                    <li class="mdc-list-item" role="menuitem">
-                      <i class="material-icons mdc-list-item__graphic" aria-hidden="true">merge_type</i>
-                      <span class="mdc-list-item__text">Merge</span>
+                    <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
+                    Merge
+                      <i class="mdc-list-item__meta material-icons " aria-hidden="true">merge_type</i>
                     </li>
-                    <li class="mdc-list-item" role="menuitem" onClick={this.save}>
-                      <i class="material-icons mdc-list-item__graphic" aria-hidden="true">done</i>
-                      <span class="mdc-list-item__text">Save</span>
+                    <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
+                    Save
+                      <i class="mdc-list-item__meta material-icons " aria-hidden="true">done</i>
                     </li>
-                    <li class="mdc-list-item" role="menuitem">
-                      <i class="material-icons mdc-list-item__graphic" aria-hidden="true">share</i>
-                      <span class="mdc-list-item__text">Share</span>
+                    <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
+                   Share
+                      <i class="mdc-list-item__meta material-icons " aria-hidden="true">share</i>
                     </li>
-                    <li class="mdc-list-item" role="menuitem">
-                      <i class="material-icons mdc-list-item__graphic" aria-hidden="true">tune</i>
-                      <span class="mdc-list-item__text">Settings</span>
+                    <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
+                   Settings
+                      <i class="mdc-list-item__meta material-icons " aria-hidden="true">tune</i>
                     </li>
-                    <li class="mdc-list-item" role="menuitem">
-                      <i class="material-icons mdc-list-item__graphic" aria-hidden="true">swap_vert</i>
-                      <span class="mdc-list-item__text">Change Perspective</span>
+                    <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
+                   Change Perspective
+                      <i class="mdc-list-item__meta material-icons " aria-hidden="true">swap_vert</i>
                     </li>
-                    <li class="mdc-list-item" role="menuitem">
-                      <i class="material-icons mdc-list-item__graphic" aria-hidden="true">publish</i>
-                      <span class="mdc-list-item__text">Publish</span>
+                    <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
+                   Comments
+                      <i class="mdc-list-item__meta material-icons " aria-hidden="true">comment</i>
                     </li>
+                    <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
+                   Publish
+                      <i class="mdc-list-item__meta material-icons " aria-hidden="true">cloud_upload</i>
+                    </li>
+                    
                   </ul>
                 </div>
+
+
+
+              
             </main>
-          </div>
+        
       
          
 
