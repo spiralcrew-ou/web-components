@@ -19,6 +19,12 @@ export namespace Components {
   }
   interface CoAppAttributes extends StencilHTMLAttributes {}
 
+  interface CoCommentCard {}
+  interface CoCommentCardAttributes extends StencilHTMLAttributes {}
+
+  interface CoCommentList {}
+  interface CoCommentListAttributes extends StencilHTMLAttributes {}
+
   interface CoEditor {
     'documentId': string;
     'iniciativeId': string;
@@ -168,6 +174,8 @@ export namespace Components {
 declare global {
   interface StencilElementInterfaces {
     'CoApp': Components.CoApp;
+    'CoCommentCard': Components.CoCommentCard;
+    'CoCommentList': Components.CoCommentList;
     'CoEditor': Components.CoEditor;
     'CoIniciativeCard': Components.CoIniciativeCard;
     'CoIniciativeList': Components.CoIniciativeList;
@@ -184,6 +192,8 @@ declare global {
 
   interface StencilIntrinsicElements {
     'co-app': Components.CoAppAttributes;
+    'co-comment-card': Components.CoCommentCardAttributes;
+    'co-comment-list': Components.CoCommentListAttributes;
     'co-editor': Components.CoEditorAttributes;
     'co-iniciative-card': Components.CoIniciativeCardAttributes;
     'co-iniciative-list': Components.CoIniciativeListAttributes;
@@ -203,6 +213,18 @@ declare global {
   var HTMLCoAppElement: {
     prototype: HTMLCoAppElement;
     new (): HTMLCoAppElement;
+  };
+
+  interface HTMLCoCommentCardElement extends Components.CoCommentCard, HTMLStencilElement {}
+  var HTMLCoCommentCardElement: {
+    prototype: HTMLCoCommentCardElement;
+    new (): HTMLCoCommentCardElement;
+  };
+
+  interface HTMLCoCommentListElement extends Components.CoCommentList, HTMLStencilElement {}
+  var HTMLCoCommentListElement: {
+    prototype: HTMLCoCommentListElement;
+    new (): HTMLCoCommentListElement;
   };
 
   interface HTMLCoEditorElement extends Components.CoEditor, HTMLStencilElement {}
@@ -279,6 +301,8 @@ declare global {
 
   interface HTMLElementTagNameMap {
     'co-app': HTMLCoAppElement
+    'co-comment-card': HTMLCoCommentCardElement
+    'co-comment-list': HTMLCoCommentListElement
     'co-editor': HTMLCoEditorElement
     'co-iniciative-card': HTMLCoIniciativeCardElement
     'co-iniciative-list': HTMLCoIniciativeListElement
@@ -295,6 +319,8 @@ declare global {
 
   interface ElementTagNameMap {
     'co-app': HTMLCoAppElement;
+    'co-comment-card': HTMLCoCommentCardElement;
+    'co-comment-list': HTMLCoCommentListElement;
     'co-editor': HTMLCoEditorElement;
     'co-iniciative-card': HTMLCoIniciativeCardElement;
     'co-iniciative-list': HTMLCoIniciativeListElement;
