@@ -18,6 +18,18 @@ const  initialState = {
     iniciatives: {
         settings: {},
         list:[]
+    },
+    activeProcess: {
+        processId: ''
+    }
+}
+
+export const handleProcess = (state={...initialState.activeProcess},action) => {
+    switch(action.type){
+        case 'NEW_PERSPECTIVE':
+            return {...state, action.processId} 
+        default:
+            return state
     }
 }
 
@@ -74,7 +86,8 @@ const reducers = combineReducers({
     loggedUser: userReducer,
     settings: settingsReducer,
     notifications: notificationsReducer,
-    iniciatives: iniciativesReducer
+    iniciatives: iniciativesReducer,
+    coHandleProcess: handleProcess
 })
 
 
