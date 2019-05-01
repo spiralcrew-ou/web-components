@@ -2,7 +2,6 @@ import { createStore, applyMiddleware, compose } from 'redux'
 import { combineReducers } from 'redux'
 import thunk from 'redux-thunk'; // Add-on you might want
 import logger from 'redux-logger'; // Add-on you might want
-import { debug } from 'util';
 
 const composeEnhancer = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
@@ -27,7 +26,7 @@ const  initialState = {
 export const handleProcess = (state={...initialState.activeProcess},action) => {
     switch(action.type){
         case 'NEW_PERSPECTIVE':
-            return {...state, action.processId} 
+            return {...state, ...action.processId } 
         default:
             return state
     }

@@ -1,12 +1,12 @@
 import { Component, Prop, State, Listen } from '@stencil/core';
 import { MDCMenu } from '@material/menu';
 import { uuidv4 } from '../../utils/utils';
-import {fetchIniciative} from '../../actions';
-import {Store} from '@stencil/redux';
+import { fetchIniciative } from '../../actions';
+import { Store } from '@stencil/redux';
 
 let menu = null
 let toolbar = null
-let toolbarRight =null
+let toolbarRight = null
 
 
 @Component({
@@ -15,7 +15,7 @@ let toolbarRight =null
   shadow: false
 })
 export class COEditor {
-  @Prop({context: 'store'}) store: Store
+  @Prop({ context: 'store' }) store: Store
   @Prop() iniciativeId: string
   @Prop() documentId: string
   @Prop() revision: string = 'draft'
@@ -33,6 +33,12 @@ export class COEditor {
     })
   }
 
+  componentDidLoad = () => {
+    menu = new MDCMenu(document.querySelector('.context_menu'))
+    toolbar = new MDCMenu(document.querySelector('.editorToolbar'))
+    toolbarRight = new MDCMenu(document.querySelector('.editorToolbarRight'))
+  }
+
   fixMenu = () => {
     const menu = document.querySelector('.context_menu')
     const _left = window.innerWidth - menu.getBoundingClientRect().width - 50
@@ -40,7 +46,7 @@ export class COEditor {
   }
 
 
-  handleOpenToolbarRight = (e,block) => {
+  handleOpenToolbarRight = (e, block) => {
     console.log(e.x, e.y)
     console.log(toolbarRight.open)
     this.currentBlock = block
@@ -49,7 +55,7 @@ export class COEditor {
     toolbarRight.open = !toolbarRight.open
   }
 
- 
+
 
   handleOpen = () => {
     menu.hoistMenuToBody()
@@ -61,7 +67,7 @@ export class COEditor {
   }
 
 
-  handleOpenToolbar = (e,block) => {
+  handleOpenToolbar = (e, block) => {
     console.log(e.x, e.y)
     console.log(toolbar.open)
     this.currentBlock = block
@@ -70,7 +76,7 @@ export class COEditor {
     toolbar.open = !toolbar.open
   }
 
-  handleMenuRight= () => {
+  handleMenuRight = () => {
     menu.hoistMenuToBody()
     const el = document.querySelector('.context_menu')
     const _x = window.innerWidth - el.getBoundingClientRect().width - 40
@@ -91,32 +97,33 @@ export class COEditor {
     // console.log(ev.target.id)
   }
 
-  drag = (ev) =>  {
+  drag = (ev) => {
     ev.dataTransfer.setData("text", ev.target.id)
     // console.log(ev)
   }
 
-  
-  drop = ev =>  {
+
+  drop = ev => {
     ev.preventDefault();
-   
-    const dummy = Object.assign([], this.blocks.filter( e => e.id !=this.currentBlock.id))
+
+    const dummy = Object.assign([], this.blocks.filter(e => e.id != this.currentBlock.id))
     const index = this.blocks.findIndex(e => e.id === ev.target.attributes.id.nodeValue)
-    dummy.splice(index,0,this.currentBlock)
-    this.blocks = dummy 
-   }
+    dummy.splice(index, 0, this.currentBlock)
+    this.blocks = dummy
+  }
 
   save = () => {
     this.blocks.map(e => this.syncBlock(e.id))
+    console.log('Save')
   }
 
-  
+
 
   syncBlock = blockId => {
     console.log('CO-ELID-' + blockId)
     const dummy = Object.assign([], this.blocks)
-    const index = this.blocks.findIndex(e => e.id ===  blockId)
-    dummy[index].content= document.getElementById('CO-ELID-' + blockId).innerHTML
+    const index = this.blocks.findIndex(e => e.id === blockId)
+    dummy[index].content = document.getElementById('CO-ELID-' + blockId).innerHTML
     this.blocks = dummy
   }
 
@@ -151,32 +158,23 @@ export class COEditor {
     // this.syncBlock(this.blockActiveId)
   }
 
-  
-  componentDidLoad = () => {
-    menu = new MDCMenu(document.querySelector('.context_menu'))
-    toolbar = new MDCMenu(document.querySelector('.editorToolbar'))
-    toolbarRight = new MDCMenu(document.querySelector('.editorToolbarRight'))
-
-    
-  }
-  
 
   renderToolbar = () => {
     return <div class="editorToolbar mdc-menu mdc-menu-surface" >
       <ul class="mdc-list mdc-typography--body1" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1" >
-        <li class="mdc-list-item" role="menuitem" onClick={ () => this.changeFormat('co-title1')}>
+        <li class="mdc-list-item" role="menuitem" onClick={() => this.changeFormat('co-title1')}>
           <span class="mdc-list-item__text">Title1</span>
         </li>
-        <li class="mdc-list-item" role="menuitem" onClick={ () => this.changeFormat('co-title2')}>
+        <li class="mdc-list-item" role="menuitem" onClick={() => this.changeFormat('co-title2')}>
           <span class="mdc-list-item__text">Title2</span>
         </li>
-        <li class="mdc-list-item" role="menuitem" onClick={ () => this.changeFormat('co-subtitle1')}>
+        <li class="mdc-list-item" role="menuitem" onClick={() => this.changeFormat('co-subtitle1')}>
           <span class="mdc-list-item__text">Subtitle1</span>
         </li>
-        <li class="mdc-list-item" role="menuitem" onClick={ () => this.changeFormat('co-subtitle2')}>
+        <li class="mdc-list-item" role="menuitem" onClick={() => this.changeFormat('co-subtitle2')}>
           <span class="mdc-list-item__text">Subtitle2</span>
         </li>
-        <li class="mdc-list-item" role="menuitem" onClick={ () => this.changeFormat('co-paragraph')}>
+        <li class="mdc-list-item" role="menuitem" onClick={() => this.changeFormat('co-paragraph')}>
           <span class="mdc-list-item__text">Paragraph</span>
         </li>
       </ul>
@@ -186,12 +184,12 @@ export class COEditor {
   renderToolbarRight = () => {
     return <div class="editorToolbarRight mdc-menu mdc-menu-surface" >
       <ul class="mdc-list mdc-typography--body1" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1" >
-         <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
-            New Version
+        <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
+          New Version
             <i class="mdc-list-item__meta material-icons " aria-hidden="true">call_split</i>
         </li>
         <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
-           Merge
+          Merge
           <i class="mdc-list-item__meta material-icons " aria-hidden="true">merge_type</i>
         </li>
         <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
@@ -235,68 +233,68 @@ export class COEditor {
     return (
       <div>
         <main class="main-content" id="main-content">
-            {this.blocks.map(block => (
-                  <div class="block">
-                    <button class="mdc-icon-button material-icons ghost" onClick={ e => this.handleOpenToolbar(e,block)}>format_size</button>
-                    {this.renderBlock(block)}
-                    <button class="mdc-icon-button material-icons ghost" onClick={ e => this.handleOpenToolbarRight(e,block)} >
-                      <a  class="demo-menu material-icons mdc-top-app-bar__navigation-icon">more_vert</a>
-                    </button>
-                    
-                  </div>
-            ))}
-            {this.renderToolbarRight()}
+          {this.blocks.map(block => (
+            <div class="block">
+              <button class="mdc-icon-button material-icons ghost" onClick={e => this.handleOpenToolbar(e, block)}>format_size</button>
+              {this.renderBlock(block)}
+              <button class="mdc-icon-button material-icons ghost" onClick={e => this.handleOpenToolbarRight(e, block)} >
+                <a class="demo-menu material-icons mdc-top-app-bar__navigation-icon">more_vert</a>
+              </button>
 
-                {this.renderToolbar()}
-                <button id="menu-button" class="mdc-fab app-fab--absolute" aria-label="Favorite" onClick={this.handleOpen}>
-                  <span class="mdc-fab__icon material-icons" >create</span>
-                </button>
+            </div>
+          ))}
+          {this.renderToolbarRight()}
 
-                <div class="context_menu mdc-menu mdc-menu-surface ">
-                  <ul class="mdc-list mdc-typography--body1" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1" >
-                    <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
-                     New perspective
+          {this.renderToolbar()}
+          <button id="menu-button" class="mdc-fab app-fab--absolute" aria-label="Favorite" onClick={this.handleOpen}>
+            <span class="mdc-fab__icon material-icons" >create</span>
+          </button>
+
+          <div class="context_menu mdc-menu mdc-menu-surface ">
+            <ul class="mdc-list mdc-typography--body1" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1" >
+              <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
+                New perspective
                       <i class="mdc-list-item__meta material-icons " aria-hidden="true">call_split</i>
-                    </li>
-                    <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
-                    Merge
+              </li>
+              <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
+                Merge
                       <i class="mdc-list-item__meta material-icons " aria-hidden="true">merge_type</i>
-                    </li>
-                    <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
-                    Save
+              </li>
+              <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem" onClick={this.save}>
+                Save
                       <i class="mdc-list-item__meta material-icons " aria-hidden="true">done</i>
-                    </li>
-                    <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
-                   Share
+              </li>
+              <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
+                Share
                       <i class="mdc-list-item__meta material-icons " aria-hidden="true">share</i>
-                    </li>
-                    <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
-                   Settings
+              </li>
+              <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
+                Settings
                       <i class="mdc-list-item__meta material-icons " aria-hidden="true">tune</i>
-                    </li>
-                    <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
-                   Change Perspective
+              </li>
+              <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
+                Change Perspective
                       <i class="mdc-list-item__meta material-icons " aria-hidden="true">swap_vert</i>
-                    </li>
-                    <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
-                   Comments
+              </li>
+              <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
+                Comments
                       <i class="mdc-list-item__meta material-icons " aria-hidden="true">comment</i>
-                    </li>
-                    <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
-                   Publish
+              </li>
+              <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
+                Publish
                       <i class="mdc-list-item__meta material-icons " aria-hidden="true">cloud_upload</i>
-                    </li>
-                    
-                  </ul>
-                </div>
+              </li>
+
+            </ul>
+          </div>
 
 
 
-              
-            </main>
-        
-      
-         
+
+        </main>
+
+
+
 
       </div>)
   }
