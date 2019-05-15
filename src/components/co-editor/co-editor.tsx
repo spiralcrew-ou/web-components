@@ -1,14 +1,14 @@
 import { Component, Prop, State, Listen } from '@stencil/core';
 import { MDCMenu } from '@material/menu';
-// import { uuidv4 } from '../../utils/utils';
-// import { fetchIniciative } from '../../actions';
-import {createEmptyContext, createCommit} from '../../main_functions';
-import { Store,Action } from '@stencil/redux';
-import {callNewPerspective} from '../../actions';
+import { Store, Action } from '@stencil/redux';
+import { callNewPerspective } from '../../actions';
+import { createEmptyContext, updateContent } from '../../globals/database';
+import { MDCDialog } from '@material/dialog';
 
 let menu = null
 let toolbar = null
 let toolbarRight = null
+let dialogNewPerspective = null
 
 
 @Component({
@@ -18,39 +18,58 @@ let toolbarRight = null
 })
 export class COEditor {
   @Prop({ context: 'store' }) store: Store
-  @Prop() iniciativeId: string
-  @Prop() documentId: string
-  @Prop() revision: string = 'draft'
   @State() blocks = []
+  @Prop() mainContextId: string
   @State() blockActiveId: string
   @State() currentBlock: any
   @State() lastCall: string
+  @State() rootDocument: any = null
+
 
   dispatchCallNewPerspective: Action
 
-  componentWillLoad = () => {
+  async componentWillLoad() {
     // this.blocks = fetchIniciative().documents
+    if (!this.rootDocument) {
+      this.rootDocument = await createEmptyContext('peterparker', 'This is the first context of document')
+      const first_block = await createEmptyContext('peterparker', 'First block')
+      this.rootDocument.context.perspectives.push(first_block.perspective)
+    }
     this.blocks = []
-    this.blocks.push(createEmptyContext())
-    console.log(this.blocks)
+
     this.store.mapStateToProps(this, state => {
       return {
-        lastCall: state.coLastCall.callData ? state.coLastCall.callData.callId  : ''
+        lastCall: state.coLastCall.callData ? state.coLastCall.callData.callId : ''
       }
     })
-    this.store.mapDispatchToProps(this,{
-      dispatchCallNewPerspective:  callNewPerspective
+    this.store.mapDispatchToProps(this, {
+      dispatchCallNewPerspective: callNewPerspective
     })
   }
 
   componentDidLoad = () => {
     menu = new MDCMenu(document.querySelector('.context_menu'))
     toolbar = new MDCMenu(document.querySelector('.editorToolbar'))
+    toolbar.hoistMenuToBody()
     toolbarRight = new MDCMenu(document.querySelector('.editorToolbarRight'))
-  }
+    toolbarRight.hoistMenuToBody()
+    dialogNewPerspective = new MDCDialog(document.querySelector('.dialog-new-perspective'));
 
-  componentDidUpdate = () => {
-    console.log(this.blocks)
+    document.body.addEventListener('keydown', ev => {
+      if (ev.key === 'Enter') {
+        ev.preventDefault()
+        createEmptyContext('peterparker', 'Another block').then(newBlock => {
+          const doc = this.rootDocument
+          doc.context.perspectives.push(newBlock.perspective)
+          this.rootDocument = Object.assign({}, doc)
+        })
+      }
+
+      if ((ev.key === 'Backspace') && (document.getElementById(this.blockActiveId).innerHTML.length <= 1)) {
+        const dummy = Object.assign([], this.blocks)
+        this.blocks = dummy.filter(e => e.id != this.blockActiveId)
+      }
+    })
   }
 
   fixMenu = () => {
@@ -60,12 +79,13 @@ export class COEditor {
   }
 
 
-  handleOpenToolbarRight = (e, block) => {
-    console.log(e.x, e.y)
-    console.log(toolbarRight.open)
+  handleOpenToolbarRight = (block) => {
+
     this.currentBlock = block
-    toolbarRight.hoistMenuToBody()
-    toolbarRight.setAbsolutePosition(e.x, e.y)
+    const el = document.querySelector('.editorToolbarRight')
+    const _x = window.innerWidth - el.getBoundingClientRect().width - 40
+    const _y = window.innerHeight - el.getBoundingClientRect().height - 90
+    toolbarRight.setAbsolutePosition(_x, _y)
     toolbarRight.open = !toolbarRight.open
   }
 
@@ -81,21 +101,26 @@ export class COEditor {
   }
 
 
-  handleOpenToolbar = (e, block) => {
+  handleOpenToolbar = (block) => {
     this.currentBlock = block
-    toolbar.hoistMenuToBody()
-    toolbar.setAbsolutePosition(e.x, e.y)
+    
+    const el = document.querySelector('.editorToolbar')
+    const _x = window.innerWidth - el.getBoundingClientRect().width - 40
+    const _y = window.innerHeight - el.getBoundingClientRect().height - 90
+    toolbar.setAbsolutePosition(_x, _y)
     toolbar.open = !toolbar.open
   }
 
-  handleMenuRight = () => {
-    menu.hoistMenuToBody()
-    const el = document.querySelector('.context_menu')
-    const _x = window.innerWidth - el.getBoundingClientRect().width - 40
-    const _y = window.innerHeight - el.getBoundingClientRect().height - 90
-    menu.setAbsolutePosition(_x, _y)
-    menu.open = !menu.open
+  handleOpenNewPerspectiveDialog = () => {
+
+    if (dialogNewPerspective.isOpen)
+      dialogNewPerspective.close()
+    else
+      dialogNewPerspective.open()
+
   }
+
+
 
   changeFormat = (newType) => {
     const dummy = Object.assign([], this.blocks)
@@ -104,53 +129,16 @@ export class COEditor {
     this.blocks = dummy
   }
 
-  allowDrop = ev => {
-    ev.preventDefault();
-    // console.log(ev.target.id)
-  }
-
-  drag = (ev) => {
-    ev.dataTransfer.setData("text", ev.target.id)
-    // console.log(ev)
-  }
 
 
-  drop = ev => {
-    ev.preventDefault();
 
-    const dummy = Object.assign([], this.blocks.filter(e => e.id != this.currentBlock.id))
-    const index = this.blocks.findIndex(e => e.id === ev.target.attributes.id.nodeValue)
-    dummy.splice(index, 0, this.currentBlock)
-    this.blocks = dummy
-  }
-
-  hexString(buffer) {
-    const byteArray = new Uint8Array(buffer);
-  
-    const hexCodes = [...byteArray].map(value => {
-      const hexCode = value.toString(16);
-      const paddedHexCode = hexCode.padStart(2, '0');
-      return paddedHexCode;
-    });
-  
-    return hexCodes.join('');
-  }
-  
-
-  save = () => {  
-    let contextId =null
-    let head = null
-    let dataId = null
-    const finalList = []
-    this.blocks.forEach(block => {
-      contextId = Object.keys(block)[0]
-      head = block[contextId].root.head
-      dataId = block[contextId].commits.commit[head].content.data
-      block[contextId].data[dataId].content = document.getElementById(contextId).innerHTML
-      finalList.push(createCommit('anonymous',block))
-    })
-    this.blocks = finalList
-    //console.log(createEmptyContext('anonymous'))
+  save = () => {
+    const contexts = document.querySelectorAll('.contextObject')
+    contexts.forEach(e =>
+      updateContent(e.id, {
+        type: 'co-paragraph',
+        value: e.innerHTML
+      }))
   }
 
 
@@ -163,29 +151,10 @@ export class COEditor {
     this.blocks = dummy
   }
 
-  @Listen('keydown')
-  handleKeyDown(ev: KeyboardEvent) {
-    
-    if (ev.key === 'Enter') {
-      ev.preventDefault()
-      const dummy = Object.assign([],this.blocks)
-      dummy.push(createEmptyContext())
-      this.blocks = dummy 
-      //console.log(this.blocks)
-    }
-
-    if ((ev.key === 'Backspace') && (document.getElementById(this.blockActiveId).innerHTML.length <= 1)) {
-      const dummy = Object.assign([], this.blocks)
-      this.blocks = dummy.filter(e => e.id != this.blockActiveId)
-    }
-  }
 
   @Listen('activeBlock')
   handleBlockActive(ev: CustomEvent) {
-
     this.blockActiveId = ev.detail
-    //console.log(ev.detail)
-    // this.syncBlock(this.blockActiveId)
   }
 
 
@@ -212,10 +181,9 @@ export class COEditor {
   }
 
   renderToolbarRight = () => {
-    const currentBlock = this.blocks.filter(b => Object.keys(b)[0] === this.blockActiveId )[0]
     return <div class="editorToolbarRight mdc-menu mdc-menu-surface" >
       <ul class="mdc-list mdc-typography--body1" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1" >
-        <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem" onClick={() =>  this.dispatchCallNewPerspective(currentBlock)}>
+        <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem" onClick={() => this.handleOpenNewPerspectiveDialog()}>
           New Perspective
             <i class="mdc-list-item__meta material-icons " aria-hidden="true">call_split</i>
         </li>
@@ -235,49 +203,62 @@ export class COEditor {
     </div>
   }
 
-  renderBlock = block => {
-    const contextId = Object.keys(block)[0]
-    const head = block[contextId].root.head
-    const dataId = block[contextId].commits.commit[head].content.data
-    switch (block[contextId].commits.commit[head].type) {
-      case 'co-title1':
-        return <co-title1 block_id={block[contextId].root.contextId} content={block[contextId].data[dataId].content}></co-title1>
-      case 'co-title2':
-        return <co-title2 block_id={block[contextId].root.contextId} content={block[contextId].data[dataId].content}></co-title2>
-      case 'co-subtitle1':
-        return <co-subtitle1 block_id={block[contextId].root.contextId} content={block[contextId].data[dataId].content}></co-subtitle1>
-      case 'co-subtitle2':
-        return <co-subtitle2 block_id={block[contextId].root.contextId} content={block[contextId].data[dataId].content}></co-subtitle2>
-      case 'co-paragraph':
-        return <co-paragraph block_id={block[contextId].root.contextId} content={block[contextId].data[dataId].content}></co-paragraph>
-      default:
-        return <co-paragraph block_id={block[contextId].root.contextId} content={block[contextId].data[dataId].content}></co-paragraph>
-    }
 
+  renderNewPerspectiveDialog = () => {
+    return (<div class="mdc-dialog dialog-new-perspective"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="my-dialog-title"
+      aria-describedby="my-dialog-content">
+      <div class="mdc-dialog__container">
+        <div class="mdc-dialog__surface">
+
+          <h2 class="mdc-dialog__title" id="my-dialog-title">New Perspective </h2>
+          <div class="mdc-dialog__content" id="my-dialog-content">
+          <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--no-label">
+            <input type="text" class="mdc-text-field__input" aria-label="Label"></input>
+            <div class="mdc-notched-outline">
+              <div class="mdc-notched-outline__leading"></div>
+              <div class="mdc-notched-outline__trailing"></div>
+            </div>
+          </div>
+          </div>
+          <footer class="mdc-dialog__actions">
+            <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+              <span class="mdc-button__label">Cancel</span>
+            </button>
+            <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="accept">
+              <span class="mdc-button__label">OK</span>
+            </button>
+          </footer>
+        </div>
+      </div>
+      <div class="mdc-dialog__scrim"></div>
+    </div>)
+  }
+
+
+  renderBlock(perspective) {
+    return <co-paragraph block_id={perspective.headObject.contentObject.id} content={perspective.headObject.contentObject.content}></co-paragraph>
   }
 
 
   render() {
-
-    // <div class='block' draggable={true} onDragOver={event => this.allowDrop(event)} onDrop={event => this.drop(event)} onDragStart = {this.drag} onMouseDown={() => this.currentBlock = block}></div>
-    if (this.lastCall === 'NEW_PERSPECTIVE')
-      return (<co-new-perspective></co-new-perspective>)
-
     return (
       <div>
         <main class="main-content" id="main-content">
-          {this.blocks.map(block => (
+          {this.rootDocument.context.perspectives.map(perspective => (
             <div class="block">
-              <button class="mdc-icon-button material-icons ghost" onClick={e => this.handleOpenToolbar(e, block)}>format_size</button>
-              {this.renderBlock(block)}
-              <button class="mdc-icon-button material-icons ghost" onClick={e => this.handleOpenToolbarRight(e, block)} >
+              <button class="mdc-icon-button material-icons ghost" onClick={() => this.handleOpenToolbar(perspective)}>format_size</button>
+              {this.renderBlock(perspective)}
+              <button class="mdc-icon-button material-icons ghost" onClick={() => this.handleOpenToolbarRight(perspective)} >
                 <a class="demo-menu material-icons mdc-top-app-bar__navigation-icon">more_vert</a>
               </button>
 
             </div>
           ))}
           {this.renderToolbarRight()}
-
+          {this.renderNewPerspectiveDialog()}
           {this.renderToolbar()}
           <button id="menu-button" class="mdc-fab app-fab--absolute" aria-label="Favorite" onClick={this.handleOpen}>
             <span class="mdc-fab__icon material-icons" >create</span>
@@ -285,7 +266,7 @@ export class COEditor {
 
           <div class="context_menu mdc-menu mdc-menu-surface ">
             <ul class="mdc-list mdc-typography--body1" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1" >
-              <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
+              <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem"  onClick={() => this.handleOpenNewPerspectiveDialog()}>
                 New perspective
                       <i class="mdc-list-item__meta material-icons " aria-hidden="true">call_split</i>
               </li>
@@ -317,18 +298,9 @@ export class COEditor {
                 Publish
                       <i class="mdc-list-item__meta material-icons " aria-hidden="true">cloud_upload</i>
               </li>
-
             </ul>
           </div>
-
-
-
-
         </main>
-
-
-
-
       </div>)
   }
 }

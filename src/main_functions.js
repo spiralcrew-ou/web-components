@@ -16,12 +16,13 @@ export const generateCID = creatorId => {
     return cid.toString()
 }
 
-export const generateCommitId = (creatorId, parentsCommitsId, message) => {
+export const generateCommitId = (creatorId, parentsCommitsId, message,content) => {
 
     const body = {
         '@creatorid': creatorId,
         partentCommits : parentsCommitsId,
-        message
+        message,
+        contentId: content.id
     }
 
     const b = Buffer.Buffer.from(JSON.stringify(body))

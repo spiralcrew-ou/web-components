@@ -26,14 +26,10 @@ export namespace Components {
   interface CoCommentListAttributes extends StencilHTMLAttributes {}
 
   interface CoEditor {
-    'documentId': string;
-    'iniciativeId': string;
-    'revision': string;
+    'mainContextId': string;
   }
   interface CoEditorAttributes extends StencilHTMLAttributes {
-    'documentId'?: string;
-    'iniciativeId'?: string;
-    'revision'?: string;
+    'mainContextId'?: string;
   }
 
   interface CoIniciativeCard {

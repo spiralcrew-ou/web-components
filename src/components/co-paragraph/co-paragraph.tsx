@@ -19,7 +19,7 @@ export class COParagraph {
     render() {
         return <div 
                     id={this.block_id} 
-                    class='mdc-typography--body1' 
+                    class='mdc-typography--body1 contextObject' 
                     contenteditable='true'
                     data-placeholder='Please write something here'
                     onClick={this.activeFocusHandler}>{this.content}</div>
