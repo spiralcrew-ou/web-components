@@ -1,8 +1,10 @@
 import { Component, Prop, State, Listen } from '@stencil/core';
 import { MDCMenu } from '@material/menu';
-import { uuidv4 } from '../../utils/utils';
-import { fetchIniciative } from '../../actions';
-import { Store } from '@stencil/redux';
+// import { uuidv4 } from '../../utils/utils';
+// import { fetchIniciative } from '../../actions';
+import {createEmptyContext, createCommit} from '../../main_functions';
+import { Store,Action } from '@stencil/redux';
+import {callNewPerspective} from '../../actions';
 
 let menu = null
 let toolbar = null
@@ -22,14 +24,22 @@ export class COEditor {
   @State() blocks = []
   @State() blockActiveId: string
   @State() currentBlock: any
-  @State() currentProcess: string
+  @State() lastCall: string
+
+  dispatchCallNewPerspective: Action
 
   componentWillLoad = () => {
-    this.blocks = fetchIniciative().documents
+    // this.blocks = fetchIniciative().documents
+    this.blocks = []
+    this.blocks.push(createEmptyContext())
+    console.log(this.blocks)
     this.store.mapStateToProps(this, state => {
       return {
-        currentProcess: state.coHandleProcess.processId
+        lastCall: state.coLastCall.callData ? state.coLastCall.callData.callId  : ''
       }
+    })
+    this.store.mapDispatchToProps(this,{
+      dispatchCallNewPerspective:  callNewPerspective
     })
   }
 
@@ -37,6 +47,10 @@ export class COEditor {
     menu = new MDCMenu(document.querySelector('.context_menu'))
     toolbar = new MDCMenu(document.querySelector('.editorToolbar'))
     toolbarRight = new MDCMenu(document.querySelector('.editorToolbarRight'))
+  }
+
+  componentDidUpdate = () => {
+    console.log(this.blocks)
   }
 
   fixMenu = () => {
@@ -68,8 +82,6 @@ export class COEditor {
 
 
   handleOpenToolbar = (e, block) => {
-    console.log(e.x, e.y)
-    console.log(toolbar.open)
     this.currentBlock = block
     toolbar.hoistMenuToBody()
     toolbar.setAbsolutePosition(e.x, e.y)
@@ -112,40 +124,57 @@ export class COEditor {
     this.blocks = dummy
   }
 
-  save = () => {
-    this.blocks.map(e => this.syncBlock(e.id))
-    console.log('Save')
+  hexString(buffer) {
+    const byteArray = new Uint8Array(buffer);
+  
+    const hexCodes = [...byteArray].map(value => {
+      const hexCode = value.toString(16);
+      const paddedHexCode = hexCode.padStart(2, '0');
+      return paddedHexCode;
+    });
+  
+    return hexCodes.join('');
+  }
+  
+
+  save = () => {  
+    let contextId =null
+    let head = null
+    let dataId = null
+    const finalList = []
+    this.blocks.forEach(block => {
+      contextId = Object.keys(block)[0]
+      head = block[contextId].root.head
+      dataId = block[contextId].commits.commit[head].content.data
+      block[contextId].data[dataId].content = document.getElementById(contextId).innerHTML
+      finalList.push(createCommit('anonymous',block))
+    })
+    this.blocks = finalList
+    //console.log(createEmptyContext('anonymous'))
   }
 
 
 
   syncBlock = blockId => {
-    console.log('CO-ELID-' + blockId)
+    console.log(blockId)
     const dummy = Object.assign([], this.blocks)
     const index = this.blocks.findIndex(e => e.id === blockId)
-    dummy[index].content = document.getElementById('CO-ELID-' + blockId).innerHTML
+    dummy[index].content = document.getElementById(blockId).innerHTML
     this.blocks = dummy
   }
 
   @Listen('keydown')
   handleKeyDown(ev: KeyboardEvent) {
-    console.log(ev.key)
-    const newLine = {
-      id: uuidv4(),
-      type: 'co-paragraph',
-      content: ''
-    }
-
+    
     if (ev.key === 'Enter') {
-      const dummy = Object.assign([], this.blocks)
-      const index = this.blocks.findIndex(e => e.id === this.blockActiveId)
-      dummy[index].content.replace(/\n/g, '')
-      dummy.splice(index + 1, 0, newLine)
-      this.blocks = dummy
-      // ev.preventDefault()
+      ev.preventDefault()
+      const dummy = Object.assign([],this.blocks)
+      dummy.push(createEmptyContext())
+      this.blocks = dummy 
+      //console.log(this.blocks)
     }
 
-    if ((ev.key === 'Backspace') && (document.getElementById('CO-ELID-' + this.blockActiveId).innerHTML.length <= 1)) {
+    if ((ev.key === 'Backspace') && (document.getElementById(this.blockActiveId).innerHTML.length <= 1)) {
       const dummy = Object.assign([], this.blocks)
       this.blocks = dummy.filter(e => e.id != this.blockActiveId)
     }
@@ -155,6 +184,7 @@ export class COEditor {
   handleBlockActive(ev: CustomEvent) {
 
     this.blockActiveId = ev.detail
+    //console.log(ev.detail)
     // this.syncBlock(this.blockActiveId)
   }
 
@@ -182,10 +212,11 @@ export class COEditor {
   }
 
   renderToolbarRight = () => {
+    const currentBlock = this.blocks.filter(b => Object.keys(b)[0] === this.blockActiveId )[0]
     return <div class="editorToolbarRight mdc-menu mdc-menu-surface" >
       <ul class="mdc-list mdc-typography--body1" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1" >
-        <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
-          New Version
+        <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem" onClick={() =>  this.dispatchCallNewPerspective(currentBlock)}>
+          New Perspective
             <i class="mdc-list-item__meta material-icons " aria-hidden="true">call_split</i>
         </li>
         <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
@@ -205,20 +236,22 @@ export class COEditor {
   }
 
   renderBlock = block => {
-    switch (block.type) {
+    const contextId = Object.keys(block)[0]
+    const head = block[contextId].root.head
+    const dataId = block[contextId].commits.commit[head].content.data
+    switch (block[contextId].commits.commit[head].type) {
       case 'co-title1':
-        return <co-title1 block_id={block.id} content={block.content}></co-title1>
+        return <co-title1 block_id={block[contextId].root.contextId} content={block[contextId].data[dataId].content}></co-title1>
       case 'co-title2':
-        return <co-title2 block_id={block.id} content={block.content}></co-title2>
+        return <co-title2 block_id={block[contextId].root.contextId} content={block[contextId].data[dataId].content}></co-title2>
       case 'co-subtitle1':
-        return <co-subtitle1 block_id={block.id} content={block.content}></co-subtitle1>
+        return <co-subtitle1 block_id={block[contextId].root.contextId} content={block[contextId].data[dataId].content}></co-subtitle1>
       case 'co-subtitle2':
-        return <co-subtitle2 block_id={block.id} content={block.content}></co-subtitle2>
+        return <co-subtitle2 block_id={block[contextId].root.contextId} content={block[contextId].data[dataId].content}></co-subtitle2>
       case 'co-paragraph':
-        return <co-paragraph block_id={block.id} content={block.content}></co-paragraph>
+        return <co-paragraph block_id={block[contextId].root.contextId} content={block[contextId].data[dataId].content}></co-paragraph>
       default:
-        return <co-paragraph block_id={block.id} content={block.content}></co-paragraph>
-
+        return <co-paragraph block_id={block[contextId].root.contextId} content={block[contextId].data[dataId].content}></co-paragraph>
     }
 
   }
@@ -227,7 +260,7 @@ export class COEditor {
   render() {
 
     // <div class='block' draggable={true} onDragOver={event => this.allowDrop(event)} onDrop={event => this.drop(event)} onDragStart = {this.drag} onMouseDown={() => this.currentBlock = block}></div>
-    if (this.currentProcess === 'NEW_INICIATIVE')
+    if (this.lastCall === 'NEW_PERSPECTIVE')
       return (<co-new-perspective></co-new-perspective>)
 
     return (

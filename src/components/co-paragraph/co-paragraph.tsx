@@ -18,7 +18,7 @@ export class COParagraph {
 
     render() {
         return <div 
-                    id={"CO-ELID-" + this.block_id} 
+                    id={this.block_id} 
                     class='mdc-typography--body1' 
                     contenteditable='true'
                     data-placeholder='Please write something here'

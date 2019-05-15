@@ -1,3 +1,5 @@
+import {generateCID} from './main_functions'
+
 const ctx1 = {
     "root": {
         "id": "2c00f",
@@ -154,16 +156,24 @@ export const fetchIniciative = ()  => {
     return iniciative
 }
 
+
+
 /*
-export const addDocumentToIniciative = (iniciative, documentType, content ) => {
+export const createContext = (userId,contextType) => {
+    return dispatch => {
+        dispatch({type: 'EDITING_CONTEXT',payload:{contextType}})
+    }
+}*/
 
+export const callNewPerspective = currentContext =>  {
+    const callData = {
+        callId: 'NEW_PERSPECTIVE',
+        payLoad: currentContext
+    }
+    return dispatch => {
+        dispatch({ type: 'NEW_PERSPECTIVE', callData })
+    }
 }
-
-export const updateDocument = document => {
-
-}
-
-export const */
 
 export const updateIniciativeFav = iniciative => {
     return dispatch => {

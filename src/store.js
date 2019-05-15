@@ -18,15 +18,20 @@ const  initialState = {
         settings: {},
         list:[]
     },
-    activeProcess: {
-        processId: ''
+    lastCall: {
+        callId: '',
+        payLoad: null
     }
 }
 
-export const handleProcess = (state={...initialState.activeProcess},action) => {
+export const handleCallsReducer = (state={...initialState.activeProcess},action) => {
     switch(action.type){
         case 'NEW_PERSPECTIVE':
-            return {...state, ...action.processId } 
+            return {...state, ...action } 
+        case 'EDITING_CONTEXT':
+            return {...state,...action}
+        case 'CLOSE_NEW_PERSPECTIVE':
+            return {...state}
         default:
             return state
     }
@@ -86,7 +91,7 @@ const reducers = combineReducers({
     settings: settingsReducer,
     notifications: notificationsReducer,
     iniciatives: iniciativesReducer,
-    coHandleProcess: handleProcess
+    coLastCall: handleCallsReducer
 })
 
 
