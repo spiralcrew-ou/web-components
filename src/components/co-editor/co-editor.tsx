@@ -2,7 +2,7 @@ import { Component, Prop, State, Listen } from '@stencil/core';
 import { MDCMenu } from '@material/menu';
 import { Store, Action } from '@stencil/redux';
 import { callNewPerspective } from '../../actions';
-import { createEmptyContext, updateContent } from '../../globals/database';
+import { createEmptyContext, updateContent, newPerspective } from '../../globals/database';
 import { MDCDialog } from '@material/dialog';
 
 let menu = null
@@ -24,6 +24,9 @@ export class COEditor {
   @State() currentBlock: any
   @State() lastCall: string
   @State() rootDocument: any = null
+  @State() newPerspectiveName: string = ''
+  @State() toolbarState: boolean = false 
+  @State() toolbarRightState: boolean = false 
 
 
   dispatchCallNewPerspective: Action
@@ -56,6 +59,10 @@ export class COEditor {
     dialogNewPerspective = new MDCDialog(document.querySelector('.dialog-new-perspective'));
 
     document.body.addEventListener('keydown', ev => {
+      if (ev.key === 'Escape') {
+        this.closeAllMenu()
+      }
+
       if (ev.key === 'Enter') {
         ev.preventDefault()
         createEmptyContext('peterparker', 'Another block').then(newBlock => {
@@ -79,17 +86,25 @@ export class COEditor {
   }
 
 
-  handleOpenToolbarRight = (block) => {
-
+  handleOpenToolbarRight = (event, block) => {
     this.currentBlock = block
-    const el = document.querySelector('.editorToolbarRight')
-    const _x = window.innerWidth - el.getBoundingClientRect().width - 40
-    const _y = window.innerHeight - el.getBoundingClientRect().height - 90
-    toolbarRight.setAbsolutePosition(_x, _y)
-    toolbarRight.open = !toolbarRight.open
+    const el = document.querySelector('.editorToolbarRight') as HTMLElement
+    this.toolbarRightState = !this.toolbarRightState
+    el.style.left =  event.clientX - 200 + "px"
+    el.style.top = event.clientY + "px"
+    if (this.toolbarRightState)
+      el.classList.add('mdc-menu-surface--open')
+    else
+      el.classList.remove('mdc-menu-surface--open')
   }
 
 
+  closeAllMenu = () => {
+    const toolbar = document.querySelector('.editorToolbar') as HTMLElement
+    const toolbarRight = document.querySelector('.editorToolbarRight') as HTMLElement
+    toolbar.classList.remove('mdc-menu-surface--open')
+    toolbarRight.classList.remove('mdc-menu-surface--open')
+  }
 
   handleOpen = () => {
     menu.hoistMenuToBody()
@@ -101,14 +116,18 @@ export class COEditor {
   }
 
 
-  handleOpenToolbar = (block) => {
+  handleOpenToolbar = (event,block) => {
     this.currentBlock = block
-    
-    const el = document.querySelector('.editorToolbar')
-    const _x = window.innerWidth - el.getBoundingClientRect().width - 40
-    const _y = window.innerHeight - el.getBoundingClientRect().height - 90
-    toolbar.setAbsolutePosition(_x, _y)
-    toolbar.open = !toolbar.open
+    console.log(event.clientX,event.clientY)
+
+    const el = document.querySelector('.editorToolbar') as HTMLElement
+    el.style.left="16px"
+    el.style.top=event.clientY  + "px"
+    this.toolbarState = !this.toolbarState
+    if (this.toolbarState)
+      el.classList.add('mdc-menu-surface--open')
+    else
+      el.classList.remove('mdc-menu-surface--open')
   }
 
   handleOpenNewPerspectiveDialog = () => {
@@ -120,17 +139,12 @@ export class COEditor {
 
   }
 
-
-
   changeFormat = (newType) => {
     const dummy = Object.assign([], this.blocks)
     const index = this.blocks.findIndex(e => e.id === this.currentBlock.id)
     dummy[index].type = newType
     this.blocks = dummy
   }
-
-
-
 
   save = () => {
     const contexts = document.querySelectorAll('.contextObject')
@@ -140,8 +154,6 @@ export class COEditor {
         value: e.innerHTML
       }))
   }
-
-
 
   syncBlock = blockId => {
     console.log(blockId)
@@ -224,10 +236,10 @@ export class COEditor {
           </div>
           </div>
           <footer class="mdc-dialog__actions">
-            <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+            <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close" >
               <span class="mdc-button__label">Cancel</span>
             </button>
-            <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="accept">
+            <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="accept" onClick={() => newPerspective(this.currentBlock)}>
               <span class="mdc-button__label">OK</span>
             </button>
           </footer>
@@ -249,9 +261,9 @@ export class COEditor {
         <main class="main-content" id="main-content">
           {this.rootDocument.context.perspectives.map(perspective => (
             <div class="block">
-              <button class="mdc-icon-button material-icons ghost" onClick={() => this.handleOpenToolbar(perspective)}>format_size</button>
+              <button class="mdc-icon-button material-icons ghost" onClick={ event => this.handleOpenToolbar(event, perspective)}>format_size</button>
               {this.renderBlock(perspective)}
-              <button class="mdc-icon-button material-icons ghost" onClick={() => this.handleOpenToolbarRight(perspective)} >
+              <button class="mdc-icon-button material-icons ghost" onClick={event => this.handleOpenToolbarRight(event, perspective)} >
                 <a class="demo-menu material-icons mdc-top-app-bar__navigation-icon">more_vert</a>
               </button>
 

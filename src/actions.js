@@ -157,14 +157,6 @@ export const fetchIniciative = ()  => {
 }
 
 
-
-/*
-export const createContext = (userId,contextType) => {
-    return dispatch => {
-        dispatch({type: 'EDITING_CONTEXT',payload:{contextType}})
-    }
-}*/
-
 export const callNewPerspective = currentContext =>  {
     const callData = {
         callId: 'NEW_PERSPECTIVE',

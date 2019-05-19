@@ -11,6 +11,7 @@ db.version(0.1).stores({
 });
 
 
+
 export const createEmptyContext = async(creatorId,name,contentData) => {
   
   const context  =  await createContext(creatorId)
@@ -49,6 +50,10 @@ export const createPerspective = async(creatorId, name, context, commit) => {
     headObject: commit
   }
   return db.perspective.add(data).then(() => {return data}) 
+}
+
+export const newPerspective = async(currentPerspective) => {
+  console.log(currentPerspective)
 }
 
 export const createCommit = (creatorId, parentsCommitsId, message,content) => {
