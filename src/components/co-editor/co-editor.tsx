@@ -121,6 +121,8 @@ export class COEditor {
     const toolbarRight = document.querySelector('.editorToolbarRight') as HTMLElement
     toolbar.classList.remove('mdc-menu-surface--open')
     toolbarRight.classList.remove('mdc-menu-surface--open')
+    this.toolbarState = false 
+    this.toolbarRightState = false 
   }
 
   handleOpen = () => {
@@ -135,8 +137,6 @@ export class COEditor {
 
   handleOpenToolbar = (event,block) => {
     this.currentBlock = block
-    console.log(event.clientX,event.clientY)
-
     const el = document.querySelector('.editorToolbar') as HTMLElement
     el.style.left="16px"
     el.style.top=event.clientY  + "px"
@@ -157,6 +157,7 @@ export class COEditor {
   }
 
   changeFormat = (newType) => {
+    this.closeAllMenu()
     let index = 0
     const document = Object.assign({},this.rootDocument)
     for (let p of document.context.perspectives) {
