@@ -2,7 +2,11 @@ import { Component, Prop, State, Listen } from '@stencil/core';
 import { MDCMenu } from '@material/menu';
 import { Store, Action } from '@stencil/redux';
 import { callNewPerspective } from '../../actions';
-import { createEmptyContext, updateContent, newPerspective } from '../../globals/database';
+import { 
+  createEmptyContext, 
+  updateContent, 
+  newPerspective,
+  documentHandler } from '../../globals/database';
 import { MDCDialog } from '@material/dialog';
 
 let menu = null
@@ -32,11 +36,15 @@ export class COEditor {
   dispatchCallNewPerspective: Action
 
   async componentWillLoad() {
-    // this.blocks = fetchIniciative().documents
+    
+    this.rootDocument = await (await documentHandler.getCurrentDocument()).first()
+
     if (!this.rootDocument) {
       this.rootDocument = await createEmptyContext('peterparker', 'This is the first context of document')
       const first_block = await createEmptyContext('peterparker', 'First block')
       this.rootDocument.context.perspectives.push(first_block.perspective)
+      //console.log(this.rootDocument)
+      documentHandler.newDocument(this.rootDocument.context,this.rootDocument.perspective)
     }
     this.blocks = []
 
@@ -62,7 +70,7 @@ export class COEditor {
       if (ev.key === 'Escape') {
         this.closeAllMenu()
       }
-      
+
       if (ev.key === 'Enter') {
         ev.preventDefault()
         createEmptyContext('peterparker', 'Another block').then(newBlock => {
