@@ -96,6 +96,7 @@ export const updateContent = (contentId, data) =>  {
 
 
 
+
 export const documentHandler =  {
   newDocument : async (context, perspective) => {
     const id = context.id + perspective.id

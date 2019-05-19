@@ -6,7 +6,8 @@ import {
   createEmptyContext, 
   updateContent, 
   newPerspective,
-  documentHandler } from '../../globals/database';
+  documentHandler,
+  getContentByCommitId } from '../../globals/database';
 import { MDCDialog } from '@material/dialog';
 
 let menu = null
@@ -43,9 +44,17 @@ export class COEditor {
       this.rootDocument = await createEmptyContext('peterparker', 'This is the first context of document')
       const first_block = await createEmptyContext('peterparker', 'First block')
       this.rootDocument.context.perspectives.push(first_block.perspective)
-      //console.log(this.rootDocument)
       documentHandler.newDocument(this.rootDocument.context,this.rootDocument.perspective)
     }
+
+    
+    let index = 0 
+    for (let p of this.rootDocument.context.perspectives) {
+      p.headObject.contentObject = await getContentByCommitId(p.head)
+      this.rootDocument.context.perspectives[index] = p
+      index=index+1
+    }
+
     this.blocks = []
 
     this.store.mapStateToProps(this, state => {
@@ -148,10 +157,17 @@ export class COEditor {
   }
 
   changeFormat = (newType) => {
-    const dummy = Object.assign([], this.blocks)
-    const index = this.blocks.findIndex(e => e.id === this.currentBlock.id)
-    dummy[index].type = newType
-    this.blocks = dummy
+    let index = 0
+    const document = Object.assign({},this.rootDocument)
+    for (let p of document.context.perspectives) {
+      if (p.id === this.currentBlock.id){
+        p.headObject.contentObject.content.type = newType 
+        document.context.perspectives[index]= p
+        this.rootDocument= document
+        break
+      }
+      index = index +1
+    }
   }
 
   save = () => {
@@ -159,7 +175,7 @@ export class COEditor {
     contexts.forEach(e =>
       updateContent(e.id, {
         type: 'co-paragraph',
-        value: e.innerHTML
+        content: e.innerHTML
       }))
   }
 
@@ -259,7 +275,19 @@ export class COEditor {
 
 
   renderBlock(perspective) {
-    return <co-paragraph block_id={perspective.headObject.contentObject.id} content={perspective.headObject.contentObject.content}></co-paragraph>
+    switch(perspective.headObject.contentObject.content.type){
+      case 'co-title1':
+        return <co-title1 block_id={perspective.headObject.contentObject.id} content={perspective.headObject.contentObject.content.content}></co-title1>
+      case 'co-title2':
+        return <co-title2 block_id={perspective.headObject.contentObject.id} content={perspective.headObject.contentObject.content.content}></co-title2>
+      case 'co-subtitle1':
+        return <co-subtitle1 block_id={perspective.headObject.contentObject.id} content={perspective.headObject.contentObject.content.content}></co-subtitle1>
+      case 'co-subtitle2':
+        return <co-subtitle2 block_id={perspective.headObject.contentObject.id} content={perspective.headObject.contentObject.content.content}></co-subtitle2>
+      default: 
+        return <co-paragraph block_id={perspective.headObject.contentObject.id} content={perspective.headObject.contentObject.content.content}></co-paragraph>
+    }
+    
   }
 
 
