@@ -62,7 +62,7 @@ export class COEditor {
       if (ev.key === 'Escape') {
         this.closeAllMenu()
       }
-
+      
       if (ev.key === 'Enter') {
         ev.preventDefault()
         createEmptyContext('peterparker', 'Another block').then(newBlock => {
