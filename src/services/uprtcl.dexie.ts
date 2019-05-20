@@ -5,6 +5,12 @@ import Buffer from 'buffer/';
 import CID from 'cids';
 import multihash from 'multihashes';
 
+/**
+ * @Guillem: Hola Leo, esto es solo una implementación de proof of concept que hice a partir 
+ * de copiar y adaptar el codigo que tenias en database.js
+ * No se si te servira para la implementación final, como veas :)
+ */
+
 export class UprtclDexie implements UprtclService {
   db: any;
   creatorId: string = 'myself';

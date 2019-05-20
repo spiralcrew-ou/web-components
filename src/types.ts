@@ -37,3 +37,8 @@ export interface TextNode {
     link: string;
   }>;
 }
+
+export type Draft = {
+  perspectiveId: string;
+  dataLink: string;
+};

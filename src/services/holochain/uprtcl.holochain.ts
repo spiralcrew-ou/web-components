@@ -2,8 +2,8 @@ import {
   HolochainConnection,
   EntryResult
 } from './holochain.connection';
-import { Perspective, Commit, Context } from '../types';
-import { UprtclService } from './uprtcl.service';
+import { Perspective, Commit, Context } from '../../types';
+import { UprtclService } from '../uprtcl.service';
 import { ConnectionFormatter } from './connection-formatter';
 
 export class UprtclHolochain implements UprtclService {
