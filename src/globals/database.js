@@ -18,7 +18,7 @@ db.version(0.1).stores({
 export const createEmptyContext = async(creatorId,name,contentData) => {
   
   const context  =  await createContext(creatorId)
-  const content = await createContent(contentData ? contentData : '')
+  const content = await createContent(contentData ? contentData : {type:'co-paragraph',content: ''})
   const commit = await createCommit(creatorId,[],'Initial commit',content)
   const perspective = await createPerspective(creatorId,name,context,commit)
   return {
@@ -37,9 +37,9 @@ export const createContext = (creatorId) => {
     timestamp: new Date().getTime(),
     perspectives: []
   }
-  return db.context.add(data).then( () => {
-    return data 
-  })
+  db.context.add(data)
+
+  return data 
 }
 
 export const createPerspective = async(creatorId, name, context, commit) => {
@@ -78,7 +78,8 @@ export const createCommit = (creatorId, parentsCommitsId, message,content) => {
 
 export const createContent = content => {
   const id = generateDataId()
-  return db.content.add({ id, content }).then( () => {return { id, content } })
+  db.content.add({ id, content })
+  return { id, content }
   
 }
 
@@ -105,5 +106,9 @@ export const documentHandler =  {
   },
   getCurrentDocument: async() => {
     return db.currentDocument.toCollection()
+  },
+  updateCurrentDocument: (context,perspective) => {
+    const id = context.id + perspective.id
+    db.currentDocument.where("id").equals(id).modify({context,perspective})
   }
 }

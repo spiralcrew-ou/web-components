@@ -2,12 +2,13 @@ import { Component, Prop, State, Listen } from '@stencil/core';
 import { MDCMenu } from '@material/menu';
 import { Store, Action } from '@stencil/redux';
 import { callNewPerspective } from '../../actions';
-import { 
-  createEmptyContext, 
-  updateContent, 
+import {
+  createEmptyContext,
+  updateContent,
   newPerspective,
   documentHandler,
-  getContentByCommitId } from '../../globals/database';
+  getContentByCommitId
+} from '../../globals/database';
 import { MDCDialog } from '@material/dialog';
 
 let menu = null
@@ -30,29 +31,29 @@ export class COEditor {
   @State() lastCall: string
   @State() rootDocument: any = null
   @State() newPerspectiveName: string = ''
-  @State() toolbarState: boolean = false 
-  @State() toolbarRightState: boolean = false 
+  @State() toolbarState: boolean = false
+  @State() toolbarRightState: boolean = false
 
 
   dispatchCallNewPerspective: Action
 
   async componentWillLoad() {
-    
+
     this.rootDocument = await (await documentHandler.getCurrentDocument()).first()
 
     if (!this.rootDocument) {
       this.rootDocument = await createEmptyContext('peterparker', 'This is the first context of document')
       const first_block = await createEmptyContext('peterparker', 'First block')
       this.rootDocument.context.perspectives.push(first_block.perspective)
-      documentHandler.newDocument(this.rootDocument.context,this.rootDocument.perspective)
+      documentHandler.newDocument(this.rootDocument.context, this.rootDocument.perspective)
     }
 
-    
-    let index = 0 
+
+    let index = 0
     for (let p of this.rootDocument.context.perspectives) {
       p.headObject.contentObject = await getContentByCommitId(p.head)
       this.rootDocument.context.perspectives[index] = p
-      index=index+1
+      index = index + 1
     }
 
     this.blocks = []
@@ -81,18 +82,21 @@ export class COEditor {
       }
 
       if (ev.key === 'Enter') {
+        this.save()
         ev.preventDefault()
         createEmptyContext('peterparker', 'Another block').then(newBlock => {
+          
           const doc = this.rootDocument
           doc.context.perspectives.push(newBlock.perspective)
           this.rootDocument = Object.assign({}, doc)
+          // this.save()
         })
       }
 
-      if ((ev.key === 'Backspace') && (document.getElementById(this.blockActiveId).innerHTML.length <= 1)) {
+      /* if ((ev.key === 'Backspace') && (document.getElementById(this.blockActiveId).innerHTML.length <= 1)) {
         const dummy = Object.assign([], this.blocks)
         this.blocks = dummy.filter(e => e.id != this.blockActiveId)
-      }
+      } */
     })
   }
 
@@ -107,7 +111,7 @@ export class COEditor {
     this.currentBlock = block
     const el = document.querySelector('.editorToolbarRight') as HTMLElement
     this.toolbarRightState = !this.toolbarRightState
-    el.style.left =  event.clientX - 200 + "px"
+    el.style.left = event.clientX - 200 + "px"
     el.style.top = event.clientY + "px"
     if (this.toolbarRightState)
       el.classList.add('mdc-menu-surface--open')
@@ -121,8 +125,8 @@ export class COEditor {
     const toolbarRight = document.querySelector('.editorToolbarRight') as HTMLElement
     toolbar.classList.remove('mdc-menu-surface--open')
     toolbarRight.classList.remove('mdc-menu-surface--open')
-    this.toolbarState = false 
-    this.toolbarRightState = false 
+    this.toolbarState = false
+    this.toolbarRightState = false
   }
 
   handleOpen = () => {
@@ -135,11 +139,11 @@ export class COEditor {
   }
 
 
-  handleOpenToolbar = (event,block) => {
+  handleOpenToolbar = (event, block) => {
     this.currentBlock = block
     const el = document.querySelector('.editorToolbar') as HTMLElement
-    el.style.left="16px"
-    el.style.top=event.clientY  + "px"
+    el.style.left = "16px"
+    el.style.top = event.clientY + "px"
     this.toolbarState = !this.toolbarState
     if (this.toolbarState)
       el.classList.add('mdc-menu-surface--open')
@@ -159,25 +163,45 @@ export class COEditor {
   changeFormat = (newType) => {
     this.closeAllMenu()
     let index = 0
-    const document = Object.assign({},this.rootDocument)
-    for (let p of document.context.perspectives) {
-      if (p.id === this.currentBlock.id){
-        p.headObject.contentObject.content.type = newType 
-        document.context.perspectives[index]= p
-        this.rootDocument= document
+    const rd = Object.assign({}, this.rootDocument)
+    for (let p of rd.context.perspectives) {
+      if (p.id === this.currentBlock.id) {
+        const c = document.getElementById(p.headObject.contentObject.id)
+        p.headObject.contentObject.content.type = newType
+        p.headObject.contentObject.content.content =  c.innerHTML
+        rd.context.perspectives[index] = p
+        this.rootDocument = rd
         break
       }
-      index = index +1
+      index = index + 1
     }
+    this.save()
   }
 
   save = () => {
-    const contexts = document.querySelectorAll('.contextObject')
-    contexts.forEach(e =>
+    //const contexts = document.querySelectorAll('.contextObject')
+
+    this.rootDocument.context.perspectives.forEach(p => {
+      //console.log(p.headObject.contentObject.id)
+      const c = document.getElementById(p.headObject.contentObject.id)
+      // console.log(c,p.headObject.contentObject.content.type)
+      updateContent(p.headObject.contentObject.id, {
+        type: p.headObject.contentObject.content.type,
+        content: c.innerHTML
+      })
+    })
+
+    documentHandler.updateCurrentDocument(this.rootDocument.context,this.rootDocument.perspective)
+
+    /*
+    contexts.forEach(e => {
       updateContent(e.id, {
         type: 'co-paragraph',
         content: e.innerHTML
-      }))
+      })
+    }*/
+
+    
   }
 
   syncBlock = blockId => {
@@ -252,13 +276,13 @@ export class COEditor {
 
           <h2 class="mdc-dialog__title" id="my-dialog-title">New Perspective </h2>
           <div class="mdc-dialog__content" id="my-dialog-content">
-          <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--no-label">
-            <input type="text" class="mdc-text-field__input" aria-label="Label"></input>
-            <div class="mdc-notched-outline">
-              <div class="mdc-notched-outline__leading"></div>
-              <div class="mdc-notched-outline__trailing"></div>
+            <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--no-label">
+              <input type="text" class="mdc-text-field__input" aria-label="Label"></input>
+              <div class="mdc-notched-outline">
+                <div class="mdc-notched-outline__leading"></div>
+                <div class="mdc-notched-outline__trailing"></div>
+              </div>
             </div>
-          </div>
           </div>
           <footer class="mdc-dialog__actions">
             <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close" >
@@ -276,7 +300,7 @@ export class COEditor {
 
 
   renderBlock(perspective) {
-    switch(perspective.headObject.contentObject.content.type){
+    switch (perspective.headObject.contentObject.content.type) {
       case 'co-title1':
         return <co-title1 block_id={perspective.headObject.contentObject.id} content={perspective.headObject.contentObject.content.content}></co-title1>
       case 'co-title2':
@@ -285,10 +309,10 @@ export class COEditor {
         return <co-subtitle1 block_id={perspective.headObject.contentObject.id} content={perspective.headObject.contentObject.content.content}></co-subtitle1>
       case 'co-subtitle2':
         return <co-subtitle2 block_id={perspective.headObject.contentObject.id} content={perspective.headObject.contentObject.content.content}></co-subtitle2>
-      default: 
+      default:
         return <co-paragraph block_id={perspective.headObject.contentObject.id} content={perspective.headObject.contentObject.content.content}></co-paragraph>
     }
-    
+
   }
 
 
@@ -298,7 +322,7 @@ export class COEditor {
         <main class="main-content" id="main-content">
           {this.rootDocument.context.perspectives.map(perspective => (
             <div class="block">
-              <button class="mdc-icon-button material-icons ghost" onClick={ event => this.handleOpenToolbar(event, perspective)}>format_size</button>
+              <button class="mdc-icon-button material-icons ghost" onClick={event => this.handleOpenToolbar(event, perspective)}>format_size</button>
               {this.renderBlock(perspective)}
               <button class="mdc-icon-button material-icons ghost" onClick={event => this.handleOpenToolbarRight(event, perspective)} >
                 <a class="demo-menu material-icons mdc-top-app-bar__navigation-icon">more_vert</a>
@@ -315,7 +339,7 @@ export class COEditor {
 
           <div class="context_menu mdc-menu mdc-menu-surface ">
             <ul class="mdc-list mdc-typography--body1" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1" >
-              <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem"  onClick={() => this.handleOpenNewPerspectiveDialog()}>
+              <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem" onClick={() => this.handleOpenNewPerspectiveDialog()}>
                 New perspective
                       <i class="mdc-list-item__meta material-icons " aria-hidden="true">call_split</i>
               </li>
