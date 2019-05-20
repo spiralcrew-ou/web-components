@@ -3,7 +3,7 @@ import { Commit, Perspective, Context } from '../types';
 export interface UprtclService {
   /** Getters */
 
-  getRootContext(): Promise<Context>;
+  getRootPerspective(): Promise<Perspective>;
   
   getContext(contextId: string): Promise<Context>;
   getContextId(context: Context): Promise<string>;
