@@ -15,7 +15,7 @@ let menu = null
 let toolbar = null
 let toolbarRight = null
 let dialogNewPerspective = null
-
+let ipfsNode = null
 
 @Component({
   tag: 'co-editor',
@@ -90,11 +90,47 @@ export class COEditor {
           this.rootDocument = Object.assign({}, doc)
       }
 
-      /* if ((ev.key === 'Backspace') && (document.getElementById(this.blockActiveId).innerHTML.length <= 1)) {
+      if ((ev.key === 'Backspace') && (document.getElementById(this.blockActiveId).innerHTML.length <= 1)) {
         const dummy = Object.assign([], this.blocks)
         this.blocks = dummy.filter(e => e.id != this.blockActiveId)
-      } */
+      }
     })
+
+    
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = 'https://unpkg.com/ipfs/dist/index.min.js'  
+    script.defer = true
+    document.getElementsByTagName('head')[0].appendChild(script);
+    
+    /*script.onload = () => {
+      ipfsNode = new window['Ipfs']()
+    }*/
+
+    //ipfsNode = new window['Ipfs']()
+  }
+
+
+  publish = () => {
+    ipfsNode = new window['Ipfs']({ repo: '/collectiveone/iniciatives/data' })
+
+    ipfsNode.on('ready', () => {
+      window['ipfs'] = ipfsNode
+      const content = window['Ipfs'].Buffer.from(JSON.stringify(this.rootDocument))
+      ipfsNode.add(content).then(results => {
+        console.log(results)
+        const hash = results[0].hash
+        console.log(hash)
+      })
+    })
+    
+    /*
+    const content = window['Ipfs'].Buffer.from(JSON.stringify(this.rootDocument))
+    ipfsNode.add(content).then(results => {
+      console.log(results)
+      const hash = results[0].hash
+      console.log(hash)
+    })*/
   }
 
   fixMenu = () => {
@@ -350,7 +386,7 @@ export class COEditor {
                 Comments
                       <i class="mdc-list-item__meta material-icons " aria-hidden="true">comment</i>
               </li>
-              <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem">
+              <li class="mdc-list-item mdc-ripple-upgraded" role="menuitem" onClick={ () => this.publish()}>
                 Publish
                       <i class="mdc-list-item__meta material-icons " aria-hidden="true">cloud_upload</i>
               </li>
