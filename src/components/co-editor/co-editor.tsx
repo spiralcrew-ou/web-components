@@ -176,12 +176,8 @@ export class COEditor {
   }
 
   save = () => {
-    //const contexts = document.querySelectorAll('.contextObject')
-
     this.rootDocument.context.perspectives.forEach(p => {
-      //console.log(p.headObject.contentObject.id)
       const c = document.getElementById(p.headObject.contentObject.id)
-      // console.log(c,p.headObject.contentObject.content.type)
       updateContent(p.headObject.contentObject.id, {
         type: p.headObject.contentObject.content.type,
         content: c.textContent
@@ -189,16 +185,6 @@ export class COEditor {
     })
 
     documentHandler.updateCurrentDocument(this.rootDocument.context,this.rootDocument.perspective)
-
-    /*
-    contexts.forEach(e => {
-      updateContent(e.id, {
-        type: 'co-paragraph',
-        content: e.innerHTML
-      })
-    }*/
-
-    
   }
 
   syncBlock = blockId => {
