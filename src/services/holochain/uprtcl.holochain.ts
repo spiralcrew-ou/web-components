@@ -124,13 +124,13 @@ export class UprtclHolochain implements UprtclService {
   createCommit(
     perspectiveId: string,
     message: string,
-    contentLink: string
+    dataLink: string
   ): Promise<string> {
     return this.uprtclZome.call('create_commit', {
       perspective_address: perspectiveId,
       message: message,
       timestamp: Date.now(),
-      content_link: contentLink
+      data_link: dataLink
     });
   }
 

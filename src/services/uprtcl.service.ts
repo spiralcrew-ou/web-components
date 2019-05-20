@@ -37,6 +37,6 @@ export interface UprtclService {
   createCommit(
     perspectiveId: string,
     message: string,
-    contentLink: string
+    dataLink: string
   ): Promise<string>;
 }
