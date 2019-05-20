@@ -68,7 +68,7 @@ export class COEditor {
     })
   }
 
-  componentDidLoad = () => {
+  componentDidLoad() {
     menu = new MDCMenu(document.querySelector('.context_menu'))
     toolbar = new MDCMenu(document.querySelector('.editorToolbar'))
     toolbar.hoistMenuToBody()
@@ -76,7 +76,7 @@ export class COEditor {
     toolbarRight.hoistMenuToBody()
     dialogNewPerspective = new MDCDialog(document.querySelector('.dialog-new-perspective'));
 
-    document.body.addEventListener('keydown', ev => {
+    document.body.addEventListener('keydown', async ev => {
       if (ev.key === 'Escape') {
         this.closeAllMenu()
       }
@@ -84,13 +84,10 @@ export class COEditor {
       if (ev.key === 'Enter') {
         this.save()
         ev.preventDefault()
-        createEmptyContext('peterparker', 'Another block').then(newBlock => {
-          
-          const doc = this.rootDocument
+        const newBlock = await createEmptyContext('peterparker', 'Another block')
+        const doc = this.rootDocument
           doc.context.perspectives.push(newBlock.perspective)
           this.rootDocument = Object.assign({}, doc)
-          // this.save()
-        })
       }
 
       /* if ((ev.key === 'Backspace') && (document.getElementById(this.blockActiveId).innerHTML.length <= 1)) {
@@ -168,7 +165,7 @@ export class COEditor {
       if (p.id === this.currentBlock.id) {
         const c = document.getElementById(p.headObject.contentObject.id)
         p.headObject.contentObject.content.type = newType
-        p.headObject.contentObject.content.content =  c.innerHTML
+        p.headObject.contentObject.content.content =  c.textContent
         rd.context.perspectives[index] = p
         this.rootDocument = rd
         break
@@ -187,7 +184,7 @@ export class COEditor {
       // console.log(c,p.headObject.contentObject.content.type)
       updateContent(p.headObject.contentObject.id, {
         type: p.headObject.contentObject.content.type,
-        content: c.innerHTML
+        content: c.textContent
       })
     })
 
@@ -208,7 +205,7 @@ export class COEditor {
     console.log(blockId)
     const dummy = Object.assign([], this.blocks)
     const index = this.blocks.findIndex(e => e.id === blockId)
-    dummy[index].content = document.getElementById(blockId).innerHTML
+    dummy[index].content = document.getElementById(blockId).textContent
     this.blocks = dummy
   }
 
