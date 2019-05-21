@@ -17,6 +17,7 @@
     "test.watch": "stencil test --spec --e2e --watchAll"
   },
   "dependencies": {
+    "@holochain/hc-web-client": "^0.4.1",
     "@material/button": "^2.1.1",
     "@material/card": "^1.1.0",
     "@material/dialog": "^2.2.0",
