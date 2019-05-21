@@ -50,15 +50,6 @@ import { UprtclService } from './uprtcl.service';
     constructor() {
     }
   
-    async getRootPerspective(): Promise<Perspective> {
-      const user = await get<AppUser>('/u/me');
-      return await this.getPerspective(user.rootPerspectiveLink);
-    }
-  
-    async getContextId(context: Context): Promise<string> {
-      return await put('/ctxId', context)
-    }
-  
     async getContext(contextId: string): Promise<Context> {
       return await get<Context>('/ctx/' + contextId);
     }
@@ -70,26 +61,78 @@ import { UprtclService } from './uprtcl.service';
     async getCommit(commitId: string): Promise<Commit> {
       return await get<Commit>('/commit/' + commitId);
     }
+
+    async getRootPerspective(): Promise<Perspective> {
+      const user = await get<AppUser>('/u/me');
+      return await this.getPerspective(user.rootPerspectiveLink);
+    }
   
+    async getContextId(context: Context): Promise<string> {
+      return await put('/ctxId', context)
+    }
+
     async getContextPerspectives(contextId: string): Promise<Perspective[]> {
       return await get<Perspective[]>('/ctxPersps')
     }
   
-    async createContext(context: Context): Promise<string> {
+    async createContext(
+      _timestamp: number,
+      _nonce: number): Promise<string> {
+
+      let context: Context;
+
+      context.timestamp = _timestamp;
+      context.nonce = _nonce
+
       return await post('/ctx', context)
     }
   
     async createPerspective(
-      contextId: string,
-      name: string,
-      headLink: string) {
-      const perspective = new Perspective();
+      _contextId: string,
+      _name: string,
+      _timestamp: number,
+      _headId: string) {
+
+      let perspective: Perspective;
+
+      perspective.contextId = _contextId;
+      perspective.name = _name;
+      perspective.timestamp = _timestamp;
+      perspective.headId = _headId;
       
       return await post('/persp', perspective)
     }
   
-    async createCommit() {
-      return await post('/persp', perspective)
+    async createCommit(
+      _timestamp: number,
+      _message: string,
+      _parentsIds: string[],
+      _dataId: string
+    ) {
+
+      let commit: Commit;
+      
+      commit.timestamp = _timestamp;
+      commit.message = _message;
+      commit.parentsIds = _parentsIds;
+      commit.dataId = _dataId;
+
+      return await post('/persp', commit)
+    }
+
+    cloneContext(context: Context): Promise<string> {
+      throw new Error("Method not implemented.");
+    }
+    clonePerspective(perspective: Perspective): Promise<string> {
+      throw new Error("Method not implemented.");
+    }
+    cloneCommit(commit: Commit): Promise<string> {
+      throw new Error("Method not implemented.");
+    }
+    
+    updateHead(perspectiveId: string, commitId: string): Promise<void> {
+      throw new Error("Method not implemented.");
     }
   
   }
+  
