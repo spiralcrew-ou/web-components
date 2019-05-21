@@ -18,10 +18,7 @@ export interface UprtclService {
   /**
    * Creates the context if necessary and returns its ID
    */
-  createContext(
-    timestamp: number,
-    nonce: number
-  ): Promise<string>;
+  createContext(timestamp: number, nonce: number): Promise<string>;
 
   // Perspectives
   createPerspective(
@@ -43,9 +40,5 @@ export interface UprtclService {
   clonePerspective(perspective: Perspective): Promise<string>;
   cloneCommit(commit: Commit): Promise<string>;
 
-  updateHead(
-    perspectiveId: string,
-    commitId: string
-  ): Promise<void>;
-
+  updateHead(perspectiveId: string, commitId: string): Promise<void>;
 }
