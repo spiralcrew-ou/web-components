@@ -139,6 +139,32 @@ export namespace Components {
 
   interface MyComponent {}
   interface MyComponentAttributes extends StencilHTMLAttributes {}
+
+  interface TextNode {
+    'dataId': string;
+  }
+  interface TextNodeAttributes extends StencilHTMLAttributes {
+    'dataId'?: string;
+    'onCommit-content'?: (event: CustomEvent) => void;
+  }
+
+  interface UprtclCommit {
+    'commitId': string;
+  }
+  interface UprtclCommitAttributes extends StencilHTMLAttributes {
+    'commitId'?: string;
+  }
+
+  interface UprtclPerspective {
+    'perspectiveId': string;
+  }
+  interface UprtclPerspectiveAttributes extends StencilHTMLAttributes {
+    'onPerspectiveCreated'?: (event: CustomEvent) => void;
+    'perspectiveId'?: string;
+  }
+
+  interface UprtclRoot {}
+  interface UprtclRootAttributes extends StencilHTMLAttributes {}
 }
 
 declare global {
@@ -158,6 +184,10 @@ declare global {
     'CoTitle1': Components.CoTitle1;
     'CoTitle2': Components.CoTitle2;
     'MyComponent': Components.MyComponent;
+    'TextNode': Components.TextNode;
+    'UprtclCommit': Components.UprtclCommit;
+    'UprtclPerspective': Components.UprtclPerspective;
+    'UprtclRoot': Components.UprtclRoot;
   }
 
   interface StencilIntrinsicElements {
@@ -176,6 +206,10 @@ declare global {
     'co-title1': Components.CoTitle1Attributes;
     'co-title2': Components.CoTitle2Attributes;
     'my-component': Components.MyComponentAttributes;
+    'text-node': Components.TextNodeAttributes;
+    'uprtcl-commit': Components.UprtclCommitAttributes;
+    'uprtcl-perspective': Components.UprtclPerspectiveAttributes;
+    'uprtcl-root': Components.UprtclRootAttributes;
   }
 
 
@@ -269,6 +303,30 @@ declare global {
     new (): HTMLMyComponentElement;
   };
 
+  interface HTMLTextNodeElement extends Components.TextNode, HTMLStencilElement {}
+  var HTMLTextNodeElement: {
+    prototype: HTMLTextNodeElement;
+    new (): HTMLTextNodeElement;
+  };
+
+  interface HTMLUprtclCommitElement extends Components.UprtclCommit, HTMLStencilElement {}
+  var HTMLUprtclCommitElement: {
+    prototype: HTMLUprtclCommitElement;
+    new (): HTMLUprtclCommitElement;
+  };
+
+  interface HTMLUprtclPerspectiveElement extends Components.UprtclPerspective, HTMLStencilElement {}
+  var HTMLUprtclPerspectiveElement: {
+    prototype: HTMLUprtclPerspectiveElement;
+    new (): HTMLUprtclPerspectiveElement;
+  };
+
+  interface HTMLUprtclRootElement extends Components.UprtclRoot, HTMLStencilElement {}
+  var HTMLUprtclRootElement: {
+    prototype: HTMLUprtclRootElement;
+    new (): HTMLUprtclRootElement;
+  };
+
   interface HTMLElementTagNameMap {
     'co-app': HTMLCoAppElement
     'co-comment-card': HTMLCoCommentCardElement
@@ -285,6 +343,10 @@ declare global {
     'co-title1': HTMLCoTitle1Element
     'co-title2': HTMLCoTitle2Element
     'my-component': HTMLMyComponentElement
+    'text-node': HTMLTextNodeElement
+    'uprtcl-commit': HTMLUprtclCommitElement
+    'uprtcl-perspective': HTMLUprtclPerspectiveElement
+    'uprtcl-root': HTMLUprtclRootElement
   }
 
   interface ElementTagNameMap {
@@ -303,6 +365,10 @@ declare global {
     'co-title1': HTMLCoTitle1Element;
     'co-title2': HTMLCoTitle2Element;
     'my-component': HTMLMyComponentElement;
+    'text-node': HTMLTextNodeElement;
+    'uprtcl-commit': HTMLUprtclCommitElement;
+    'uprtcl-perspective': HTMLUprtclPerspectiveElement;
+    'uprtcl-root': HTMLUprtclRootElement;
   }
 
 

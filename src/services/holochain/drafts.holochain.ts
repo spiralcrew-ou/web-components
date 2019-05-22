@@ -19,7 +19,7 @@ export class DraftsHolochain implements DraftsService {
     return this.draftZome.call('set_draft', {
       entry_address: draft.perspectiveId,
       draft: {
-        data_link: draft.dataLink
+        data_link: draft.dataId
       }
     });
   }
