@@ -6,7 +6,7 @@ import { sass } from '@stencil/sass';
 
 export const config: Config = {
   namespace: 'collectiveone-component-lib',
-  outputTargets:[
+  outputTargets: [
     { type: 'dist' },
     { type: 'docs' },
     {
@@ -15,14 +15,15 @@ export const config: Config = {
     }
   ],
   plugins: [
-    sass({ 
+    sass({
       includePaths: ['./node_modules'],
-      injectGlobalPaths: [
-        'src/globals/variables.scss',
-      ]
-     }),
+      injectGlobalPaths: ['src/globals/variables.scss']
+    }),
     builtins(),
     globals()
-  ] 
-  
+  ],
+  nodeResolve: {
+    browser: true,
+    preferBuiltins: true
+  }
 };

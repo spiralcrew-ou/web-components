@@ -1,7 +1,7 @@
-import { HolochainConnection, EntryResult } from './holochain.connection';
-import { Perspective, Commit, Context } from '../../types';
 import { UprtclService } from '../uprtcl.service';
+import { HolochainConnection, EntryResult } from './holochain.connection';
 import { ConnectionFormatter } from './connection-formatter';
+import { Perspective, Commit, Context } from '../../types';
 
 export class UprtclHolochain implements UprtclService {
   uprtclZome: HolochainConnection;
@@ -143,10 +143,10 @@ export class UprtclHolochain implements UprtclService {
     });
   }
 
-  updateHead(perspectiveId: string, commitId: string): Promise<void> {
+  updateHead(perspectiveId: string, headId: string): Promise<void> {
     return this.uprtclZome.call('update_perspective_head', {
       perspective_address: perspectiveId,
-      commit_address: commitId
+      head_address: headId
     });
   }
 }

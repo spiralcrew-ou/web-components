@@ -1,26 +1,19 @@
 <!DOCTYPE html><html dir="ltr" lang="en"><head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0">
-  <title>Stencil Component Starter</title>
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <script src="/build/collectiveone-component-lib.js"></script>
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,500" rel="stylesheet">
-  
-  
-</head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0">
+    <title>Stencil Component Starter</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="/build/collectiveone-component-lib.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,500" rel="stylesheet">
+  </head>
 
-<body>
-  <div>
-   <co-app client-id="COLLECTIVEONE">
-    <co-editor></co-editor>
-  </co-app>
+  <body>
+    <div>
+      <uprtcl-root serviceproviders="[LOCAL]" provider-selected="LOCAL">
+        <text-node></text-node>
+      </uprtcl-root>
+    </div>
   
-  </div>
-
-
-  
-  
-
   <script>
     if ('serviceWorker' in navigator && location.protocol !== 'file:') {
       // auto-unregister service worker during dev mode
