@@ -53,8 +53,9 @@ export class UprtclLocal implements UprtclService {
     createPerspective(_contextId: string, _name: string, _timestamp: number, _headId: string): Promise<string> {
         // TODO: Get userID or userCreator
         const creatorId = 'anon'
+        const origin = 'local://'
         const cid = generateCID(creatorId,[],'First Commit',)
-        return insertPerspective( new Perspective(cid,creatorId,_timestamp,_contextId,_name,_headId))
+        return insertPerspective( new Perspective(cid,origin,creatorId,_timestamp,_contextId,_name,_headId))
         
         // TO-REVIEW: createPerspective method may be will return Perspective instead of string (to check with pepo)
     }

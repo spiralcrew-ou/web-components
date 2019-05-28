@@ -9,13 +9,15 @@ import Dexie from 'dexie';
 
 export class Perspective implements IPerspective {
     id: string;
+    origin: string;
     creatorId: string;
     timestamp: number;
     contextId: string;
     name: string;
     headId: string;
-    constructor(_id, _creatorId, _timestamp,_contextId,_name,_headId){
+    constructor(_id, _origin,_creatorId, _timestamp,_contextId,_name,_headId){
         this.id = _id
+        this.origin = _origin
         this.creatorId = _creatorId
         this.timestamp = _timestamp
         this.contextId = _contextId
