@@ -1,7 +1,7 @@
 import { DataHolochain } from '../services/holochain/data.holochain'
 import { UprtclHolochain } from './holochain/uprtcl.holochain';
 import { DataLocal } from './local/data.local';
-import { UprtclData } from './local/uprtcl.local';
+import { UprtclLocal } from './local/uprtcl.local';
 
 export interface DataService {
   getData(dataId: string): Promise<any>;
@@ -30,7 +30,7 @@ export const factory = {
   getUprtclService: (serviceProvider: string) => {
     switch(serviceProvider) {
       case serviceProviders.LOCAL:
-        return new UprtclData()
+        return new UprtclLocal()
       case serviceProviders.HOLOCHAIN:
         return new UprtclHolochain()
       case serviceProviders.C1:

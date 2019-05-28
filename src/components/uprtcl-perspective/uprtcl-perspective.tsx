@@ -9,7 +9,6 @@ import {
 } from '@stencil/core';
 import { UprtclService } from '../../services/uprtcl.service';
 import { Perspective } from '../../types';
-import { factory } from '../../services/data.service';
 import { uprtclMultiplatform } from '../../services';
 
 @Component({
