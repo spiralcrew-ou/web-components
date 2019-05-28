@@ -22,8 +22,6 @@ export class UprtclRoot {
         this.uprtcl.createPerspective(contextId,'MyName',new Date().getTime(),headId)
       })
     })
-    
-    
   }
 
   componentWillLoad() {
