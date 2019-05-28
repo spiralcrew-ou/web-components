@@ -13,7 +13,7 @@ import {
 
 
 
-export class UprtclData implements UprtclService {
+export class UprtclLocal implements UprtclService {
     
     constructor() {
 

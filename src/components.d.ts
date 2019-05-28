@@ -7,7 +7,7 @@
 
 import '@stencil/core';
 
-import '@stencil/redux';
+
 
 
 export namespace Components {

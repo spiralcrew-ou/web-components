@@ -1,7 +1,7 @@
 import { Component, Prop, State, Watch, Element } from '@stencil/core';
 import { UprtclService } from '../../services/uprtcl.service';
 import { Commit } from '../../types';
-import { factory } from '../../services/data.service';
+import { uprtclMultiplatform } from '../../services';
 
 @Component({
   tag: 'uprtcl-commit',
@@ -18,7 +18,7 @@ export class UprtclCommit {
 
   // TODO: replace uprtcl with Redux appropiate calls
   // Also for now the component does not know which implementation of the UprtclService to use
-  uprtcl: UprtclService = factory.getUprtclService('LOCAL')
+  uprtcl: UprtclService = uprtclMultiplatform;
 
   loadCommit() {
     this.loading = true;

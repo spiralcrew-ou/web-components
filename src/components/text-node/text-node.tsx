@@ -8,7 +8,8 @@ import {
   Element,
   Listen
 } from '@stencil/core';
-import { DataService, factory } from '../../services/data.service';
+import { DataService } from '../../services/data.service';
+import { dataMultiplatform } from '../../services';
 
 interface TextNode {
   id?: string;
@@ -42,7 +43,7 @@ export class TextNodeElement {
   })
   commitContent: EventEmitter;
 
-  data: DataService = factory.getDataService(null)
+  data: DataService = dataMultiplatform;
 
   loadData() {
     if (this.dataId) {
