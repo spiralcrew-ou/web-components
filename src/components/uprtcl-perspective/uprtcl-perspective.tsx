@@ -9,7 +9,7 @@ import {
 } from '@stencil/core';
 import { UprtclService } from '../../services/uprtcl.service';
 import { Perspective } from '../../types';
-import { UprtclHolochain } from '../../services/holochain/uprtcl.holochain';
+import { factory } from '../../services/data.service';
 
 @Component({
   tag: 'uprtcl-perspective',
@@ -18,7 +18,7 @@ import { UprtclHolochain } from '../../services/holochain/uprtcl.holochain';
 })
 export class UprtclPerspective {
   @Prop() perspectiveId: string;
-
+  
   @State() perspective: Perspective;
 
   @State() loading: boolean = true;
@@ -32,7 +32,7 @@ export class UprtclPerspective {
 
   // TODO: replace uprtcl with Redux appropiate calls
   // Also for now the component does not know which implementation of the UprtclService to use
-  uprtcl: UprtclService = new UprtclHolochain();
+  uprtcl: UprtclService =  factory.getUprtclService('LOCAL');
 
   loadPerspective() {
     // Perspective id can be null, in that case do nothing

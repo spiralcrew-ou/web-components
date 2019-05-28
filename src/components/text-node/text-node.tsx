@@ -8,8 +8,7 @@ import {
   Element,
   Listen
 } from '@stencil/core';
-import { DataService } from '../../services/data.service';
-import { DataHolochain } from '../../services/holochain/data.holochain';
+import { DataService, factory } from '../../services/data.service';
 
 interface TextNode {
   id?: string;
@@ -26,6 +25,7 @@ export class TextNodeElement {
   @Element() private element: HTMLElement;
 
   @Prop() dataId: string;
+  @Prop() serviceProvider: string
   @State() loading: boolean = !!this.dataId;
 
   @State() private node: TextNode = {
@@ -42,7 +42,7 @@ export class TextNodeElement {
   })
   commitContent: EventEmitter;
 
-  data: DataService = new DataHolochain();
+  data: DataService = factory.getDataService(null)
 
   loadData() {
     if (this.dataId) {

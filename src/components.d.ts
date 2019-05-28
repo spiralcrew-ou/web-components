@@ -142,10 +142,12 @@ export namespace Components {
 
   interface TextNode {
     'dataId': string;
+    'serviceProvider': string;
   }
   interface TextNodeAttributes extends StencilHTMLAttributes {
     'dataId'?: string;
     'onCommit-content'?: (event: CustomEvent) => void;
+    'serviceProvider'?: string;
   }
 
   interface UprtclCommit {
@@ -163,8 +165,15 @@ export namespace Components {
     'perspectiveId'?: string;
   }
 
-  interface UprtclRoot {}
-  interface UprtclRootAttributes extends StencilHTMLAttributes {}
+  interface UprtclRoot {
+    'createRootElement': () => void;
+    'perspectiveId': string;
+    'providerSelected': string;
+  }
+  interface UprtclRootAttributes extends StencilHTMLAttributes {
+    'perspectiveId'?: string;
+    'providerSelected'?: string;
+  }
 }
 
 declare global {
