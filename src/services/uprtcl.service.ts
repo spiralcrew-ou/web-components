@@ -44,10 +44,7 @@ export interface UprtclService {
     * - timestamp: Unix epoch in miliseconds. Is final. Updating it changes the context ID.
     * - nonce: Free.  Is final. Updating it changes the context ID.
    */
-  createContext(
-    timestamp: number,
-    nonce: number
-  ): Promise<string>;
+  createContext(timestamp: number, nonce: number): Promise<string>;
 
    /** Perspective 
     * 

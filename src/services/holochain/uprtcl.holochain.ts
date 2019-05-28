@@ -107,7 +107,7 @@ export class UprtclHolochain implements UprtclService {
       context_address: contextId,
       name: name,
       timestamp: timestamp,
-      head_address: headId
+      head: headId
     });
   }
 

@@ -10,6 +10,7 @@ import {
 import { UprtclService } from '../../services/uprtcl.service';
 import { Perspective } from '../../types';
 import { factory } from '../../services/data.service';
+import { uprtclMultiplatform } from '../../services';
 
 @Component({
   tag: 'uprtcl-perspective',
@@ -32,7 +33,7 @@ export class UprtclPerspective {
 
   // TODO: replace uprtcl with Redux appropiate calls
   // Also for now the component does not know which implementation of the UprtclService to use
-  uprtcl: UprtclService =  factory.getUprtclService('LOCAL');
+  uprtcl: UprtclService = uprtclMultiplatform;
 
   loadPerspective() {
     // Perspective id can be null, in that case do nothing
