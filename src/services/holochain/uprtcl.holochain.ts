@@ -75,15 +75,20 @@ export class UprtclHolochain implements UprtclService {
     );
   }
 
-  getContextPerspectives(contextId: string): Promise<Perspective[]> {
-    return this.uprtclZome
-      .call('get_context_perspectives', {
+  async getContextPerspectives(contextId: string): Promise<Perspective[]> {
+    const perspectivesResponse = await this.uprtclZome.call(
+      'get_context_perspectives',
+      {
         context_address: contextId
-      })
-      .then(perspectives => this.uprtclZome.parseEntriesResults(perspectives))
-      .then(perspectives =>
-        perspectives.map(p => this.formatter.formatServerToUi('perspective', p))
-      );
+      }
+    );
+
+    const perspectives = this.uprtclZome.parseEntriesResults(
+      perspectivesResponse
+    );
+    return perspectives.map(p =>
+      this.formatter.formatServerToUi('perspective', p.entry)
+    );
   }
 
   createContext(timestamp: number, nonce: number): Promise<string> {
