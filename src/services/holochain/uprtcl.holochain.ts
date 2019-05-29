@@ -28,7 +28,7 @@ export class UprtclHolochain implements UprtclService {
     this.formatter = new ConnectionFormatter(this.objectRelation);
   }
 
-  getEntry(entryId): Promise<EntryResult> {
+  getEntry(entryId: string): Promise<EntryResult> {
     return this.uprtclZome
       .call('get_entry', { address: entryId })
       .then(entry => this.uprtclZome.parseEntryResult(entry));

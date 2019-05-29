@@ -39,10 +39,5 @@ export interface TextNode {
   }>;
 }
 
-export type Draft = {
-  perspectiveId: string;
-  dataId: string;
-};
-
 export type Dictionary<T> = { [key: string]: T };
 
