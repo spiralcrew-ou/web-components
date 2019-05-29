@@ -32,7 +32,7 @@ export class UprtclLocal implements UprtclService {
         throw new Error("Method not implemented.");
     }
 
-    getRootPerspectiveId(): Promise<string> {
+    getRootContextId(): Promise<string> {
         throw new Error("Method not implemented.");
     }
 
