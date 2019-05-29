@@ -38,11 +38,9 @@ export class Multiplatform<T> {
           let knownSources = await discoverService.getKnownSources(link);
 
           // If there are no known sources, assume that the source of the object is the original source
-          if (!knownSources) {
-            knownSources = [originSource];
+          if (knownSources) {
+            await this.knownSources.addKnownSources(link, knownSources);
           }
-
-          await this.knownSources.addKnownSources(link, knownSources);
         })
       );
     }

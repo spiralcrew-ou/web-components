@@ -34,12 +34,12 @@ export class UprtclHolochain implements UprtclService {
       .then(entry => this.uprtclZome.parseEntryResult(entry));
   }
 
-  getRootPerspective(): Promise<Perspective> {
+  getRootPerspectiveId(): Promise<string> {
     return this.uprtclZome
       .call('get_root_perspective', {})
-      .then(result => this.uprtclZome.parseEntryResult(result).entry)
+      .then(result => this.uprtclZome.parseEntryResult<Perspective>(result).entry)
       .then(perspective =>
-        this.formatter.formatServerToUi<Perspective>('perspective', perspective)
+        perspective.id
       );
   }
 

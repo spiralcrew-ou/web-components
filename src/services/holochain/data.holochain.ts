@@ -8,7 +8,7 @@ export class DataHolochain implements DataService {
     this.documentsZome = new HolochainConnection('test-instance', 'documents');
   }
 
-  getData(dataId: string): Promise<any> {
+  getWorkingData(dataId: string): Promise<any> {
     return this.documentsZome
       .call('get_text_node', {
         address: dataId
