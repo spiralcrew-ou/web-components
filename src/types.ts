@@ -7,6 +7,7 @@ export interface Context {
 
 export interface Perspective {
   id: string;
+  origin: string;
   creatorId: string;
   timestamp: number;
   contextId: string;
@@ -42,3 +43,5 @@ export type Draft = {
   perspectiveId: string;
   dataId: string;
 };
+
+export type Dictionary<T> = { [key: string]: T };

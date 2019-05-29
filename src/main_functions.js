@@ -22,7 +22,7 @@ export const generateCommitId = (creatorId, parentsCommitsId, message,content) =
         '@creatorid': creatorId,
         partentCommits : parentsCommitsId,
         message,
-        contentId: content.id
+        contentId: content
     }
 
     const b = Buffer.Buffer.from(JSON.stringify(body))

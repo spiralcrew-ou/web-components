@@ -1,10 +1,7 @@
-import {
-  HolochainConnection,
-  EntryResult
-} from './holochain.connection';
-import { Perspective, Commit, Context } from '../../types';
 import { UprtclService } from '../uprtcl.service';
+import { HolochainConnection, EntryResult } from './holochain.connection';
 import { ConnectionFormatter } from './connection-formatter';
+import { Perspective, Commit, Context } from '../../types';
 
 export class UprtclHolochain implements UprtclService {
   uprtclZome: HolochainConnection;
@@ -17,12 +14,12 @@ export class UprtclHolochain implements UprtclService {
     perspective: {
       creatorId: 'creator',
       contextId: 'context_address',
-      headLink: 'head'
+      headId: 'head'
     },
     commit: {
       creatorId: 'creator',
-      parentsLinks: 'parent_commits_links',
-      dataLink: 'content_link'
+      parentsIds: 'parent_commits_addresses',
+      dataId: 'content_address'
     }
   };
 
@@ -31,19 +28,16 @@ export class UprtclHolochain implements UprtclService {
     this.formatter = new ConnectionFormatter(this.objectRelation);
   }
 
-  getEntry(entryId): Promise<EntryResult> {
+  getEntry(entryId: string): Promise<EntryResult> {
     return this.uprtclZome
       .call('get_entry', { address: entryId })
       .then(entry => this.uprtclZome.parseEntryResult(entry));
   }
 
-  getRootPerspective(): Promise<Perspective> {
+  getRootContextId(): Promise<string> {
     return this.uprtclZome
-      .call('get_root_perspective', {})
-      .then(result => this.uprtclZome.parseEntryResult(result).entry)
-      .then(perspective =>
-        this.formatter.formatServerToUi<Perspective>('perspective', perspective)
-      );
+      .call('get_root_context_id', {})
+      .then(result => (result.Ok ? result.Ok : result));
   }
 
   getContextId(context: Context): Promise<string> {
@@ -81,57 +75,79 @@ export class UprtclHolochain implements UprtclService {
     );
   }
 
-  getContextPerspectives(contextId: string): Promise<Perspective[]> {
-    return this.uprtclZome
-      .call('get_context_perspectives', {
+  async getContextPerspectives(contextId: string): Promise<Perspective[]> {
+    const perspectivesResponse = await this.uprtclZome.call(
+      'get_context_perspectives',
+      {
         context_address: contextId
-      })
-      .then((perspectiveAddresses: { links: Array<{ address: string }> }) =>
-        Promise.all(
-          perspectiveAddresses.links.map(p => this.getPerspective(p.address))
-        )
-      )
+      }
+    );
+
+    const perspectives = this.uprtclZome.parseEntriesResults(
+      perspectivesResponse
+    );
+    return perspectives.map(p =>
+      this.formatter.formatServerToUi('perspective', p.entry)
+    );
   }
 
-  createContext(): Promise<string> {
-    return this.uprtclZome.call('create_context', { timestamp: Date.now() });
+  createContext(timestamp: number, nonce: number): Promise<string> {
+    return this.uprtclZome.call('create_context', {
+      timestamp: timestamp,
+      nonce: nonce
+    });
   }
 
   createPerspective(
     contextId: string,
     name: string,
-    headLink: string
+    timestamp: number,
+    headId: string
   ): Promise<string> {
     return this.uprtclZome.call('create_perspective', {
       context_address: contextId,
       name: name,
-      head_link: headLink
-    });
-  }
-
-  createPerspectiveAndContent(
-    context: Context,
-    name: string,
-    head: Commit
-  ): Promise<string> {
-    return this.uprtclZome.call('create_perspective_and_content', {
-      context: this.formatter.formatUiToServer('context', context),
-      name: name,
-      head: this.formatter.formatUiToServer('commit', head)
+      timestamp: timestamp,
+      head: headId
     });
   }
 
   createCommit(
-    perspectiveId: string,
+    timestamp: number,
     message: string,
-    contentLink: string
+    parentsIds: string[],
+    dataId: string
   ): Promise<string> {
     return this.uprtclZome.call('create_commit', {
-      perspective_address: perspectiveId,
       message: message,
-      timestamp: Date.now(),
-      content_link: contentLink
+      timestamp: timestamp,
+      parent_commits_addresses: parentsIds,
+      content_address: dataId
     });
   }
 
+  cloneContext(context: Context): Promise<string> {
+    return this.uprtclZome.call('clone_context', {
+      context
+    });
+  }
+
+  clonePerspective(perspective: Perspective): Promise<string> {
+    return this.uprtclZome.call('clone_perspective', {
+      perspective
+    });
+  }
+
+  cloneCommit(commit: Commit): Promise<string> {
+    return this.uprtclZome.call('clone_commit', {
+      commit
+    });
+  }
+
+  updateHead(perspectiveId: string, headId: string): Promise<void> {
+    return this.uprtclZome.call('update_perspective_head', {
+      perspective_address: perspectiveId,
+      head_address: headId
+    });
+  }
 }

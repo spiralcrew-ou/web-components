@@ -1,22 +1,32 @@
-import { DataService } from '../data.service';
+import { DataService, WorkingData } from '../data.service';
 import { HolochainConnection } from './holochain.connection';
+import { DraftsHolochain } from './drafts.holochain';
 
-export class DataHolochain implements DataService {
+export class DataHolochain<T = any> implements DataService<T> {
   documentsZome: HolochainConnection;
+  draftsHolochain = new DraftsHolochain<T>();
 
   constructor() {
     this.documentsZome = new HolochainConnection('test-instance', 'documents');
   }
 
-  getData(dataId: string): Promise<any> {
-    return this.documentsZome
-      .call('get_text_node', {
+  getWorkingData(dataId: string): Promise<WorkingData<T>> {
+    return Promise.all([
+      this.documentsZome.call('get_text_node', {
         address: dataId
-      })
-      .then(result => this.documentsZome.parseEntryResult<any>(result).entry);
+      }),
+      this.draftsHolochain.getDraft(dataId)
+    ]).then(([result, draft]) => ({
+      data: this.documentsZome.parseEntryResult<T>(result).entry,
+      draft: draft
+    }));
   }
 
-  createData(data: any): Promise<string> {
+  createData(data: T): Promise<string> {
     return this.documentsZome.call('create_text_node', data);
+  }
+
+  updateDraft(dataId: string, draft: T): Promise<void> {
+    return this.draftsHolochain.setDraft(dataId, draft);
   }
 }

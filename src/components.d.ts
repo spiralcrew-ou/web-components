@@ -7,195 +7,64 @@
 
 import '@stencil/core';
 
-import '@stencil/redux';
+
 
 
 export namespace Components {
 
-  interface CoApp {
-    'isAuthenticated': () => boolean;
-    'newIniciative': (iniciative: any) => void;
-    'registerUser': (user: any) => void;
-  }
-  interface CoAppAttributes extends StencilHTMLAttributes {}
-
-  interface CoCommentCard {}
-  interface CoCommentCardAttributes extends StencilHTMLAttributes {}
-
-  interface CoCommentList {}
-  interface CoCommentListAttributes extends StencilHTMLAttributes {}
-
   interface CoEditor {
-    'mainContextId': string;
+    'createRootElement': () => void;
   }
-  interface CoEditorAttributes extends StencilHTMLAttributes {
-    'mainContextId'?: string;
+  interface CoEditorAttributes extends StencilHTMLAttributes {}
+
+  interface DataResolver {
+    'dataId': string;
+  }
+  interface DataResolverAttributes extends StencilHTMLAttributes {
+    'dataId'?: string;
   }
 
-  interface CoIniciativeCard {
-    'author': object;
-    'cc': string;
-    'fav': boolean;
-    'iniciativeId': string;
-    'name': string;
-    'summary': string;
-    'urlBackground': string;
-    'visibility': string;
+  interface TextNode {
+    'data': TextNode;
   }
-  interface CoIniciativeCardAttributes extends StencilHTMLAttributes {
-    'author'?: object;
-    'cc'?: string;
-    'fav'?: boolean;
-    'iniciativeId'?: string;
-    'name'?: string;
-    'summary'?: string;
-    'urlBackground'?: string;
-    'visibility'?: string;
+  interface TextNodeAttributes extends StencilHTMLAttributes {
+    'data'?: TextNode;
+    'onCommit-content'?: (event: CustomEvent) => void;
   }
 
-  interface CoIniciativeList {
-    'funcNewIniciative': Object;
-    'onlyMine': boolean;
-    'sharedWithMe': boolean;
+  interface UprtclCommit {
+    'commitId': string;
   }
-  interface CoIniciativeListAttributes extends StencilHTMLAttributes {
-    'funcNewIniciative'?: Object;
-    'onlyMine'?: boolean;
-    'sharedWithMe'?: boolean;
+  interface UprtclCommitAttributes extends StencilHTMLAttributes {
+    'commitId'?: string;
   }
 
-  interface CoNewPerspective {}
-  interface CoNewPerspectiveAttributes extends StencilHTMLAttributes {}
-
-  interface CoNotificationBadge {}
-  interface CoNotificationBadgeAttributes extends StencilHTMLAttributes {}
-
-  interface CoNotificationItem {
-    'avatarURL': string;
-    'content': string;
-    'date': string;
-    'status': string;
-    'title': string;
-    'url': string;
+  interface UprtclPerspective {
+    'perspectiveId': string;
   }
-  interface CoNotificationItemAttributes extends StencilHTMLAttributes {
-    'avatarURL'?: string;
-    'content'?: string;
-    'date'?: string;
-    'status'?: string;
-    'title'?: string;
-    'url'?: string;
+  interface UprtclPerspectiveAttributes extends StencilHTMLAttributes {
+    'onPerspectiveCreated'?: (event: CustomEvent) => void;
+    'perspectiveId'?: string;
   }
-
-  interface CoParagraph {
-    'block_id': string;
-    'content': string;
-  }
-  interface CoParagraphAttributes extends StencilHTMLAttributes {
-    'block_id'?: string;
-    'content'?: string;
-    'onActiveBlock'?: (event: CustomEvent) => void;
-  }
-
-  interface CoSubtitle1 {
-    'block_id': string;
-    'content': string;
-  }
-  interface CoSubtitle1Attributes extends StencilHTMLAttributes {
-    'block_id'?: string;
-    'content'?: string;
-    'onActiveBlock'?: (event: CustomEvent) => void;
-  }
-
-  interface CoSubtitle2 {
-    'block_id': string;
-    'content': string;
-  }
-  interface CoSubtitle2Attributes extends StencilHTMLAttributes {
-    'block_id'?: string;
-    'content'?: string;
-    'onActiveBlock'?: (event: CustomEvent) => void;
-  }
-
-  interface CoTitle1 {
-    'block_id': string;
-    'content': string;
-  }
-  interface CoTitle1Attributes extends StencilHTMLAttributes {
-    'block_id'?: string;
-    'content'?: string;
-    'onActiveBlock'?: (event: CustomEvent) => void;
-  }
-
-  interface CoTitle2 {
-    'block_id': string;
-    'content': string;
-  }
-  interface CoTitle2Attributes extends StencilHTMLAttributes {
-    'block_id'?: string;
-    'content'?: string;
-    'onActiveBlock'?: (event: CustomEvent) => void;
-  }
-
-  interface MyComponent {}
-  interface MyComponentAttributes extends StencilHTMLAttributes {}
 }
 
 declare global {
   interface StencilElementInterfaces {
-    'CoApp': Components.CoApp;
-    'CoCommentCard': Components.CoCommentCard;
-    'CoCommentList': Components.CoCommentList;
     'CoEditor': Components.CoEditor;
-    'CoIniciativeCard': Components.CoIniciativeCard;
-    'CoIniciativeList': Components.CoIniciativeList;
-    'CoNewPerspective': Components.CoNewPerspective;
-    'CoNotificationBadge': Components.CoNotificationBadge;
-    'CoNotificationItem': Components.CoNotificationItem;
-    'CoParagraph': Components.CoParagraph;
-    'CoSubtitle1': Components.CoSubtitle1;
-    'CoSubtitle2': Components.CoSubtitle2;
-    'CoTitle1': Components.CoTitle1;
-    'CoTitle2': Components.CoTitle2;
-    'MyComponent': Components.MyComponent;
+    'DataResolver': Components.DataResolver;
+    'TextNode': Components.TextNode;
+    'UprtclCommit': Components.UprtclCommit;
+    'UprtclPerspective': Components.UprtclPerspective;
   }
 
   interface StencilIntrinsicElements {
-    'co-app': Components.CoAppAttributes;
-    'co-comment-card': Components.CoCommentCardAttributes;
-    'co-comment-list': Components.CoCommentListAttributes;
     'co-editor': Components.CoEditorAttributes;
-    'co-iniciative-card': Components.CoIniciativeCardAttributes;
-    'co-iniciative-list': Components.CoIniciativeListAttributes;
-    'co-new-perspective': Components.CoNewPerspectiveAttributes;
-    'co-notification-badge': Components.CoNotificationBadgeAttributes;
-    'co-notification-item': Components.CoNotificationItemAttributes;
-    'co-paragraph': Components.CoParagraphAttributes;
-    'co-subtitle1': Components.CoSubtitle1Attributes;
-    'co-subtitle2': Components.CoSubtitle2Attributes;
-    'co-title1': Components.CoTitle1Attributes;
-    'co-title2': Components.CoTitle2Attributes;
-    'my-component': Components.MyComponentAttributes;
+    'data-resolver': Components.DataResolverAttributes;
+    'text-node': Components.TextNodeAttributes;
+    'uprtcl-commit': Components.UprtclCommitAttributes;
+    'uprtcl-perspective': Components.UprtclPerspectiveAttributes;
   }
 
-
-  interface HTMLCoAppElement extends Components.CoApp, HTMLStencilElement {}
-  var HTMLCoAppElement: {
-    prototype: HTMLCoAppElement;
-    new (): HTMLCoAppElement;
-  };
-
-  interface HTMLCoCommentCardElement extends Components.CoCommentCard, HTMLStencilElement {}
-  var HTMLCoCommentCardElement: {
-    prototype: HTMLCoCommentCardElement;
-    new (): HTMLCoCommentCardElement;
-  };
-
-  interface HTMLCoCommentListElement extends Components.CoCommentList, HTMLStencilElement {}
-  var HTMLCoCommentListElement: {
-    prototype: HTMLCoCommentListElement;
-    new (): HTMLCoCommentListElement;
-  };
 
   interface HTMLCoEditorElement extends Components.CoEditor, HTMLStencilElement {}
   var HTMLCoEditorElement: {
@@ -203,106 +72,44 @@ declare global {
     new (): HTMLCoEditorElement;
   };
 
-  interface HTMLCoIniciativeCardElement extends Components.CoIniciativeCard, HTMLStencilElement {}
-  var HTMLCoIniciativeCardElement: {
-    prototype: HTMLCoIniciativeCardElement;
-    new (): HTMLCoIniciativeCardElement;
+  interface HTMLDataResolverElement extends Components.DataResolver, HTMLStencilElement {}
+  var HTMLDataResolverElement: {
+    prototype: HTMLDataResolverElement;
+    new (): HTMLDataResolverElement;
   };
 
-  interface HTMLCoIniciativeListElement extends Components.CoIniciativeList, HTMLStencilElement {}
-  var HTMLCoIniciativeListElement: {
-    prototype: HTMLCoIniciativeListElement;
-    new (): HTMLCoIniciativeListElement;
+  interface HTMLTextNodeElement extends Components.TextNode, HTMLStencilElement {}
+  var HTMLTextNodeElement: {
+    prototype: HTMLTextNodeElement;
+    new (): HTMLTextNodeElement;
   };
 
-  interface HTMLCoNewPerspectiveElement extends Components.CoNewPerspective, HTMLStencilElement {}
-  var HTMLCoNewPerspectiveElement: {
-    prototype: HTMLCoNewPerspectiveElement;
-    new (): HTMLCoNewPerspectiveElement;
+  interface HTMLUprtclCommitElement extends Components.UprtclCommit, HTMLStencilElement {}
+  var HTMLUprtclCommitElement: {
+    prototype: HTMLUprtclCommitElement;
+    new (): HTMLUprtclCommitElement;
   };
 
-  interface HTMLCoNotificationBadgeElement extends Components.CoNotificationBadge, HTMLStencilElement {}
-  var HTMLCoNotificationBadgeElement: {
-    prototype: HTMLCoNotificationBadgeElement;
-    new (): HTMLCoNotificationBadgeElement;
-  };
-
-  interface HTMLCoNotificationItemElement extends Components.CoNotificationItem, HTMLStencilElement {}
-  var HTMLCoNotificationItemElement: {
-    prototype: HTMLCoNotificationItemElement;
-    new (): HTMLCoNotificationItemElement;
-  };
-
-  interface HTMLCoParagraphElement extends Components.CoParagraph, HTMLStencilElement {}
-  var HTMLCoParagraphElement: {
-    prototype: HTMLCoParagraphElement;
-    new (): HTMLCoParagraphElement;
-  };
-
-  interface HTMLCoSubtitle1Element extends Components.CoSubtitle1, HTMLStencilElement {}
-  var HTMLCoSubtitle1Element: {
-    prototype: HTMLCoSubtitle1Element;
-    new (): HTMLCoSubtitle1Element;
-  };
-
-  interface HTMLCoSubtitle2Element extends Components.CoSubtitle2, HTMLStencilElement {}
-  var HTMLCoSubtitle2Element: {
-    prototype: HTMLCoSubtitle2Element;
-    new (): HTMLCoSubtitle2Element;
-  };
-
-  interface HTMLCoTitle1Element extends Components.CoTitle1, HTMLStencilElement {}
-  var HTMLCoTitle1Element: {
-    prototype: HTMLCoTitle1Element;
-    new (): HTMLCoTitle1Element;
-  };
-
-  interface HTMLCoTitle2Element extends Components.CoTitle2, HTMLStencilElement {}
-  var HTMLCoTitle2Element: {
-    prototype: HTMLCoTitle2Element;
-    new (): HTMLCoTitle2Element;
-  };
-
-  interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {}
-  var HTMLMyComponentElement: {
-    prototype: HTMLMyComponentElement;
-    new (): HTMLMyComponentElement;
+  interface HTMLUprtclPerspectiveElement extends Components.UprtclPerspective, HTMLStencilElement {}
+  var HTMLUprtclPerspectiveElement: {
+    prototype: HTMLUprtclPerspectiveElement;
+    new (): HTMLUprtclPerspectiveElement;
   };
 
   interface HTMLElementTagNameMap {
-    'co-app': HTMLCoAppElement
-    'co-comment-card': HTMLCoCommentCardElement
-    'co-comment-list': HTMLCoCommentListElement
     'co-editor': HTMLCoEditorElement
-    'co-iniciative-card': HTMLCoIniciativeCardElement
-    'co-iniciative-list': HTMLCoIniciativeListElement
-    'co-new-perspective': HTMLCoNewPerspectiveElement
-    'co-notification-badge': HTMLCoNotificationBadgeElement
-    'co-notification-item': HTMLCoNotificationItemElement
-    'co-paragraph': HTMLCoParagraphElement
-    'co-subtitle1': HTMLCoSubtitle1Element
-    'co-subtitle2': HTMLCoSubtitle2Element
-    'co-title1': HTMLCoTitle1Element
-    'co-title2': HTMLCoTitle2Element
-    'my-component': HTMLMyComponentElement
+    'data-resolver': HTMLDataResolverElement
+    'text-node': HTMLTextNodeElement
+    'uprtcl-commit': HTMLUprtclCommitElement
+    'uprtcl-perspective': HTMLUprtclPerspectiveElement
   }
 
   interface ElementTagNameMap {
-    'co-app': HTMLCoAppElement;
-    'co-comment-card': HTMLCoCommentCardElement;
-    'co-comment-list': HTMLCoCommentListElement;
     'co-editor': HTMLCoEditorElement;
-    'co-iniciative-card': HTMLCoIniciativeCardElement;
-    'co-iniciative-list': HTMLCoIniciativeListElement;
-    'co-new-perspective': HTMLCoNewPerspectiveElement;
-    'co-notification-badge': HTMLCoNotificationBadgeElement;
-    'co-notification-item': HTMLCoNotificationItemElement;
-    'co-paragraph': HTMLCoParagraphElement;
-    'co-subtitle1': HTMLCoSubtitle1Element;
-    'co-subtitle2': HTMLCoSubtitle2Element;
-    'co-title1': HTMLCoTitle1Element;
-    'co-title2': HTMLCoTitle2Element;
-    'my-component': HTMLMyComponentElement;
+    'data-resolver': HTMLDataResolverElement;
+    'text-node': HTMLTextNodeElement;
+    'uprtcl-commit': HTMLUprtclCommitElement;
+    'uprtcl-perspective': HTMLUprtclPerspectiveElement;
   }
 
 
