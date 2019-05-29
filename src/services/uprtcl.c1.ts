@@ -16,15 +16,15 @@
     })
   }
 
-  function put(url: string, _body: any) {
-    return putOrPost(url, _body, "PUT")
+  function put<T>(url: string, _body: any) {
+    return putOrPost<T>(url, _body, "PUT")
   }
 
-  function post(url: string, _body: any) {
-    return putOrPost(url, _body, "POST")
+  function post<T>(url: string, _body: any) {
+    return putOrPost<T>(url, _body, "POST")
   }
 
-  function putOrPost(url: string, _body: any, _method: string): Promise<string> {
+  function putOrPost<T>(url: string, _body: any, _method: string): Promise<T> {
     return fetch(url, { 
       method: _method,
       body: JSON.stringify(_body)
@@ -33,7 +33,7 @@
       if (!response.ok) {
         throw new Error(response.statusText)
       }
-      return response.json() as Promise<{ data: string }>
+      return response.json() as Promise<{ data: T }>
     })
     .then(data => {
         return data.data
@@ -94,7 +94,7 @@
       perspective.timestamp = _timestamp;
       perspective.headId = _headId;
       
-      return await post('/persp', perspective)
+      return await post<string>('/persp', perspective)
     }
   
     async createCommit(
@@ -111,7 +111,7 @@
       commit.parentsIds = _parentsIds;
       commit.dataId = _dataId;
 
-      return await post('/persp', commit)
+      return await post<string>('/persp', commit)
     }
 
     cloneContext(context: Context): Promise<string> {
@@ -125,7 +125,7 @@
     }
     
     updateHead(perspectiveId: string, commitId: string): Promise<void> {
-      throw new Error("Method not implemented.");
+      return put<void>(`/persp/${perspectiveId}?headId=${commitId}`, null);
     }
   
   }
