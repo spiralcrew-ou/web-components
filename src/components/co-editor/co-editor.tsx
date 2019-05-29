@@ -1,8 +1,10 @@
 import { Component, State, Method } from '@stencil/core';
 import { UprtclService } from '../../services/uprtcl.service';
-import { DataService, WorkingData } from '../../services/data.service';
+import { DataService } from '../../services/data.service';
 import { uprtclMultiplatform, dataMultiplatform } from '../../services';
 import { TextNode } from '../../types';
+import { DraftLocal } from '../../services/local/draft.local';
+import { DraftService } from '../../services/draft.service';
 
 @Component({
   tag: 'co-editor',
@@ -17,6 +19,8 @@ export class CoEditor {
   // Multiplatform service is already instantiated, get a reference to it
   uprtcl: UprtclService = uprtclMultiplatform;
   dataService: DataService<TextNode> = dataMultiplatform;
+  /** Drafts are managed by the local service only for the moment */
+  draftService: DraftService<any> = new DraftLocal();
 
   @Method()
   createRootElement() {
@@ -34,29 +38,28 @@ export class CoEditor {
       });
   }
 
-  async getPerspectiveWorkingData(perspectiveId: string) : Promise<WorkingData<TextNode>> {
+  async getPerspectiveDraft(perspectiveId: string) : Promise<TextNode> {
     const perspective = await this.uprtcl.getPerspective(perspectiveId);
     const commit = await this.uprtcl.getCommit(perspective.headId);
-    return await this.dataService.getWorkingData(commit.dataId);
+    return await this.dataService.getData(commit.dataId);
   }
 
-  async createPerspectiveWithWorkingData(data: TextNode) : Promise<string> {
+  async createPerspectiveWithDraft(data: TextNode) : Promise<string> {
     const contextId = await this.uprtcl.createContext(Date.now(), 0);
     const perspectiveId = await this.uprtcl.createPerspective(contextId, "default", Date.now(), null);
     // head commit is left as null, only draft data is created. head commit is created at first commit
-    await this.dataService.updateDraft(perspectiveId, data);
+    await this.draftService.setDraft(perspectiveId, data);
     return perspectiveId
   }
 
   async addLinkToPerspective(_link: string, perspectiveId: string) {
-    const workingData = await this.getPerspectiveWorkingData(perspectiveId);
-    const newDraft = workingData.draft;
+    const newDraft = await this.getPerspectiveDraft(perspectiveId);
     newDraft.links.push({link: _link});
-    await this.dataService.updateDraft(perspectiveId, newDraft)
+    await this.draftService.setDraft(perspectiveId, newDraft)
   }
 
   async createPerspectiveWithWorkingDataUnder(data: TextNode, parentId: string) : Promise<string> {
-    const perspectiveId = await this.createPerspectiveWithWorkingData(data);
+    const perspectiveId = await this.createPerspectiveWithDraft(data);
     await this.addLinkToPerspective(perspectiveId, parentId);
     return perspectiveId;
   }
@@ -68,11 +71,12 @@ export class CoEditor {
     const rootContextId = await this.uprtcl.getRootContextId();
     const rootPerspectives = await this.uprtcl.getContextPerspectives(rootContextId);
     const rootPerspectiveId = rootPerspectives[0].id;
-    const workingData = await this.getPerspectiveWorkingData(rootPerspectiveId);
+    
+    const draft = await this.getPerspectiveDraft(rootPerspectiveId);
 
-    if (workingData.draft.links.length > 0) {
+    if (draft.links.length > 0) {
       // MVP shows one document per user only
-      this.perspectiveId = workingData.draft.links[0].link;
+      this.perspectiveId = draft.links[0].link;
     } else {
       this.perspectiveId = await this.createPerspectiveWithWorkingDataUnder({text: "", links: []}, rootPerspectiveId);
     }
