@@ -1,11 +1,6 @@
   import { Commit, Context, Perspective } from '../types';
-import { UprtclService } from './uprtcl.service';
+  import { UprtclService } from './uprtcl.service';
   
-  interface AppUser {
-    did: string,
-    rootPerspectiveLink: string
-  }
-
   function get<T>(url: string): Promise<T> {
     return fetch(url, { 
       method: "GET"
@@ -62,17 +57,16 @@ import { UprtclService } from './uprtcl.service';
       return await get<Commit>('/commit/' + commitId);
     }
 
-    async getRootPerspective(): Promise<Perspective> {
-      const user = await get<AppUser>('/u/me');
-      return await this.getPerspective(user.rootPerspectiveLink);
+    async getRootContextId(): Promise<string> {
+      return await get<string>('/u/rootContextId');
     }
-  
+
     async getContextId(context: Context): Promise<string> {
       return await put('/ctxId', context)
     }
 
     async getContextPerspectives(contextId: string): Promise<Perspective[]> {
-      return await get<Perspective[]>('/ctxPersps')
+      return await get<Perspective[]>(`/ctx/${contextId}/ctxPersps`)
     }
   
     async createContext(
