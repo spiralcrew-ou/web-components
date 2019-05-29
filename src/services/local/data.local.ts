@@ -1,16 +1,19 @@
 import { DataService } from '../data.service';
+import { WorkingData } from '../data.service';
+import { TextNode } from '../../types';
 
 export class DataLocal implements DataService {
-    constructor() {
-    }
-  
-    getData(dataId: string): Promise<any> {
-      console.log(dataId)
-      return null
-    }
-  
-    createData(data: any): Promise<string> {
-      console.log(data)
-      return null
-    }
+  createData(data: TextNode): Promise<string> {
+    console.log(data)
+    throw new Error("Method not implemented.");
   }
+  getWorkingData(dataId: string): Promise<WorkingData<TextNode>> {
+    console.log(dataId);
+    throw new Error("Method not implemented.");
+  }
+  updateDraft(dataId: string, draft: TextNode): Promise<void> {
+    console.log(dataId);
+    console.log(draft);
+    throw new Error("Method not implemented.");
+  }
+}

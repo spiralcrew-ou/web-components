@@ -4,7 +4,7 @@ import {
   Event,
   EventEmitter,
   State,
-  Element,
+  // Element,
   Listen
 } from '@stencil/core';
 
@@ -20,7 +20,7 @@ interface TextNode {
   shadow: true
 })
 export class TextNodeElement {
-  @Element() private element: HTMLElement;
+  // @Element() private element: HTMLElement;
 
   @Prop() data: TextNode;
 

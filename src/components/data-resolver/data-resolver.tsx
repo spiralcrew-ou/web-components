@@ -18,14 +18,14 @@ export class DataResolver {
 
   @Prop() dataId: string;
   @State() loading: boolean = true;
-  @State() data: any;
+  @State() workingData: any;
   
   dataService: DataService<any> = dataMultiplatform;
 
   async loadData() {
     if (this.dataId) {
       this.loading = true;
-      this.data = await this.dataService.getData(this.dataId);
+      this.workingData = await this.dataService.getWorkingData(this.dataId);
 
       this.loading = false;
     }
@@ -53,12 +53,12 @@ export class DataResolver {
   }
 
   hostData() {
-    if (this.data && !this.loading) {
+    if (this.workingData && !this.loading) {
       this.element
         .querySelector('slot')
         .assignedNodes({ flatten: true })
         .filter(node => node.nodeType === 1)
-        .forEach(e => (e['data'] = this.data));
+        .forEach(e => (e['data'] = this.workingData.draft));
     }
 
     return {};
