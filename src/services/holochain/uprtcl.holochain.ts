@@ -34,13 +34,10 @@ export class UprtclHolochain implements UprtclService {
       .then(entry => this.uprtclZome.parseEntryResult(entry));
   }
 
-  getRootPerspectiveId(): Promise<string> {
+  getRootContextId(): Promise<string> {
     return this.uprtclZome
-      .call('get_root_perspective', {})
-      .then(result => this.uprtclZome.parseEntryResult<Perspective>(result).entry)
-      .then(perspective =>
-        perspective.id
-      );
+      .call('get_root_context_id', {})
+      .then(result => (result.Ok ? result.Ok : result));
   }
 
   getContextId(context: Context): Promise<string> {
@@ -78,16 +75,20 @@ export class UprtclHolochain implements UprtclService {
     );
   }
 
-  getContextPerspectives(contextId: string): Promise<Perspective[]> {
-    return this.uprtclZome
-      .call('get_context_perspectives', {
+  async getContextPerspectives(contextId: string): Promise<Perspective[]> {
+    const perspectivesResponse = await this.uprtclZome.call(
+      'get_context_perspectives',
+      {
         context_address: contextId
-      })
-      .then((perspectiveAddresses: { links: Array<{ address: string }> }) =>
-        Promise.all(
-          perspectiveAddresses.links.map(p => this.getPerspective(p.address))
-        )
-      );
+      }
+    );
+
+    const perspectives = this.uprtclZome.parseEntriesResults(
+      perspectivesResponse
+    );
+    return perspectives.map(p =>
+      this.formatter.formatServerToUi('perspective', p.entry)
+    );
   }
 
   createContext(timestamp: number, nonce: number): Promise<string> {

@@ -2,6 +2,7 @@ import {
   Component,
   Prop,
   Event,
+  Element,
   EventEmitter,
   State,
   Watch,
@@ -17,6 +18,8 @@ import { uprtclMultiplatform } from '../../services';
   shadow: true
 })
 export class UprtclPerspective {
+  @Element() private element: HTMLElement;
+
   @Prop() perspectiveId: string;
   
   @State() perspective: Perspective;
@@ -66,6 +69,21 @@ export class UprtclPerspective {
         )}
       </div>
     );
+  }
+
+  hostData() {
+    if (!this.loading) {
+      /** Pass perspectiveId to data resolver. 
+       *  Dirty fix until we understand how to handle drafts management */
+      this.element
+        .querySelector('slot')
+        .assignedNodes({ flatten: true })
+        .filter(node => node.nodeType === 1)
+        .forEach(e => (e['perspectiveId'] = this.perspectiveId));
+    }
+
+    // HELP: Not sure what to return here
+    return {};
   }
 
   // If perspective id is null, it means that a new context and perspective will be created

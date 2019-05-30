@@ -40,8 +40,8 @@ export class UprtclMultiplatform extends Multiplatform<UprtclService>
     );
   }
 
-  getRootPerspectiveId(): Promise<string> {
-    return this.getDefaultServiceProvider().getRootPerspectiveId();
+  getRootContextId(): Promise<string> {
+    return this.getDefaultServiceProvider().getRootContextId();
   }
 
   getContextId(context: Context): Promise<string> {

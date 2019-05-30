@@ -9,15 +9,16 @@ export interface UprtclService {
   getPerspective(perspectiveId: string): Promise<Perspective>;
   getCommit(commitId: string): Promise<Commit>;
 
+
   /** --------------- 
    * Support getters 
    * ---------------- */
 
-  /** getRootPerspective() returns the default perspective of the root context 
-   * of the authenticated user on that platform. The root context of a user has
-   * is unique and equal to {"creatorId":userDid,"timestamp":"0","nonce":"0"}
+  /** getRootContextId() returns the id of the root context of the authenticated 
+   * user on that platform. The root context of a user is unique and equal to 
+   * {"creatorId":userDid,"timestamp":"0","nonce":"0"}
   */
-  getRootPerspectiveId(): Promise<string>;
+  getRootContextId(): Promise<string>;
 
   /** getContextId() returns the id of a given context using the platform native
    * hash algorithm, allowing the same context to exist with different IDs depending
@@ -45,6 +46,7 @@ export interface UprtclService {
     * - nonce: Free.  Is final. Updating it changes the context ID.
    */
   createContext(timestamp: number, nonce: number): Promise<string>;
+
 
    /** Perspective 
     * 
@@ -75,6 +77,7 @@ export interface UprtclService {
     parentsIds: string[],
     dataId: string
   ): Promise<string>;
+
 
 
   /** --------------- 

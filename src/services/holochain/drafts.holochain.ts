@@ -1,7 +1,7 @@
 import { HolochainConnection } from './holochain.connection';
-import { DraftsService } from '../drafts.service';
+import { DraftService } from '../draft.service';
 
-export class DraftsHolochain<T> implements DraftsService<T> {
+export class DraftsHolochain<T> implements DraftService<T> {
   draftZome: HolochainConnection;
 
   constructor() {
