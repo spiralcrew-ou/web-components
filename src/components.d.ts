@@ -12,14 +12,24 @@ import '@stencil/core';
 
 export namespace Components {
 
-  interface TextNode {
+  interface CoEditor {
+    'createRootElement': () => void;
+  }
+  interface CoEditorAttributes extends StencilHTMLAttributes {}
+
+  interface DataResolver {
     'dataId': string;
-    'serviceProvider': string;
+  }
+  interface DataResolverAttributes extends StencilHTMLAttributes {
+    'dataId'?: string;
+  }
+
+  interface TextNode {
+    'data': TextNode;
   }
   interface TextNodeAttributes extends StencilHTMLAttributes {
-    'dataId'?: string;
+    'data'?: TextNode;
     'onCommit-content'?: (event: CustomEvent) => void;
-    'serviceProvider'?: string;
   }
 
   interface UprtclCommit {
@@ -36,33 +46,37 @@ export namespace Components {
     'onPerspectiveCreated'?: (event: CustomEvent) => void;
     'perspectiveId'?: string;
   }
-
-  interface UprtclRoot {
-    'createRootElement': () => void;
-    'perspectiveId': string;
-    'providerSelected': string;
-  }
-  interface UprtclRootAttributes extends StencilHTMLAttributes {
-    'perspectiveId'?: string;
-    'providerSelected'?: string;
-  }
 }
 
 declare global {
   interface StencilElementInterfaces {
+    'CoEditor': Components.CoEditor;
+    'DataResolver': Components.DataResolver;
     'TextNode': Components.TextNode;
     'UprtclCommit': Components.UprtclCommit;
     'UprtclPerspective': Components.UprtclPerspective;
-    'UprtclRoot': Components.UprtclRoot;
   }
 
   interface StencilIntrinsicElements {
+    'co-editor': Components.CoEditorAttributes;
+    'data-resolver': Components.DataResolverAttributes;
     'text-node': Components.TextNodeAttributes;
     'uprtcl-commit': Components.UprtclCommitAttributes;
     'uprtcl-perspective': Components.UprtclPerspectiveAttributes;
-    'uprtcl-root': Components.UprtclRootAttributes;
   }
 
+
+  interface HTMLCoEditorElement extends Components.CoEditor, HTMLStencilElement {}
+  var HTMLCoEditorElement: {
+    prototype: HTMLCoEditorElement;
+    new (): HTMLCoEditorElement;
+  };
+
+  interface HTMLDataResolverElement extends Components.DataResolver, HTMLStencilElement {}
+  var HTMLDataResolverElement: {
+    prototype: HTMLDataResolverElement;
+    new (): HTMLDataResolverElement;
+  };
 
   interface HTMLTextNodeElement extends Components.TextNode, HTMLStencilElement {}
   var HTMLTextNodeElement: {
@@ -82,24 +96,20 @@ declare global {
     new (): HTMLUprtclPerspectiveElement;
   };
 
-  interface HTMLUprtclRootElement extends Components.UprtclRoot, HTMLStencilElement {}
-  var HTMLUprtclRootElement: {
-    prototype: HTMLUprtclRootElement;
-    new (): HTMLUprtclRootElement;
-  };
-
   interface HTMLElementTagNameMap {
+    'co-editor': HTMLCoEditorElement
+    'data-resolver': HTMLDataResolverElement
     'text-node': HTMLTextNodeElement
     'uprtcl-commit': HTMLUprtclCommitElement
     'uprtcl-perspective': HTMLUprtclPerspectiveElement
-    'uprtcl-root': HTMLUprtclRootElement
   }
 
   interface ElementTagNameMap {
+    'co-editor': HTMLCoEditorElement;
+    'data-resolver': HTMLDataResolverElement;
     'text-node': HTMLTextNodeElement;
     'uprtcl-commit': HTMLUprtclCommitElement;
     'uprtcl-perspective': HTMLUprtclPerspectiveElement;
-    'uprtcl-root': HTMLUprtclRootElement;
   }
 
 

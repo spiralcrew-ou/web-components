@@ -36,12 +36,12 @@ export class UprtclMultiplatform extends Multiplatform<UprtclService>
     return await this.discover(
       commitId,
       (service, hash) => service.getCommit(hash),
-      commit => [commit.dataId]
+      commit => [commit.dataId, ...commit.parentsIds ]
     );
   }
 
-  getRootPerspective(): Promise<Perspective> {
-    return this.getDefaultServiceProvider().getRootPerspective();
+  getRootPerspectiveId(): Promise<string> {
+    return this.getDefaultServiceProvider().getRootPerspectiveId();
   }
 
   getContextId(context: Context): Promise<string> {

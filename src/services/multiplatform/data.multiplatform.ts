@@ -1,26 +1,32 @@
 import { Multiplatform } from './multiplatform';
-import { DataService } from '../data.service';
+import { DataService, WorkingData } from '../data.service';
+import { TextNode } from '../../types';
 
-export class DataMultiplatform extends Multiplatform<DataService>
-  implements DataService {
-
-  getData(dataId: string): Promise<any> {
+export class DataMultiplatform extends Multiplatform<DataService<TextNode>>
+  implements DataService<TextNode> {
+  getWorkingData(dataId: string): Promise<WorkingData<TextNode>> {
     return this.discover(
       dataId,
-      (service: DataService, hash: string) => service.getData(hash),
-      data => {
-        if (data.links) {
-          return data.links.map(link => link.link);
-        } else {
-          return [];
-        }
-      }
+      (service, hash) => service.getWorkingData(hash),
+      workingData => [
+        ...workingData.data.links.map(link => link.link),
+        ...workingData.draft.links.map(link => link.link)
+      ]
     );
   }
 
-  createData(data: any): Promise<string> {
+  createData(data: TextNode): Promise<string> {
     // TODO: How to create data in one service provider or the other?
     const serviceProvider = Object.keys(this.serviceProviders)[0];
     return this.serviceProviders[serviceProvider].service.createData(data);
+  }
+  
+  updateDraft(dataId: string, draft: TextNode): Promise<void> {
+    // TODO: How to create data in one service provider or the other?
+    const serviceProvider = Object.keys(this.serviceProviders)[0];
+    return this.serviceProviders[serviceProvider].service.updateDraft(
+      dataId,
+      draft
+    );
   }
 }

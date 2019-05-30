@@ -4,12 +4,9 @@ import {
   Event,
   EventEmitter,
   State,
-  Watch,
-  Element,
+  // Element,
   Listen
 } from '@stencil/core';
-import { DataService } from '../../services/data.service';
-import { dataMultiplatform } from '../../services';
 
 interface TextNode {
   id?: string;
@@ -23,16 +20,11 @@ interface TextNode {
   shadow: true
 })
 export class TextNodeElement {
-  @Element() private element: HTMLElement;
+  // @Element() private element: HTMLElement;
 
-  @Prop() dataId: string;
-  @Prop() serviceProvider: string
-  @State() loading: boolean = !!this.dataId;
+  @Prop() data: TextNode;
 
-  @State() private node: TextNode = {
-    text: '',
-    links: []
-  };
+  @State() node = this.data;
 
   newText: string;
 
@@ -43,83 +35,34 @@ export class TextNodeElement {
   })
   commitContent: EventEmitter;
 
-  data: DataService = dataMultiplatform;
-
-  loadData() {
-    if (this.dataId) {
-      this.loading = true;
-      this.data.getData(this.dataId).then(node => {
-        this.node = node;
-        this.loading = false;
-      });
-    }
-  }
-
-  componentWillLoad() {
-    this.loadData();
-  }
-
-  @Watch('dataId')
-  dataChanged() {
-    this.loadData();
-  }
-
   render() {
     return (
       <div>
-        {this.loading ? (
-          <span>Loading...</span>
-        ) : (
-          <div>
-            <span
-              id="text"
-              data-focused-advice="Start typing"
-              contenteditable="true"
-              onInput={() => this.updateText()}
-            >
-              {this.node.text}
-            </span>
+        <span
+          id="text"
+          data-focused-advice="Start typing"
+          contenteditable="true"
+        >
+          {this.data.text}
+        </span>
 
-            {this.node.links.map((link, index) => (
-              <uprtcl-perspective
-                perspectiveId={link}
-                onPerspectiveCreated={e => this.perspectiveCreated(index, e)}
-              >
-                <text-node />
-              </uprtcl-perspective>
-            ))}
-          </div>
-        )}
+        {this.data.links.map((link) => (
+          <uprtcl-perspective perspectiveId={link}>
+            <data-resolver>
+              <text-node />
+            </data-resolver>
+          </uprtcl-perspective>
+        ))}
       </div>
-    );
-  }
-
-  updateText() {
-    // HELP: Get the value of the <span id="text"> and store it in newText
-    this.newText = this.element.querySelector('#text').innerHTML;
+    )
   }
 
   @Listen('keydown')
   onKeyDown(event) {
     if (event.key === 'Enter') {
-      const links = [...this.node.links, null];
-      // Force rerendering of the component
-      this.node = { ...this.node, links: links };
+      /* change parent perspective draft to add a new link to textNode next to this */
+    } else {
+      /* emit something that updates the draft of this element data */
     }
-  }
-
-  perspectiveCreated(index: number, event: CustomEvent) {
-    this.node.links[index] = event.detail.perspectiveId;
-    // We need to immediately save the content with the new link not to lose the relationship
-    this.saveContent();
-    event.stopPropagation();
-  }
-
-  async saveContent() {
-    const node: TextNode = { ...this.node };
-    if (this.newText) {
-      node.text = this.newText;
-    }
-    this.data.createData(node).then(nodeId => this.commitContent.emit(nodeId));
   }
 }

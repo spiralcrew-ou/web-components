@@ -1,7 +1,5 @@
-import { Draft } from '../types';
+export interface DraftsService<T = any> {
+  getDraft(objectId: string): Promise<T>;
 
-export interface DraftsService {
-  getDraft(perspectiveId: string): Promise<Draft>;
-
-  setDraft(draft: Draft): Promise<void>;
+  setDraft(objectId: string, draft: T): Promise<void>;
 }

@@ -28,18 +28,18 @@ export class UprtclHolochain implements UprtclService {
     this.formatter = new ConnectionFormatter(this.objectRelation);
   }
 
-  getEntry(entryId): Promise<EntryResult> {
+  getEntry(entryId: string): Promise<EntryResult> {
     return this.uprtclZome
       .call('get_entry', { address: entryId })
       .then(entry => this.uprtclZome.parseEntryResult(entry));
   }
 
-  getRootPerspective(): Promise<Perspective> {
+  getRootPerspectiveId(): Promise<string> {
     return this.uprtclZome
       .call('get_root_perspective', {})
-      .then(result => this.uprtclZome.parseEntryResult(result).entry)
+      .then(result => this.uprtclZome.parseEntryResult<Perspective>(result).entry)
       .then(perspective =>
-        this.formatter.formatServerToUi<Perspective>('perspective', perspective)
+        perspective.id
       );
   }
 
