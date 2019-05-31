@@ -38,25 +38,17 @@ export class UprtclLocal implements UprtclService {
     throw new Error("Method not implemented.");
   }
 
-  getRootContextId(): Promise<string> {
+   async getRootContextId(): Promise<string> {
     const contextId = generateUserContext('anon')
-    return getContext(contextId).then(ctx => {
+    return getContext(contextId).then(async (ctx) => {
       if (!ctx) {
-        //this.createContext(0,0).then(result => {return result})
-        this.createCommit(new Date().getTime(),'',[],null).then(headId  =>{
-          this.createContext(0,0).then(newCtx => {
-            this.createPerspective(newCtx,'User Context',new Date().getTime(),headId).then( () => {
-              return newCtx
-            })
-          })
-        } )
-      } else {
+        const headId = await this.createCommit(new Date().getTime(),'',[],null)
+        const newCtx = await this.createContext(0,0)
+        await this.createPerspective(newCtx,'User Context',new Date().getTime(),headId)
+        return newCtx
+      } else 
         return ctx.id
-      }
-      
     })
-
-    // throw new Error("Method not implemented.");
   }
 
   getContextId(_context: IContext): Promise<string> {
