@@ -58,7 +58,9 @@ export class Context implements IContext {
 export class Draft implements IDraft {
     perspectiveId: string;    
     dataId: string;
-    constructor(_perspectiveId:string,_dataId:string){
+    id: string
+    constructor(_id:string,_perspectiveId:string,_dataId:string){
+        this.id = _id
         this.perspectiveId= _perspectiveId
         this.dataId = _dataId
     }
