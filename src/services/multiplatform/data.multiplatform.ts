@@ -6,7 +6,7 @@ export class DataMultiplatform extends Multiplatform<DataService<TextNode>>
   implements DataService<TextNode> {
 
   getData(dataId: string): Promise<TextNode> {
-    return this.discover(
+    return this.discoverObject(
       dataId,
       (service, hash) => service.getData(hash),
       data => [...data.links.map(link => link.link)]

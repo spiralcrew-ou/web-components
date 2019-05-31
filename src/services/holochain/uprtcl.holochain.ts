@@ -53,12 +53,24 @@ export class UprtclHolochain implements UprtclService {
     );
   }
 
+  async getPerspectiveHead(perspectiveId: string): Promise<string> {
+    let headId = null;
+    try {
+      headId = await this.uprtclZome.call('get_perspective_head', {
+        perspective_address: perspectiveId
+      });
+    } catch (e) {
+      if (e.message !== '{"Internal":"given perspective has no commits"}') {
+        throw new Error(e);
+      }
+    }
+    return headId;
+  }
+
   getPerspective(perspectiveId: string): Promise<Perspective> {
     return Promise.all([
       this.getEntry(perspectiveId),
-      this.uprtclZome.call('get_perspective_head', {
-        perspective_address: perspectiveId
-      })
+      this.getPerspectiveHead(perspectiveId)
     ]).then(([result, headAddress]: [EntryResult, string]) => {
       const perspective = result.entry;
       perspective.head = headAddress;
@@ -83,11 +95,19 @@ export class UprtclHolochain implements UprtclService {
       }
     );
 
-    const perspectives = this.uprtclZome.parseEntriesResults(
+    const perspectivesEntries = this.uprtclZome.parseEntriesResults(
       perspectivesResponse
     );
-    return perspectives.map(p =>
-      this.formatter.formatServerToUi('perspective', p.entry)
+    let perspectives = perspectivesEntries.map(p =>
+      this.formatter.formatServerToUi<Perspective>('perspective', p.entry)
+    );
+
+    return await Promise.all(
+      perspectives.map(async perspective => {
+        const headId = await this.getPerspectiveHead(perspective.id);
+        perspective.headId = headId;
+        return perspective;
+      })
     );
   }
 

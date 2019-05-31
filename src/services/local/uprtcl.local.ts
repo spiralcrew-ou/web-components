@@ -16,7 +16,8 @@ import {
   insertCommit, Commit,
   getContext, 
   getPerpectives,
-  getPerspective
+  getPerspective,
+  getCommit
 } from './dataservices';
 
 
@@ -36,20 +37,11 @@ export class UprtclLocal implements UprtclService {
   }
 
   getCommit(_commitId: string): Promise<ICommit> {
-    throw new Error("Method not implemented.");
+    return getCommit(_commitId);
   }
 
    async getRootContextId(): Promise<string> {
-    const contextId = generateUserContext('anon')
-    return getContext(contextId).then(async (ctx) => {
-      if (!ctx) {
-        const headId = await this.createCommit(new Date().getTime(),'',[],null)
-        const newCtx = await this.createContext(0,0)
-        await this.createPerspective(newCtx,'User Context',new Date().getTime(),headId)
-        return newCtx
-      } else 
-        return ctx.id
-    })
+    return generateUserContext('anon');
   }
 
   getContextId(_context: IContext): Promise<string> {
