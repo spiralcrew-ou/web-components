@@ -1,3 +1,25 @@
+import { WebAuth } from 'auth0-js';
+
+const auth0Options = {
+    domain: 'collectiveone.auth0.com',
+    clientID: 'kuDX1ZVorAly5PYdyV721zRoTf0K0orm'
+}
+
+let auth = new WebAuth(auth0Options);
+
+const loginOptions = {
+    email: 'tom@x.com',
+    password: '123456',
+    responseType: 'id_token',
+    redirectUri: 'http://localhost:3333'
+}
+
+auth.login(loginOptions, (error, result) => {
+    console.log(error);
+    console.log(result);
+});
+
+
 export class Http {
     async get<T>(url: string): Promise<T> {
         return fetch(url, {
@@ -38,4 +60,6 @@ export class Http {
             })
     }
 }
+
+export const http = new Http();
 

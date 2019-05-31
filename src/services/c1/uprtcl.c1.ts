@@ -1,8 +1,6 @@
   import { Commit, Context, Perspective } from '../../types';
   import { UprtclService } from '../uprtcl.service';
-  import { Http } from './http';
-  
-  const http = new Http();
+  import { http } from './http';
   
   export class UprtclCollectiveOne implements UprtclService {
     

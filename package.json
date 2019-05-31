@@ -32,6 +32,8 @@
     "@material/textfield": "^2.1.1",
     "@stencil/redux": "^0.1.1",
     "@stencil/sass": "^0.1.1",
+    "@types/auth0-js": "^9.10.2",
+    "auth0-js": "^9.10.4",
     "buffer": "^5.2.1",
     "cids": "^0.6.0",
     "codex-notifier": "^1.1.2",
