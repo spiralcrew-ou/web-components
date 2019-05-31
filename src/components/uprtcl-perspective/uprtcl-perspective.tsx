@@ -21,7 +21,7 @@ export class UprtclPerspective {
   @Element() private element: HTMLElement;
 
   @Prop() perspectiveId: string;
-  
+
   @State() perspective: Perspective;
 
   @State() loading: boolean = true;
@@ -63,27 +63,20 @@ export class UprtclPerspective {
         {this.loading ? (
           <span>Loading...</span> // What to do in the meantime the information is loading?
         ) : (
-          <uprtcl-commit commitId={this.perspective.headId}>
-            <slot />
-          </uprtcl-commit>
+          <div>
+            {this.perspective.headId ? (
+              <uprtcl-commit commitId={this.perspective.headId}>
+                <slot />
+              </uprtcl-commit>
+            ) : (
+              <data-resolver perspectiveId={this.perspectiveId}>
+                <slot />
+              </data-resolver>
+            )}
+          </div>
         )}
       </div>
     );
-  }
-
-  hostData() {
-    if (!this.loading) {
-      /** Pass perspectiveId to data resolver. 
-       *  Dirty fix until we understand how to handle drafts management */
-      this.element
-        .querySelector('slot')
-        .assignedNodes({ flatten: true })
-        .filter(node => node.nodeType === 1)
-        .forEach(e => (e['perspectiveId'] = this.perspectiveId));
-    }
-
-    // HELP: Not sure what to return here
-    return {};
   }
 
   // If perspective id is null, it means that a new context and perspective will be created
@@ -99,6 +92,21 @@ export class UprtclPerspective {
         )}
       </div>
     );
+  }
+
+  hostData() {
+    if (!this.loading && this.perspective.headId) {
+      /** Pass perspectiveId to data resolver.
+       *  Dirty fix until we understand how to handle drafts management */
+      this.element
+        .querySelector('slot')
+        .assignedNodes({ flatten: true })
+        .filter(node => node.nodeType === 1)
+        .forEach(e => (e['perspectiveId'] = this.perspectiveId));
+    }
+
+    // HELP: Not sure what to return here
+    return {};
   }
 
   @Listen('commit-content')

@@ -4,7 +4,7 @@ import { DataService } from '../../services/data.service';
 import { uprtclMultiplatform, dataMultiplatform } from '../../services';
 import { TextNode } from '../../types';
 import { DraftService } from '../../services/draft.service';
-import { DraftsHolochain } from '../../services/holochain/drafts.holochain';
+import { DraftLocal } from '../../services/local/draft.local';
 
 @Component({
   tag: 'co-editor',
@@ -19,7 +19,7 @@ export class CoEditor {
   uprtcl: UprtclService = uprtclMultiplatform;
   dataService: DataService<TextNode> = dataMultiplatform;
   /** Drafts are managed by the local service only for the moment */
-  draftService: DraftService<any> = new DraftsHolochain();
+  draftService: DraftService<any> = new DraftLocal();
 
   @Method()
   createRootElement() {
@@ -73,15 +73,12 @@ export class CoEditor {
 
     /** MVP assumes one root perspective per user in platform */
     const rootContextId = await this.uprtcl.getRootContextId();
-    console.log('hi', rootContextId);
     const rootPerspectives = await this.uprtcl.getContextPerspectives(
       rootContextId
     );
     const rootPerspectiveId = rootPerspectives[0].id;
-    console.log('hi2', rootPerspectiveId);
 
     const draft = await this.draftService.getDraft(rootPerspectiveId);
-    console.log('hi3', draft);
 
     if (draft && draft.links.length > 0) {
       // MVP shows one document per user only

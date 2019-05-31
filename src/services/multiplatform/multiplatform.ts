@@ -29,7 +29,6 @@ export class Multiplatform<T> {
     links: string[],
     originSource: string
   ): Promise<void> {
-    console.log('discoverLinkSources', links);
     const discoverService = this.serviceProviders[originSource].discovery;
 
     if (discoverService) {
@@ -61,7 +60,6 @@ export class Multiplatform<T> {
     getter: (service: T, hash: string) => Promise<O>,
     linksSelector: (object: O) => string[] = () => []
   ): Promise<O> {
-    console.log('discover', hash);
     // Retrieve the known sources from the local store
     const knownSources = await this.knownSources.getKnownSources(hash);
 
@@ -112,7 +110,6 @@ export class Multiplatform<T> {
     linksSelector: (object: O) => string[] = () => [],
     idSelector: (object: O) => string = o => o['id']
   ): Promise<Array<O>> {
-    console.log('discover', hash);
     // Retrieve the known sources from the local store
     const knownSources = await this.knownSources.getKnownSources(hash);
 
@@ -171,7 +168,6 @@ export class Multiplatform<T> {
     const newHash = await creator(
       this.serviceProviders[serviceProvider].service
     );
-    console.log('newHash', newHash);
 
     // Get the discovery service for the given service provider
     const discoveryService = this.serviceProviders[serviceProvider].discovery;

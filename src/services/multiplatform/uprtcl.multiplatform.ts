@@ -42,17 +42,9 @@ export class UprtclMultiplatform extends Multiplatform<UprtclService>
 
   async getRootContextId(): Promise<string> {
     let rootContextId = await this.getDefaultServiceProvider().getRootContextId();
-
-    if (!rootContextId) {
-      rootContextId = await this.createContext(0, 0);
-      // Create an empty perspective 
-      await this.createPerspective(
-        rootContextId,
-        'User Context',
-        new Date().getTime(),
-        null
-      );
-    }
+    const rootContext = await this.getDefaultServiceProvider().getContext(
+      rootContextId
+    );
 
     const defaultDiscovery = this.serviceProviders[this.defaultServiceProvider]
       .discovery;
@@ -60,8 +52,19 @@ export class UprtclMultiplatform extends Multiplatform<UprtclService>
     if (defaultDiscovery) {
       defaultSource = await defaultDiscovery.getOwnSource();
     }
-    await this.knownSources.addKnownSources(rootContextId, [defaultSource]);
 
+    if (!rootContext) {
+      rootContextId = await this.createContext(0, 0);
+      // Create an empty perspective
+      const perspectiveId = await this.createPerspective(
+        rootContextId,
+        'User Context',
+        new Date().getTime(),
+        null
+      );
+      await this.knownSources.addKnownSources(perspectiveId, [defaultSource]);
+    }
+    await this.knownSources.addKnownSources(rootContextId, [defaultSource]);
     return rootContextId;
   }
 
@@ -91,10 +94,14 @@ export class UprtclMultiplatform extends Multiplatform<UprtclService>
     timestamp: number,
     headId: string
   ): Promise<string> {
+    const links = [contextId];
+    if (headId) {
+      links.push(headId);
+    }
     return this.createWithLinks(
       this.defaultServiceProvider,
       service => service.createPerspective(contextId, name, timestamp, headId),
-      [contextId, headId]
+      links
     );
   }
 
