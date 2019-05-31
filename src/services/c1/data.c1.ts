@@ -1,20 +1,10 @@
 import { DataService } from '../data.service';
 import { TextNode } from '../../types';
+import { DataC1If, DataC1 } from './data.if';
 import { Http } from './http';
   
 const http = new Http();
 
-interface DataC1If {
-    id: string;
-    type: string;
-    jsonData: string;
-}
-
-class DataC1 implements DataC1If {
-    id: string;    
-    type: string;
-    jsonData: string;
-}
 export class DataCollectiveOne implements DataService {
 
     async getData(dataId: string): Promise<any> {
