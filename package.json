@@ -13,8 +13,7 @@
   "scripts": {
     "build": "stencil build --docs",
     "start": "stencil build --dev --watch --serve",
-    "test": "stencil test --spec --e2e",
-    "test-c1": "jest",
+    "test": "stencil test --spec --e2e --coverage",
     "test.watch": "stencil test --spec --e2e --watchAll"
   },
   "dependencies": {
@@ -59,6 +58,7 @@
     "babel-jest": "^24.8.0",
     "jest": "^23.6.0",
     "jest-cli": "23.6.0",
+    "puppeteer": "1.8.0",
     "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-plugin-node-globals": "^1.4.0",
     "ts-jest": "^24.0.2"

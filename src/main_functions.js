@@ -16,6 +16,18 @@ export const generateCID = creatorId => {
     return cid.toString()
 }
 
+
+export const generateUserContext = (userID)  => {
+    const body = {
+        '@creatorid': userID,
+        "@timestamp": 0
+    }
+    const b = Buffer.Buffer.from(JSON.stringify(body))
+    var encoded = multihash.encode(b, 'sha2-256')
+    var cid = new CID(1, 'dag-pb', encoded)
+    return cid.toString()
+}
+
 export const generateCommitId = (creatorId, parentsCommitsId, message,content) => {
 
     const body = {

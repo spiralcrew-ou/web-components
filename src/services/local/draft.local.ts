@@ -1,14 +1,14 @@
 import { DraftService } from '../draft.service';
+import {insertDraft,getDraft} from './dataservices';
+
 
 export class DraftLocal<T> implements DraftService<T> {
     getDraft(objectId: string): Promise<T> {
-        console.log(objectId);
-        throw new Error("Method not implemented.");
+        return getDraft(objectId)
     }    
     
     setDraft(objectId: string, draft: T): Promise<void> {
-        console.log(objectId);
-        console.log(draft);
-        throw new Error("Method not implemented.");
+        draft['id']= objectId
+        return insertDraft(draft as any)
     }  
 }
