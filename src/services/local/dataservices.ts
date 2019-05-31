@@ -55,20 +55,23 @@ export class Context implements IContext {
 }
 
 class LocalDatabase extends Dexie {
-    perspectives: Dexie.Table<IPerspective,string>
-    commits: Dexie.Table<ICommit, string>
-    contexts: Dexie.Table<IContext,string>
+    perspectives: Dexie.Table<Perspective,string>
+    commits: Dexie.Table<Commit, string>
+    contexts: Dexie.Table<Context,string>
 
     constructor() {
         super('CollectiveOne');
         this.version(0.1).stores({
-            perspectives: 'id',
+            perspectives: 'id,contextId',
             commits: 'id',
             contexts: 'id'
         })
-        this.perspectives = this.table('perspectives')
-        this.contexts = this.table('contexts')
-        this.commits = this.table('commits')
+        // this.perspectives = this.table('perspectives')
+        // this.contexts = this.table('contexts')
+        // this.commits = this.table('commits')
+        this.contexts.mapToClass(Context)
+        this.perspectives.mapToClass(Perspective)
+        this.commits.mapToClass(Commit)
     }
 }
 
@@ -90,3 +93,10 @@ export const insertCommit = (commit): Promise<any> => {
     return db.commits.add(commit)
 }
 
+export const getContext = (contextId):Promise<any> => {
+    return db.contexts.get(contextId)
+}
+
+export const getPerpectives = (contextId):Promise<any> => {
+    return db.perspectives.where('contextId').equals(contextId).toArray()
+}

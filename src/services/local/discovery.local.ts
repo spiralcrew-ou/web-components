@@ -2,9 +2,10 @@ import Dexie from 'dexie';
 import { DiscoveryService } from '../discovery.service';
 
 export class DiscoveryLocal implements DiscoveryService {
+  //knownSources = null 
   knownSources: Dexie.Table<string[], string>;
 
-  constructor() {    
+  constructor() {   
     const db = new Dexie('knownsources');
     db.version(0.1).stores({
       knownsources: 'id'
