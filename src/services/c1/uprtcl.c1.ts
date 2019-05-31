@@ -1,4 +1,4 @@
-  import { Commit, Context, Perspective } from '../../types';
+  import { Commit, Context, Perspective } from './data.objects.c1';
   import { UprtclService } from '../uprtcl.service';
   import { http } from './http';
   
@@ -35,12 +35,13 @@
       _timestamp: number,
       _nonce: number): Promise<string> {
 
-      let context: Context;
+      let context: Context = new Context();
 
+      context.id = null;
       context.timestamp = _timestamp;
       context.nonce = _nonce
 
-      return await http.post('/ctx', context)
+      return await http.post('/ctx', [ context ])
     }
   
     async createPerspective(
@@ -49,14 +50,16 @@
       _timestamp: number,
       _headId: string) {
 
-      let perspective: Perspective;
+      let perspective: Perspective = new Perspective();
 
+      perspective.id = null;
+      perspective.creatorId = null;
       perspective.contextId = _contextId;
       perspective.name = _name;
       perspective.timestamp = _timestamp;
       perspective.headId = _headId;
       
-      return await http.post<string>('/persp', perspective)
+      return await http.post<string>('/persp', [ perspective ])
     }
   
     async createCommit(
@@ -66,14 +69,14 @@
       _dataId: string
     ) {
 
-      let commit: Commit;
+      let commit: Commit = new Commit();
       
       commit.timestamp = _timestamp;
       commit.message = _message;
       commit.parentsIds = _parentsIds;
       commit.dataId = _dataId;
 
-      return await http.post<string>('/commit', commit)
+      return await http.post<string>('/commit', [ commit ])
     }
 
     cloneContext(context: Context): Promise<string> {

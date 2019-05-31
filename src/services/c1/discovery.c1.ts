@@ -7,12 +7,11 @@ export class DiscoveryCollectiveOne implements DiscoveryService {
   }
 
   getOwnSource(): Promise<string> {
-    return http.get('discovery/you');
+    return http.get('/discovery/you');
   }
 
   getKnownSources(hash: string): Promise<string[]> {
-    console.log(hash);
-    return Promise.resolve([]);
+    return http.get(`/discovery/${hash}`);
   }
   addKnownSources(hash: string, sources: string[]): Promise<void> {
     console.log(hash);

@@ -1,6 +1,6 @@
 import { Dictionary } from '../../types';
 import { DiscoveryService } from '../discovery.service';
-import { DiscoveryLocal } from '../local/discovery.local';
+import { DiscoveryCollectiveOne } from '../c1/discovery.c1';
 
 export class Multiplatform<T> {
   /**
@@ -10,7 +10,7 @@ export class Multiplatform<T> {
   serviceProviders: Dictionary<{ service: T; discovery: DiscoveryService }>;
 
   // Stores the known sources locally
-  knownSources: DiscoveryService = new DiscoveryLocal();
+  knownSources: DiscoveryService = new DiscoveryCollectiveOne();
 
   constructor(
     serviceProviders: Dictionary<{
