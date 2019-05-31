@@ -14,7 +14,9 @@ import {
   insertPerspective, Perspective,
   insertContext, Context,
   insertCommit, Commit,
-  getContext, getPerpectives
+  getContext, 
+  getPerpectives,
+  getPerspective
 } from './dataservices';
 
 
@@ -26,12 +28,11 @@ export class UprtclLocal implements UprtclService {
   }
 
   getContext(_contextId: string): Promise<IContext> {
-
-    throw new Error("Method not implemented.");
+    return getContext(_contextId)
   }
 
   getPerspective(_perspectiveId: string): Promise<IPerspective> {
-    throw new Error("Method not implemented.");
+    return getPerspective(_perspectiveId)
   }
 
   getCommit(_commitId: string): Promise<ICommit> {
@@ -52,6 +53,7 @@ export class UprtclLocal implements UprtclService {
   }
 
   getContextId(_context: IContext): Promise<string> {
+    // TODO: To see with Pepo. Too much weed?? 
     throw new Error("Method not implemented.");
   }
 

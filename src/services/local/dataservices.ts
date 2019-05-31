@@ -125,6 +125,10 @@ export const getPerpectives = (contextId):Promise<any> => {
     return db.perspectives.where('contextId').equals(contextId).toArray()
 }
 
+export const getPerspective = (perspectiveId:string):Promise<IPerspective> => {
+    return db.perspectives.get(perspectiveId)
+}
+
 export const insertDraft = (draft:Draft):Promise<any> => {
     return db.drafts.add(draft)
 }
