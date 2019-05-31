@@ -1,17 +1,15 @@
 import { Multiplatform } from './multiplatform';
-import { DataService, WorkingData } from '../data.service';
+import { DataService } from '../data.service';
 import { TextNode } from '../../types';
 
 export class DataMultiplatform extends Multiplatform<DataService<TextNode>>
   implements DataService<TextNode> {
-  getWorkingData(dataId: string): Promise<WorkingData<TextNode>> {
-    return this.discover(
+
+  getData(dataId: string): Promise<TextNode> {
+    return this.discoverObject(
       dataId,
-      (service, hash) => service.getWorkingData(hash),
-      workingData => [
-        ...workingData.data.links.map(link => link.link),
-        ...workingData.draft.links.map(link => link.link)
-      ]
+      (service, hash) => service.getData(hash),
+      data => [...data.links.map(link => link.link)]
     );
   }
 
@@ -20,13 +18,6 @@ export class DataMultiplatform extends Multiplatform<DataService<TextNode>>
     const serviceProvider = Object.keys(this.serviceProviders)[0];
     return this.serviceProviders[serviceProvider].service.createData(data);
   }
-  
-  updateDraft(dataId: string, draft: TextNode): Promise<void> {
-    // TODO: How to create data in one service provider or the other?
-    const serviceProvider = Object.keys(this.serviceProviders)[0];
-    return this.serviceProviders[serviceProvider].service.updateDraft(
-      dataId,
-      draft
-    );
-  }
+
+
 }

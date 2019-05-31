@@ -34,9 +34,9 @@ export class UprtclHolochain implements UprtclService {
       .then(entry => this.uprtclZome.parseEntryResult(entry));
   }
 
-  getRootPerspectiveId(): Promise<string> {
+  getRootContextId(): Promise<string> {
     return this.uprtclZome
-      .call('get_root_perspective_id', {})
+      .call('get_root_context_id', {})
       .then(result => (result.Ok ? result.Ok : result));
   }
 
@@ -53,12 +53,24 @@ export class UprtclHolochain implements UprtclService {
     );
   }
 
+  async getPerspectiveHead(perspectiveId: string): Promise<string> {
+    let headId = null;
+    try {
+      headId = await this.uprtclZome.call('get_perspective_head', {
+        perspective_address: perspectiveId
+      });
+    } catch (e) {
+      if (e.message !== '{"Internal":"given perspective has no commits"}') {
+        throw new Error(e);
+      }
+    }
+    return headId;
+  }
+
   getPerspective(perspectiveId: string): Promise<Perspective> {
     return Promise.all([
       this.getEntry(perspectiveId),
-      this.uprtclZome.call('get_perspective_head', {
-        perspective_address: perspectiveId
-      })
+      this.getPerspectiveHead(perspectiveId)
     ]).then(([result, headAddress]: [EntryResult, string]) => {
       const perspective = result.entry;
       perspective.head = headAddress;
@@ -75,16 +87,28 @@ export class UprtclHolochain implements UprtclService {
     );
   }
 
-  getContextPerspectives(contextId: string): Promise<Perspective[]> {
-    return this.uprtclZome
-      .call('get_context_perspectives', {
+  async getContextPerspectives(contextId: string): Promise<Perspective[]> {
+    const perspectivesResponse = await this.uprtclZome.call(
+      'get_context_perspectives',
+      {
         context_address: contextId
+      }
+    );
+
+    const perspectivesEntries = this.uprtclZome.parseEntriesResults(
+      perspectivesResponse
+    );
+    let perspectives = perspectivesEntries.map(p =>
+      this.formatter.formatServerToUi<Perspective>('perspective', p.entry)
+    );
+
+    return await Promise.all(
+      perspectives.map(async perspective => {
+        const headId = await this.getPerspectiveHead(perspective.id);
+        perspective.headId = headId;
+        return perspective;
       })
-      .then((perspectiveAddresses: { links: Array<{ address: string }> }) =>
-        Promise.all(
-          perspectiveAddresses.links.map(p => this.getPerspective(p.address))
-        )
-      );
+    );
   }
 
   createContext(timestamp: number, nonce: number): Promise<string> {

@@ -2,6 +2,7 @@ import {
   Component,
   Prop,
   Event,
+  Element,
   EventEmitter,
   State,
   Watch,
@@ -17,8 +18,10 @@ import { uprtclMultiplatform } from '../../services';
   shadow: true
 })
 export class UprtclPerspective {
+  @Element() private element: HTMLElement;
+
   @Prop() perspectiveId: string;
-  
+
   @State() perspective: Perspective;
 
   @State() loading: boolean = true;
@@ -60,9 +63,17 @@ export class UprtclPerspective {
         {this.loading ? (
           <span>Loading...</span> // What to do in the meantime the information is loading?
         ) : (
-          <uprtcl-commit commitId={this.perspective.headId}>
-            <slot />
-          </uprtcl-commit>
+          <div>
+            {this.perspective.headId ? (
+              <uprtcl-commit commitId={this.perspective.headId}>
+                <slot />
+              </uprtcl-commit>
+            ) : (
+              <data-resolver perspectiveId={this.perspectiveId}>
+                <slot />
+              </data-resolver>
+            )}
+          </div>
         )}
       </div>
     );
@@ -81,6 +92,21 @@ export class UprtclPerspective {
         )}
       </div>
     );
+  }
+
+  hostData() {
+    if (!this.loading && this.perspective.headId) {
+      /** Pass perspectiveId to data resolver.
+       *  Dirty fix until we understand how to handle drafts management */
+      this.element
+        .querySelector('slot')
+        .assignedNodes({ flatten: true })
+        .filter(node => node.nodeType === 1)
+        .forEach(e => (e['perspectiveId'] = this.perspectiveId));
+    }
+
+    // HELP: Not sure what to return here
+    return {};
   }
 
   @Listen('commit-content')

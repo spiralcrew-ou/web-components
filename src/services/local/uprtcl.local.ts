@@ -1,86 +1,100 @@
 import { UprtclService } from '../uprtcl.service';
-import {generateCID,generateCommitId} from '../../main_functions';
+import {
+  generateCID,
+  generateCommitId,
+  generateUserContext
+} from '../../main_functions';
 
-import { 
-    Perspective as IPerspective, 
-    Commit as ICommit, 
-    Context as IContext } from '../../types';
-import { 
-    insertPerspective, Perspective, 
-    insertContext, Context, 
-    insertCommit, Commit } from './dataservices';
+import {
+  Perspective as IPerspective,
+  Commit as ICommit,
+  Context as IContext
+} from '../../types';
+import {
+  insertPerspective, Perspective,
+  insertContext, Context,
+  insertCommit, Commit,
+  getContext, 
+  getPerpectives,
+  getPerspective,
+  getCommit
+} from './dataservices';
 
 
 
 
 export class UprtclLocal implements UprtclService {
-    
-    constructor() {
 
-    }
+  constructor() {
+  }
 
-    getContext(_contextId: string): Promise<IContext> {
-        
-        throw new Error("Method not implemented.");
-    } 
-    
-    getPerspective(_perspectiveId: string): Promise<IPerspective> {
-        throw new Error("Method not implemented.");
-    }
+  getContext(_contextId: string): Promise<IContext> {
+    return getContext(_contextId)
+  }
 
-    getCommit(_commitId: string): Promise<ICommit> {
-        throw new Error("Method not implemented.");
-    }
+  getPerspective(_perspectiveId: string): Promise<IPerspective> {
+    return getPerspective(_perspectiveId)
+  }
 
-    getRootPerspectiveId(): Promise<string> {
-        throw new Error("Method not implemented.");
-    }
+  getCommit(_commitId: string): Promise<ICommit> {
+    return getCommit(_commitId);
+  }
 
-    getContextId(_context: IContext): Promise<string> {
-        throw new Error("Method not implemented.");
-    }
+   async getRootContextId(): Promise<string> {
+    return generateUserContext('anon');
+  }
 
-    getContextPerspectives(_contextId: string): Promise<IPerspective[]> {
-        throw new Error("Method not implemented.");
-    }
+  getContextId(_context: IContext): Promise<string> {
+    // TODO: To see with Pepo. Too much weed?? 
+    throw new Error("Method not implemented.");
+  }
 
-    createContext(_timestamp: number, _nonce: number): Promise<string> {
-        const creatorId = 'anon'
-        const cid = generateCID(creatorId)
-        return insertContext(new Context(cid,creatorId,_timestamp,_nonce)).then( () =>{ return cid})
-    }
+  getContextPerspectives(_contextId: string): Promise<IPerspective[]> {
+    return getPerpectives(_contextId) 
+  }
 
-    createPerspective(_contextId: string, _name: string, _timestamp: number, _headId: string): Promise<string> {
-        // TODO: Get userID or userCreator
-        const creatorId = 'anon'
-        const origin = 'local://'
-        const cid = generateCID(creatorId,[],'First Commit',)
-        return insertPerspective( new Perspective(cid,origin,creatorId,_timestamp,_contextId,_name,_headId))
-        
-        // TO-REVIEW: createPerspective method may be will return Perspective instead of string (to check with pepo)
-    }
+  createContext(_timestamp: number, _nonce: number): Promise<string> {
+    const creatorId = 'anon'
+    let cid = ''
+    if ((_timestamp===0) && (_nonce === 0)) //MonkeyPatch: create user context. Check this with pepo
+      cid = generateUserContext(creatorId)
+    else
+      cid = generateCID(creatorId)
+   
+    return insertContext(new Context(cid, creatorId, _timestamp, _nonce)).then(() => { return cid })
+  }
 
-    createCommit(_timestamp: number, _message: string, _parentsIds: string[], _dataId: string): Promise<string> {
-        const creatorId = 'anon'
-        const commitId = generateCommitId(creatorId,_parentsIds,_message,_dataId)
-        return insertCommit(new Commit(commitId,new Date().getDate(),_message,_parentsIds,_dataId))
-    }
+  createPerspective(_contextId: string, _name: string, _timestamp: number, _headId: string): Promise<string> {
+    // TODO: Get userID or userCreator
+    const creatorId = 'anon'
+    const origin = 'local://'
+    const cid = generateCID(creatorId, [], 'First Commit')
+    return insertPerspective(new Perspective(cid, origin, creatorId, _timestamp, _contextId, _name, _headId))
 
-    cloneContext(_context: IContext): Promise<string> {
-        throw new Error("Method not implemented.");
-    }
+    // TO-REVIEW: createPerspective method may be will return Perspective instead of string (to check with pepo)
+  }
 
-    clonePerspective(_perspective: IPerspective): Promise<string> {
-        throw new Error("Method not implemented.");
-    }
+  createCommit(_timestamp: number, _message: string, _parentsIds: string[], _dataId: string): Promise<string> {
+    const creatorId = 'anon'
+    const commitId = generateCommitId(creatorId, _parentsIds, _message, _dataId)
+    return insertCommit(new Commit(commitId, new Date().getDate(), _message, _parentsIds, _dataId))
+  }
 
-    cloneCommit(_commit: ICommit): Promise<string> {
-        throw new Error("Method not implemented.");
-    }
+  cloneContext(_context: IContext): Promise<string> {
+    throw new Error("Method not implemented.");
+  }
 
-    updateHead(_perspectiveId: string, _commitId: string): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
+  clonePerspective(_perspective: IPerspective): Promise<string> {
+    throw new Error("Method not implemented.");
+  }
+
+  cloneCommit(_commit: ICommit): Promise<string> {
+    throw new Error("Method not implemented.");
+  }
+
+  updateHead(_perspectiveId: string, _commitId: string): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
 
 
 

@@ -2,7 +2,8 @@
 import {
     Perspective as IPerspective,
     Commit as ICommit,
-    Context as IContext
+    Context as IContext,
+    Draft as IDraft
 } from '../../types';
 
 import Dexie from 'dexie';
@@ -54,21 +55,47 @@ export class Context implements IContext {
     }
 }
 
+export class Draft implements IDraft {
+    perspectiveId: string;    
+    dataId: string;
+    id: string
+    constructor(_id:string,_perspectiveId:string,_dataId:string){
+        this.id = _id
+        this.perspectiveId= _perspectiveId
+        this.dataId = _dataId
+    }
+}
+
+export class KnownSources {
+    hash: string
+    sources: string[]
+    constructor(_hash,_sources){
+        this.hash=_hash
+        this.sources=_sources
+    }
+}
+
 class LocalDatabase extends Dexie {
-    perspectives: Dexie.Table<IPerspective,string>
-    commits: Dexie.Table<ICommit, string>
-    contexts: Dexie.Table<IContext,string>
+    perspectives: Dexie.Table<Perspective,string>
+    commits: Dexie.Table<Commit, string>
+    contexts: Dexie.Table<Context,string>
+    drafts: Dexie.Table<Draft,string>
+    knowSources: Dexie.Table<KnownSources,string>
 
     constructor() {
         super('CollectiveOne');
         this.version(0.1).stores({
-            perspectives: 'id',
+            perspectives: 'id,contextId',
             commits: 'id',
-            contexts: 'id'
+            contexts: 'id',
+            drafts: 'id',
+            knowSources: 'hash'
         })
-        this.perspectives = this.table('perspectives')
-        this.contexts = this.table('contexts')
-        this.commits = this.table('commits')
+        this.contexts.mapToClass(Context)
+        this.perspectives.mapToClass(Perspective)
+        this.commits.mapToClass(Commit)
+        this.drafts.mapToClass(Draft)
+        this.knowSources.mapToClass(KnownSources)
     }
 }
 
@@ -88,5 +115,42 @@ export const insertContext = (context): Promise<any> => {
 
 export const insertCommit = (commit): Promise<any> => { 
     return db.commits.add(commit)
+}
+
+export const getContext = (contextId):Promise<any> => {
+    return db.contexts.get(contextId)
+}
+
+export const getPerpectives = (contextId):Promise<any> => {
+    return db.perspectives.where('contextId').equals(contextId).toArray()
+}
+
+export const getPerspective = (perspectiveId:string):Promise<IPerspective> => {
+    return db.perspectives.get(perspectiveId)
+}
+
+export const getCommit = (commitId:string):Promise<ICommit> => {
+    return db.commits.get(commitId)
+}
+
+export const insertDraft = (draft:Draft):Promise<any> => {
+    return db.drafts.add(draft)
+}
+
+export const getDraft = (id:string):Promise<any> => {
+    return db.drafts.get(id)
+}
+
+export const getKnownSources = (hash:string): Promise<string[]> => {
+    return db.knowSources.get(hash).then(result => {
+        if (!result)
+            return []
+        else
+            return result.sources
+    })
+}
+
+export const insertKnownSources = (knownSources:KnownSources): Promise<any> => {
+    return db.knowSources.put(knownSources)
 }
 

@@ -8,6 +8,10 @@ export class DiscoveryHolochain implements DiscoveryService {
     this.discoveryZome = new HolochainConnection('test-instance', 'discovery');
   }
 
+  getOwnSource(): Promise<string> {
+    return Promise.resolve('holochain');
+  }
+
   getKnownSources(hash: string): Promise<string[]> {
     return this.discoveryZome.call('get_known_sources', { address: hash });
   }

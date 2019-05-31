@@ -19,9 +19,11 @@ export namespace Components {
 
   interface DataResolver {
     'dataId': string;
+    'perspectiveId': string;
   }
   interface DataResolverAttributes extends StencilHTMLAttributes {
     'dataId'?: string;
+    'perspectiveId'?: string;
   }
 
   interface TextNode {

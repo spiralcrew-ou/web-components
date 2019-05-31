@@ -3,6 +3,8 @@ import { UprtclService } from '../../services/uprtcl.service';
 import { DataService } from '../../services/data.service';
 import { uprtclMultiplatform, dataMultiplatform } from '../../services';
 import { TextNode } from '../../types';
+import { DraftService } from '../../services/draft.service';
+import { DraftLocal } from '../../services/local/draft.local';
 
 @Component({
   tag: 'co-editor',
@@ -10,13 +12,14 @@ import { TextNode } from '../../types';
   shadow: true
 })
 export class CoEditor {
-  
   @State() perspectiveId: string;
   @State() loading: boolean = true;
-  
+
   // Multiplatform service is already instantiated, get a reference to it
   uprtcl: UprtclService = uprtclMultiplatform;
-  data: DataService<TextNode> = dataMultiplatform;
+  dataService: DataService<TextNode> = dataMultiplatform;
+  /** Drafts are managed by the local service only for the moment */
+  draftService: DraftService<any> = new DraftLocal();
 
   @Method()
   createRootElement() {
@@ -34,19 +37,58 @@ export class CoEditor {
       });
   }
 
-  async getPerspectiveWorkingData(perspectiveId: string) {
-    const perspective = await this.uprtcl.getPerspective(perspectiveId);
-    const commit = await this.uprtcl.getCommit(perspective.headId);
-    return await this.data.getWorkingData(commit.dataId);
+  async createPerspectiveWithDraft(data: TextNode): Promise<string> {
+    const contextId = await this.uprtcl.createContext(Date.now(), 0);
+    const perspectiveId = await this.uprtcl.createPerspective(
+      contextId,
+      'default',
+      Date.now(),
+      null
+    );
+    // head commit is left as null, only draft data is created. head commit is created at first commit
+    await this.draftService.setDraft(perspectiveId, data);
+    return perspectiveId;
+  }
+
+  async addLinkToPerspective(_link: string, perspectiveId: string) {
+    let newDraft = await this.draftService.getDraft(perspectiveId);
+    if (!newDraft) {
+      newDraft = { text: '', links: [] };
+    }
+    newDraft.links.push({ link: _link });
+    await this.draftService.setDraft(perspectiveId, newDraft);
+  }
+
+  async createPerspectiveWithDraftUnder(
+    data: TextNode,
+    parentId: string
+  ): Promise<string> {
+    const perspectiveId = await this.createPerspectiveWithDraft(data);
+    await this.addLinkToPerspective(perspectiveId, parentId);
+    return perspectiveId;
   }
 
   async componentWillLoad() {
     this.loading = true;
-    const id = await this.uprtcl.getRootPerspectiveId();
-    const workingData = await this.getPerspectiveWorkingData(id);
 
-    // MVP shows one document per user only
-    this.perspectiveId = workingData.draft.links[0].link;
+    /** MVP assumes one root perspective per user in platform */
+    const rootContextId = await this.uprtcl.getRootContextId();
+    const rootPerspectives = await this.uprtcl.getContextPerspectives(
+      rootContextId
+    );
+    const rootPerspectiveId = rootPerspectives[0].id;
+
+    const draft = await this.draftService.getDraft(rootPerspectiveId);
+
+    if (draft && draft.links.length > 0) {
+      // MVP shows one document per user only
+      this.perspectiveId = draft.links[0].link;
+    } else {
+      this.perspectiveId = await this.createPerspectiveWithDraftUnder(
+        { text: '', links: [] },
+        rootPerspectiveId
+      );
+    }
 
     this.loading = false;
   }
@@ -59,7 +101,7 @@ export class CoEditor {
         ) : (
           <uprtcl-perspective perspectiveId={this.perspectiveId}>
             <data-resolver>
-              <text-node></text-node>
+              <text-node />
             </data-resolver>
           </uprtcl-perspective>
         )}
