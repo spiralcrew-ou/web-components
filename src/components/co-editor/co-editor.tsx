@@ -3,8 +3,8 @@ import { UprtclService } from '../../services/uprtcl.service';
 import { DataService } from '../../services/data.service';
 import { uprtclMultiplatform, dataMultiplatform } from '../../services';
 import { TextNode } from '../../types';
-import { DraftLocal } from '../../services/local/draft.local';
 import { DraftService } from '../../services/draft.service';
+import { DraftsHolochain } from '../../services/holochain/drafts.holochain';
 
 @Component({
   tag: 'co-editor',
@@ -19,7 +19,7 @@ export class CoEditor {
   uprtcl: UprtclService = uprtclMultiplatform;
   dataService: DataService<TextNode> = dataMultiplatform;
   /** Drafts are managed by the local service only for the moment */
-  draftService: DraftService<any> = new DraftLocal();
+  draftService: DraftService<any> = new DraftsHolochain();
 
   @Method()
   createRootElement() {
@@ -37,12 +37,6 @@ export class CoEditor {
       });
   }
 
-  async getPerspectiveDraft(perspectiveId: string): Promise<TextNode> {
-    const perspective = await this.uprtcl.getPerspective(perspectiveId);
-    const commit = await this.uprtcl.getCommit(perspective.headId);
-    return await this.dataService.getData(commit.dataId);
-  }
-
   async createPerspectiveWithDraft(data: TextNode): Promise<string> {
     const contextId = await this.uprtcl.createContext(Date.now(), 0);
     const perspectiveId = await this.uprtcl.createPerspective(
@@ -57,7 +51,10 @@ export class CoEditor {
   }
 
   async addLinkToPerspective(_link: string, perspectiveId: string) {
-    const newDraft = await this.getPerspectiveDraft(perspectiveId);
+    let newDraft = await this.draftService.getDraft(perspectiveId);
+    if (!newDraft) {
+      newDraft = { text: '', links: [] };
+    }
     newDraft.links.push({ link: _link });
     await this.draftService.setDraft(perspectiveId, newDraft);
   }
@@ -83,10 +80,10 @@ export class CoEditor {
     const rootPerspectiveId = rootPerspectives[0].id;
     console.log('hi2', rootPerspectiveId);
 
-    const draft = await this.getPerspectiveDraft(rootPerspectiveId);
-    console.log('hi3', rootContextId);
+    const draft = await this.draftService.getDraft(rootPerspectiveId);
+    console.log('hi3', draft);
 
-    if (draft.links.length > 0) {
+    if (draft && draft.links.length > 0) {
       // MVP shows one document per user only
       this.perspectiveId = draft.links[0].link;
     } else {
