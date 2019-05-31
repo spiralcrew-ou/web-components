@@ -14,7 +14,6 @@
     "build": "stencil build --docs",
     "start": "stencil build --dev --watch --serve",
     "test": "stencil test --spec --e2e",
-    "test-c1": "jest",
     "test.watch": "stencil test --spec --e2e --watchAll"
   },
   "dependencies": {
@@ -56,8 +55,6 @@
     "@stencil/core": "~0.16.2",
     "@types/jest": "^23.3.14",
     "@types/puppeteer": "1.12.2",
-    "babel-jest": "^24.8.0",
-    "jest": "^23.6.0",
     "jest-cli": "23.6.0",
     "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-plugin-node-globals": "^1.4.0",
