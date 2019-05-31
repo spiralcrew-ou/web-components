@@ -66,11 +66,21 @@ export class Draft implements IDraft {
     }
 }
 
+export class KnownSources {
+    hash: string
+    sources: string[]
+    constructor(_hash,_sources){
+        this.hash=_hash
+        this.sources=_sources
+    }
+}
+
 class LocalDatabase extends Dexie {
     perspectives: Dexie.Table<Perspective,string>
     commits: Dexie.Table<Commit, string>
     contexts: Dexie.Table<Context,string>
     drafts: Dexie.Table<Draft,string>
+    knowSources: Dexie.Table<KnownSources,string>
 
     constructor() {
         super('CollectiveOne');
@@ -78,12 +88,14 @@ class LocalDatabase extends Dexie {
             perspectives: 'id,contextId',
             commits: 'id',
             contexts: 'id',
-            drafts: 'id'
+            drafts: 'id',
+            knowSources: 'id'
         })
         this.contexts.mapToClass(Context)
         this.perspectives.mapToClass(Perspective)
         this.commits.mapToClass(Commit)
         this.drafts.mapToClass(Draft)
+        this.knowSources.mapToClass(KnownSources)
     }
 }
 
@@ -120,3 +132,17 @@ export const insertDraft = (draft:Draft):Promise<any> => {
 export const getDraft = (id:string):Promise<any> => {
     return db.drafts.get(id)
 }
+
+export const getKnownSources = (id:string): Promise<string[]> => {
+    return db.knowSources.get(id).then(result => {
+        if (!result)
+            return []
+        else
+            return result.sources
+    })
+}
+
+export const insertKnownSources = (knowSources:KnownSources): Promise<any> => {
+    return db.knowSources.add(knowSources)
+}
+

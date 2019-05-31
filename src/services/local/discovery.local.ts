@@ -1,24 +1,18 @@
-import Dexie from 'dexie';
 import { DiscoveryService } from '../discovery.service';
+import {insertKnownSources,getKnownSources, KnownSources} from './dataservices'
 
 export class DiscoveryLocal implements DiscoveryService {
-  //knownSources = null 
-  knownSources: Dexie.Table<string[], string>;
 
   constructor() {   
-    const db = new Dexie('knownsources');
-    db.version(0.1).stores({
-      knownsources: 'id'
-    });
-
-    this.knownSources = db.table('knownsources');
+    
   }
 
   getKnownSources(hash: string): Promise<string[]> {
-    return this.knownSources.get(hash);
+    return getKnownSources(hash)
   }
 
   async addKnownSources(hash: string, sources: string[]): Promise<void> {
+    /*
     let knownSources = await this.knownSources.get(hash);
     if (!knownSources) {
       knownSources = [];
@@ -27,15 +21,20 @@ export class DiscoveryLocal implements DiscoveryService {
       if (!knownSources.includes(source)) {
         knownSources.push(source);
       }
-    }
+    }*/
+    await insertKnownSources(new KnownSources(hash,sources))
 
-    await this.knownSources.put(knownSources, hash);
+    //await this.knownSources.put(knownSources, hash);
   }
 
-  async removeKnownSource(hash: string, source: string): Promise<void> {
+  async removeKnownSource(_hash: string, _source: string): Promise<void> {
+    /*
     let knownSources = await this.knownSources.get(hash);
     knownSources = knownSources.filter(s => s !== source);
 
-    await this.knownSources.put(knownSources, hash);
+    await this.knownSources.put(knownSources, hash);*/
+    throw new Error("Method not implemented.");
   }
+  
+  
 }
