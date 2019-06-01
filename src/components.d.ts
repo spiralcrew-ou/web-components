@@ -30,17 +30,21 @@ export namespace Components {
 
   interface TextNode {
     'data': TextNode;
+    'draft': TextNode;
   }
   interface TextNodeAttributes extends StencilHTMLAttributes {
     'data'?: TextNode;
+    'draft'?: TextNode;
     'onCommit-content'?: (event: CustomEvent) => void;
   }
 
   interface UprtclCommit {
     'commitId': string;
+    'perspectiveId': string;
   }
   interface UprtclCommitAttributes extends StencilHTMLAttributes {
     'commitId'?: string;
+    'perspectiveId'?: string;
   }
 
   interface UprtclPerspective {

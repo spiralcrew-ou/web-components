@@ -12,6 +12,8 @@ export class UprtclCommit {
   @Element() private element: HTMLElement;
 
   @Prop() commitId: string;
+  @Prop() perspectiveId: string;
+  
   @State() commit: Commit;
 
   @State() loading: boolean = true;
@@ -21,11 +23,13 @@ export class UprtclCommit {
   uprtcl: UprtclService = uprtclMultiplatform;
 
   loadCommit() {
-    this.loading = true;
-    this.uprtcl.getCommit(this.commitId).then(commit => {
-      this.commit = commit;
-      this.loading = false;
-    });
+    if (this.commitId) {
+      this.loading = true;
+      this.uprtcl.getCommit(this.commitId).then(commit => {
+        this.commit = commit;
+        this.loading = false;
+      });
+    }
   }
 
   componentWillLoad() {
@@ -43,7 +47,8 @@ export class UprtclCommit {
   }
 
   hostData() {
-    if (this.commit && !this.loading) {
+    debugger
+    if (!this.loading) {
       // Not definetely sure about this, maybe we can access the HTML element
       // within the <slot> another way
       // This worked in my prototype at least :)
@@ -51,7 +56,10 @@ export class UprtclCommit {
         .querySelector('slot')
         .assignedNodes({ flatten: true })
         .filter(node => node.nodeType === 1)
-        .forEach(e => (e['dataId'] = this.commit.dataId));
+        .forEach(e => {
+          e['dataId'] = this.commit ? this.commit.dataId : null;
+          e['perspectiveId'] = this.perspectiveId;
+        });
     }
 
     // HELP: Not sure what to return here

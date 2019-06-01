@@ -8,7 +8,7 @@ import {
 
 import { DataService } from '../../services/data.service';
 import { DraftService } from '../../services/draft.service';
-import { DraftLocal } from '../../services/local/draft.local';
+import { DraftsCollectiveOne } from '../../services/c1/draft.c1';
 import { dataMultiplatform } from '../../services';
 
 @Component({
@@ -28,12 +28,13 @@ export class DataResolver {
   dataService: DataService<any> = dataMultiplatform;
   
   /** Drafts are managed by the local service only for the moment */
-  draftService: DraftService<any> = new DraftLocal();
+  draftService: DraftService<any> = new DraftsCollectiveOne();
 
   async loadData() {
+    debugger
     if (this.dataId) {
       this.loading = true;
-      this.data = await this.dataService.getData(this.dataId);
+      this.data = this.dataId ? await this.dataService.getData(this.dataId) : null;
       this.draft = await this.draftService.getDraft(this.perspectiveId);
 
       this.loading = false;
@@ -62,7 +63,7 @@ export class DataResolver {
   }
 
   hostData() {
-    if (this.data && !this.loading) {
+    if (!this.loading) {
       this.element
         .querySelector('slot')
         .assignedNodes({ flatten: true })

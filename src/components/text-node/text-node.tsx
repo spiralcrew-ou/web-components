@@ -23,6 +23,7 @@ export class TextNodeElement {
   // @Element() private element: HTMLElement;
 
   @Prop() data: TextNode;
+  @Prop() draft: TextNode;
 
   @State() node = this.data;
 
@@ -36,17 +37,18 @@ export class TextNodeElement {
   commitContent: EventEmitter;
 
   render() {
-    return (
+    debugger
+    return !this.draft ? (<span>...Loading></span>) : (
       <div>
         <span
           id="text"
           data-focused-advice="Start typing"
           contenteditable="true"
         >
-          {this.data.text}
+          {this.draft.text}
         </span>
 
-        {this.data.links.map((link) => (
+        {this.draft.links.map((link) => (
           <uprtcl-perspective perspectiveId={link}>
             <data-resolver>
               <text-node />

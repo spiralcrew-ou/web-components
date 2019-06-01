@@ -12,16 +12,16 @@ import { DataCollectiveOne } from './c1/data.c1';
 
 export const uprtclMultiplatform = new UprtclMultiplatform(
   {
-    collectiveone: { 
+    "https://www.collectiveone.org/uprtcl/1": { 
       service: new UprtclCollectiveOne(), 
       discovery: new DiscoveryCollectiveOne() 
     },
   },
-  'collectiveone'
+  'https://www.collectiveone.org/uprtcl/1'
 );
 
 export const dataMultiplatform = new DataMultiplatform({
-  collectiveone: { 
+  'https://www.collectiveone.org/uprtcl/1': { 
     service: new DataCollectiveOne(), 
     discovery: new DiscoveryCollectiveOne() 
   },

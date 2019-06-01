@@ -1,3 +1,9 @@
+interface PostResult {
+    result: string,
+    message: string,
+    elementIds: string[];
+}
+
 export class Http {
 
     baseUrl: string = '/1';
@@ -21,15 +27,15 @@ export class Http {
             })
     }
 
-    async put<T>(url: string, _body: any) {
-        return this.putOrPost<T>(url, _body, "PUT")
+    async put(url: string, _body: any) {
+        return this.putOrPost(url, _body, "PUT")
     }
 
-    async post<T>(url: string, _body: any) {
-        return this.putOrPost<T>(url, _body, "POST")
+    async post(url: string, _body: any) {
+        return this.putOrPost(url, _body, "POST")
     }
 
-    async putOrPost<T>(url: string, _body: any, _method: string): Promise<T> {
+    async putOrPost(url: string, _body: any, _method: string): Promise<string> {
         return fetch(this.baseUrl + url, {
             method: _method,
             headers: {
@@ -39,16 +45,18 @@ export class Http {
             },            
             body: JSON.stringify(_body)
         })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(response.statusText)
-                }
-                return response.json() as Promise<{ data: T }>
-            })
-            .then(data => {
-                return data.data
-            })
-    }
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(response.statusText)
+            }
+            return response.json() as Promise<PostResult>
+        })
+        .then(result => {
+            if (result.elementIds != null) {
+                return result.elementIds[0]
+            }
+        })
+}
 }
 
 export const http = new Http();

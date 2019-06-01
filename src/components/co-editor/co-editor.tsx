@@ -71,7 +71,7 @@ export class CoEditor {
   async componentWillLoad() {
     this.loading = true;
 
-    // debugger;
+    debugger;
 
     /** MVP assumes one root perspective per user in platform */
     const rootContextId = await this.uprtcl.getRootContextId();

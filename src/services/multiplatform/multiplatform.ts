@@ -185,10 +185,12 @@ export class Multiplatform<T> {
       // Stores the links contained in the object in the discovery service of the given service provider
       await Promise.all(
         linksToObjects.map(async link => {
-          const knownLinkSources = await this.knownSources.getKnownSources(
-            link
-          );
-          await discoveryService.addKnownSources(link, knownLinkSources);
+          if (link != null) {
+            const knownLinkSources = await this.knownSources.getKnownSources(
+              link
+            );
+            await discoveryService.addKnownSources(link, knownLinkSources);
+          }
         })
       );
     }

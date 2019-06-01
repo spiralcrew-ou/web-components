@@ -24,11 +24,11 @@
     }
 
     async getContextId(context: Context): Promise<string> {
-      return await http.put('/ctxId', context)
+      return await http.put('/ctxId', context)[0]
     }
 
     async getContextPerspectives(contextId: string): Promise<Perspective[]> {
-      return await http.get<Perspective[]>(`/ctx/${contextId}/ctxPersps`)
+      return await http.get<Perspective[]>(`/ctx/${contextId}/perspectives`)
     }
   
     async createContext(
@@ -59,7 +59,7 @@
       perspective.timestamp = _timestamp;
       perspective.headId = _headId;
       
-      return await http.post<string>('/persp', [ perspective ])
+      return await http.post('/persp', [ perspective ]);
     }
   
     async createCommit(
@@ -76,21 +76,26 @@
       commit.parentsIds = _parentsIds;
       commit.dataId = _dataId;
 
-      return await http.post<string>('/commit', [ commit ])
+      return await http.post('/commit', [ commit ])
     }
 
     cloneContext(context: Context): Promise<string> {
-      return http.post<string>('/ctx', context);
+      return http.post('/ctx', context);
     }
     clonePerspective(perspective: Perspective): Promise<string> {
-      return http.post<string>('/persp', perspective);
+      return http.post('/persp', perspective);
     }
     cloneCommit(commit: Commit): Promise<string> {
-      return http.post<string>('/commit', commit);
+      return http.post('/commit', commit);
     }
     
     updateHead(perspectiveId: string, commitId: string): Promise<void> {
-      return http.put<void>(`/persp/${perspectiveId}?headId=${commitId}`, null);
+      /** convert Promise<string> into Promise<void> */
+      return new Promise<void>((resolve) => {
+        http.put(`/persp/${perspectiveId}?headId=${commitId}`, null).then(() => {
+          resolve();
+        })
+      });
     }
   
   }
