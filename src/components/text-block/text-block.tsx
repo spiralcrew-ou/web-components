@@ -27,6 +27,10 @@ export class TextBlock {
   // Keep timeout to cancel debounce typing
   changeTextTimeout = null;
 
+  componentWillUpdate() {
+    this.element.shadowRoot.getElementById('text').innerHTML = this.text;
+  }
+
   render() {
     return (
       <div>
@@ -34,9 +38,7 @@ export class TextBlock {
           id='text'
           data-placeholder='Start typing...'
           contenteditable='true'
-        >
-          {this.text}
-        </span>
+        />
       </div>
     );
   }
@@ -50,10 +52,11 @@ export class TextBlock {
       if (this.changeTextTimeout) {
         clearTimeout(this.changeTextTimeout);
       }
+
       this.changeTextTimeout = setTimeout(() => {
         // Get the new text and emit it
         const newText = this.element.shadowRoot.getElementById('text')
-          .innerHTML;
+          .innerText;
         this.contentChanged.emit(newText);
       }, 2000);
     }
