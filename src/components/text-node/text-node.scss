@@ -1,2 +1,10 @@
-@import "../../globals/variables.scss";
+@import '../../globals/variables.scss';
 
+.node {
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.node:hover {
+  background-color: rgba(150, 150, 150, 0.2);
+}

@@ -1,18 +1,15 @@
 import {
   Component,
   Prop,
-  Event,
-  EventEmitter,
   State,
-  // Element,
-  Listen
+  Listen,
+  Watch,
+  Event,
+  EventEmitter
 } from '@stencil/core';
-
-interface TextNode {
-  id?: string;
-  text: string;
-  links: string[]; // Links to the children perspectives
-}
+import { TextNode, Perspective, Commit } from '../../types';
+import { UprtclService } from '../../services/uprtcl.service';
+import { uprtclMultiplatform, dataMultiplatform } from '../../services';
 
 @Component({
   tag: 'text-node',
@@ -20,49 +17,146 @@ interface TextNode {
   shadow: true
 })
 export class TextNodeElement {
-  // @Element() private element: HTMLElement;
+  @Prop() perspectiveId: string;
 
-  @Prop() data: TextNode;
+  @State() perspective: Perspective;
+  @State() commit: Commit;
 
-  @State() node = this.data;
+  @State() node: TextNode;
+  @State() draft: TextNode;
 
-  newText: string;
+  @State() loading: boolean = true;
+
+  // Necessary to add to diferentiate when to add a child node or when to emit createSibling event
+  @Prop() isRootNode: boolean = true;
 
   @Event({
-    bubbles: true, // Not sure if necessary
-    composed: true, // At least necessary if we want to use shadowDom
-    eventName: 'commit-content'
+    eventName: 'createSibling'
   })
-  commitContent: EventEmitter;
+  createSibling: EventEmitter;
+
+  uprtclService: UprtclService = uprtclMultiplatform;
+  dataService = dataMultiplatform;
+
+  async loadPerspective() {
+    this.perspective = await this.uprtclService.getPerspective(
+      this.perspectiveId
+    );
+
+    // Head can be null, only go get it if it exists
+    if (this.perspective.headId) {
+      this.commit = await this.uprtclService.getCommit(this.perspective.headId);
+      this.node = await this.dataService.getData(this.commit.dataId);
+    }
+  }
+
+  @Watch('perspectiveId')
+  async componentWillLoad() {
+    this.loading = true;
+
+    // We can load the perspective with its contents and its draft at the same time
+    await Promise.all([
+      this.loadPerspective(),
+      this.dataService
+        .getDraft(this.perspectiveId)
+        .then(draft => (this.draft = draft))
+    ]);
+
+    this.loading = false;
+  }
+
+  getRenderingData() {
+    // If draft is null, we can render the node directly
+    return this.draft ? this.draft : this.node;
+  }
 
   render() {
     return (
       <div>
-        <span
-          id="text"
-          data-focused-advice="Start typing"
-          contenteditable="true"
-        >
-          {this.data.text}
-        </span>
+        {this.loading ? (
+          <span>Loading...</span>
+        ) : (
+          <div class='node'>
+            <text-block text={this.getRenderingData().text} />
 
-        {this.data.links.map((link) => (
-          <uprtcl-perspective perspectiveId={link}>
-            <data-resolver>
-              <text-node />
-            </data-resolver>
-          </uprtcl-perspective>
-        ))}
+            {this.getRenderingData().links.map(link => (
+              <text-node
+                isRootNode={false}
+                perspectiveId={link.link}
+                onCreateSibling={() => this.createNewChild()}
+              />
+            ))}
+          </div>
+        )}
       </div>
-    )
+    );
+  }
+
+  newNode(): TextNode {
+    return {
+      text: '',
+      links: []
+    };
   }
 
   @Listen('keydown')
-  onKeyDown(event) {
+  async onKeyDown(event: KeyboardEvent) {
     if (event.key === 'Enter') {
-      /* change parent perspective draft to add a new link to textNode next to this */
-    } else {
-      /* emit something that updates the draft of this element data */
+      event.preventDefault();
+      event.stopPropagation();
+
+      // If this is the root node, add a new child, otherwise emit event for the parent to create a sibling
+      if (this.isRootNode) {
+        this.createNewChild();
+      } else {
+        this.createSibling.emit();
+      }
     }
+  }
+
+  // Creates a new perspective and adds it to the current draft
+  async createNewChild() {
+    // Create new perspective
+    const newPerspectiveId = await this.createNewPerspective();
+
+    // Create a new draft to the said perspective
+    await this.dataService.setDraft(newPerspectiveId, this.newNode());
+
+    // Add a link to the new perspective to draft
+    this.draft.links.push({ link: newPerspectiveId });
+    await this.dataService.setDraft(this.perspectiveId, this.draft);
+    this.draft = { ...this.draft };
+  }
+
+  @Listen('content-changed')
+  contentChanged(event: CustomEvent) {
+    event.stopPropagation();
+    this.draft.text = event.detail;
+    this.dataService.setDraft(this.perspectiveId, this.draft);
+  }
+
+  // Unused method for now, to be called when we want to commit to the current perspective
+  async commitContent() {
+    const dataId = await this.dataService.createData(this.draft);
+    const parentsIds = this.perspective.headId ? [this.perspective.headId] : [];
+
+    const commitId = await this.uprtclService.createCommit(
+      Date.now(),
+      'Commit at ' + Date.now(),
+      parentsIds,
+      dataId
+    );
+    await this.uprtclService.updateHead(this.perspectiveId, commitId);
+  }
+
+  // Creates a new context and perspective
+  async createNewPerspective(): Promise<string> {
+    const contextId = await this.uprtclService.createContext(Date.now(), 0);
+    return await this.uprtclService.createPerspective(
+      contextId,
+      'master',
+      Date.now(),
+      null
+    );
   }
 }
