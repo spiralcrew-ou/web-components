@@ -25,7 +25,7 @@ export class Multiplatform<T> {
    * Discover the sources of the given links from the discover service of the originSource
    * and store them locally for future operations
    */
-  private async discoverLinksSources(
+  protected async discoverLinksSources(
     links: string[],
     originSource: string
   ): Promise<void> {
@@ -146,7 +146,9 @@ export class Multiplatform<T> {
     }
 
     // All known sources failed, throw error
-    throw new Error(`Array with relation to hash ${hash} not found in any of the sources`);
+    throw new Error(
+      `Array with relation to hash ${hash} not found in any of the sources`
+    );
   }
 
   /**
