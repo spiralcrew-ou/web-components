@@ -13,22 +13,22 @@ import { DiscoveryHolochain } from './holochain/discovery.holochain';
 export const uprtclMultiplatform = new UprtclMultiplatform(
   {
     // local: { service: new UprtclLocal(), discovery: null }
-    'holochain://QmVE6tmbcHPDkC2ULueG73hH2RcqNmrcDLY4RcuuwWQoN7': {
+    'holochain://Qme2riuQTbZpPt2LekWyi4GuCz53rmEA7g2xtXhgmqccpp': {
       service: new UprtclHolochain(),
       discovery: new DiscoveryHolochain()
     }
   },
-  'holochain://QmVE6tmbcHPDkC2ULueG73hH2RcqNmrcDLY4RcuuwWQoN7'
+  'holochain://Qme2riuQTbZpPt2LekWyi4GuCz53rmEA7g2xtXhgmqccpp'
 );
 
 export const dataMultiplatform = new DataMultiplatform(
   {
     //local: { service: new DataLocal(), discovery: null }
-    'holochain://QmVE6tmbcHPDkC2ULueG73hH2RcqNmrcDLY4RcuuwWQoN7': {
+    'holochain://Qme2riuQTbZpPt2LekWyi4GuCz53rmEA7g2xtXhgmqccpp': {
       service: new DataHolochain(),
       discovery: new DiscoveryHolochain()
     }
   },
   new DraftHolochain(),
-  'holochain://QmVE6tmbcHPDkC2ULueG73hH2RcqNmrcDLY4RcuuwWQoN7'
+  'holochain://Qme2riuQTbZpPt2LekWyi4GuCz53rmEA7g2xtXhgmqccpp'
 );
