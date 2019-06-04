@@ -38,7 +38,9 @@ export class TextBlock {
           id='text'
           data-placeholder='Start typing...'
           contenteditable='true'
-        />
+        >
+          {this.text}
+        </span>
       </div>
     );
   }
