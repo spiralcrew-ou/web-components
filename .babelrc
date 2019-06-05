@@ -1,0 +1,22 @@
+{
+  "env": {
+    "test": {
+      "presets": [
+        [
+          "env",
+          {
+            "modules": "commonjs",
+            "useBuiltIns": "usage",
+            "debug": false
+          }
+        ],
+        "jest",
+        "@babel/preset-es2017"
+      ],
+      "plugins": [
+        "transform-class-properties",
+        "transform-es2015-modules-commonjs"
+      ]
+    }
+  }
+}
