@@ -45,7 +45,10 @@ export class TextNodeElement {
       this.perspectiveId
     );
 
-    this.draft = await this.dataService.getDraft(this.perspective.origin, this.perspectiveId);
+    this.draft = await this.dataService.getDraft(
+      this.perspective.origin,
+      this.perspectiveId
+    );
 
     // Head can be null, only go get it if it exists
     if (this.perspective.headId) {
@@ -60,9 +63,7 @@ export class TextNodeElement {
     this.loading = true;
 
     // We can load the perspective with its contents and its draft at the same time
-    await this.loadPerspective(),
-
-      this.loading = false;
+    await this.loadPerspective(), (this.loading = false);
   }
 
   hasChanges() {
@@ -97,6 +98,23 @@ export class TextNodeElement {
         {this.loading ? (
           <span>Loading...</span>
         ) : (
+          <div class="flex-column">
+            {this.isRootNode ? (
+              <uprtcl-toolbar
+                perspective={this.perspective}
+                onCreateCommit={() => this.createCommit()}
+                onCreatePerspective={e =>
+                  this.createPerspective(
+                    e.detail.name,
+                    e.detail.serviceProvider
+                  )
+                }
+                onSelectPerspective={e => this.selectPerspective(e.detail)}
+              />
+            ) : (
+              ''
+            )}
+
             <div class="node">
               <text-block text={this.getRenderingData().text} />
               {this.hasChanges() ? <div class="indicator" /> : ''}
@@ -110,7 +128,8 @@ export class TextNodeElement {
                 />
               ))}
             </div>
-          )}
+          </div>
+        )}
       </div>
     );
   }
@@ -120,6 +139,11 @@ export class TextNodeElement {
       text: '',
       links: []
     };
+  }
+
+  selectPerspective(perspectiveId: string) {
+    this.perspectiveId = perspectiveId;
+    this.loadPerspective();
   }
 
   @Listen('keydown')
@@ -137,14 +161,20 @@ export class TextNodeElement {
     }
   }
 
-
   @Method()
   public async createPerspective(serviceProvider: string, name: string) {
     // Create new perspective
-    const newPerspectiveId = await this.createNewPerspective(serviceProvider, this.perspective.contextId, name);
+    const newPerspectiveId = await this.createNewPerspective(
+      serviceProvider,
+      this.perspective.contextId,
+      name
+    );
 
     await Promise.all([
-      this.uprtclService.updateHead(this.perspectiveId, this.perspective.headId),
+      this.uprtclService.updateHead(
+        this.perspectiveId,
+        this.perspective.headId
+      ),
       this.dataService.setDraft(serviceProvider, newPerspectiveId, this.draft)
     ]);
 
@@ -155,15 +185,26 @@ export class TextNodeElement {
   // Creates a new perspective and adds it to the current draft
   async createNewChild() {
     // Create new perspective
-    const newPerspectiveId = await this.createNewPerspective(this.perspective.origin, null);
+    const newPerspectiveId = await this.createNewPerspective(
+      this.perspective.origin,
+      null
+    );
 
     // Create a new draft to the said perspective
-    await this.dataService.setDraft(this.perspective.origin, newPerspectiveId, this.newNode());
+    await this.dataService.setDraft(
+      this.perspective.origin,
+      newPerspectiveId,
+      this.newNode()
+    );
 
     // Add a link to the new perspective to draft
     this.draft.links.push({ link: newPerspectiveId });
     this.draft = { ...this.draft };
-    await this.dataService.setDraft(this.perspective.origin, this.perspectiveId, this.draft);
+    await this.dataService.setDraft(
+      this.perspective.origin,
+      this.perspectiveId,
+      this.draft
+    );
   }
 
   @Listen('content-changed')
@@ -172,7 +213,11 @@ export class TextNodeElement {
 
     this.draft.text = event.detail;
     this.draft = { ...this.draft };
-    this.dataService.setDraft(this.perspective.origin, this.perspectiveId, this.draft);
+    this.dataService.setDraft(
+      this.perspective.origin,
+      this.perspectiveId,
+      this.draft
+    );
   }
 
   @Method()
@@ -187,7 +232,10 @@ export class TextNodeElement {
   }
 
   private async commitContent() {
-    const dataId = await this.dataService.createData(this.perspective.origin, this.draft);
+    const dataId = await this.dataService.createData(
+      this.perspective.origin,
+      this.draft
+    );
     const parentsIds = this.perspective.headId ? [this.perspective.headId] : [];
 
     const commitId = await this.uprtclService.createCommit(
@@ -203,9 +251,17 @@ export class TextNodeElement {
   }
 
   // Creates a new context (if contextId is null) and perspective
-  async createNewPerspective(serviceProvider: string, contextId: string, name: string = 'master'): Promise<string> {
+  async createNewPerspective(
+    serviceProvider: string,
+    contextId: string,
+    name: string = 'master'
+  ): Promise<string> {
     if (!contextId) {
-      contextId = await this.uprtclService.createContext(serviceProvider, Date.now(), 0);
+      contextId = await this.uprtclService.createContext(
+        serviceProvider,
+        Date.now(),
+        0
+      );
     }
     return this.uprtclService.createPerspective(
       serviceProvider,

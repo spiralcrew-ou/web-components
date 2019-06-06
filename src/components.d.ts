@@ -8,6 +8,9 @@
 import '@stencil/core';
 
 
+import {
+  Perspective,
+} from './types';
 
 
 export namespace Components {
@@ -35,12 +38,17 @@ export namespace Components {
     'perspectiveId'?: string;
   }
 
-  interface TextBlock {
-    'text': string;
+  interface UprtclToolbar {
+    'perspective': Perspective;
   }
-  interface TextBlockAttributes extends StencilHTMLAttributes {
-    'onContent-changed'?: (event: CustomEvent) => void;
-    'text'?: string;
+  interface UprtclToolbarAttributes extends StencilHTMLAttributes {
+    'onCreateCommit'?: (event: CustomEvent<void>) => void;
+    'onCreatePerspective'?: (event: CustomEvent<{
+      name: string;
+      serviceProvider: string;
+    }>) => void;
+    'onSelectPerspective'?: (event: CustomEvent<string>) => void;
+    'perspective'?: Perspective;
   }
 }
 
@@ -49,14 +57,14 @@ declare global {
     'CoEditor': Components.CoEditor;
     'TextBlock': Components.TextBlock;
     'TextNode': Components.TextNode;
-    'TextBlock': Components.TextBlock;
+    'UprtclToolbar': Components.UprtclToolbar;
   }
 
   interface StencilIntrinsicElements {
     'co-editor': Components.CoEditorAttributes;
     'text-block': Components.TextBlockAttributes;
     'text-node': Components.TextNodeAttributes;
-    'text-block': Components.TextBlockAttributes;
+    'uprtcl-toolbar': Components.UprtclToolbarAttributes;
   }
 
 
@@ -78,24 +86,24 @@ declare global {
     new (): HTMLTextNodeElement;
   };
 
-  interface HTMLTextBlockElement extends Components.TextBlock, HTMLStencilElement {}
-  var HTMLTextBlockElement: {
-    prototype: HTMLTextBlockElement;
-    new (): HTMLTextBlockElement;
+  interface HTMLUprtclToolbarElement extends Components.UprtclToolbar, HTMLStencilElement {}
+  var HTMLUprtclToolbarElement: {
+    prototype: HTMLUprtclToolbarElement;
+    new (): HTMLUprtclToolbarElement;
   };
 
   interface HTMLElementTagNameMap {
     'co-editor': HTMLCoEditorElement
     'text-block': HTMLTextBlockElement
     'text-node': HTMLTextNodeElement
-    'text-block': HTMLTextBlockElement
+    'uprtcl-toolbar': HTMLUprtclToolbarElement
   }
 
   interface ElementTagNameMap {
     'co-editor': HTMLCoEditorElement;
     'text-block': HTMLTextBlockElement;
     'text-node': HTMLTextNodeElement;
-    'text-block': HTMLTextBlockElement;
+    'uprtcl-toolbar': HTMLUprtclToolbarElement;
   }
 
 
