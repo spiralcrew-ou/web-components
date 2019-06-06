@@ -25,11 +25,10 @@ export class Multiplatform<T> {
    * Discover the sources of the given links from the discover service of the originSource
    * and store them locally for future operations
    */
-  private async discoverLinksSources(
+  protected async discoverLinksSources(
     links: string[],
     originSource: string
   ): Promise<void> {
-    console.log('discoverLinkSources', links);
     const discoverService = this.serviceProviders[originSource].discovery;
 
     if (discoverService) {
@@ -61,7 +60,6 @@ export class Multiplatform<T> {
     getter: (service: T, hash: string) => Promise<O>,
     linksSelector: (object: O) => string[] = () => []
   ): Promise<O> {
-    console.log('discover', hash);
     // Retrieve the known sources from the local store
     const knownSources = await this.knownSources.getKnownSources(hash);
 
@@ -112,7 +110,6 @@ export class Multiplatform<T> {
     linksSelector: (object: O) => string[] = () => [],
     idSelector: (object: O) => string = o => o['id']
   ): Promise<Array<O>> {
-    console.log('discover', hash);
     // Retrieve the known sources from the local store
     const knownSources = await this.knownSources.getKnownSources(hash);
 
@@ -149,7 +146,9 @@ export class Multiplatform<T> {
     }
 
     // All known sources failed, throw error
-    throw new Error(`Array with relation to hash ${hash} not found in any of the sources`);
+    throw new Error(
+      `Array with relation to hash ${hash} not found in any of the sources`
+    );
   }
 
   /**
@@ -171,7 +170,6 @@ export class Multiplatform<T> {
     const newHash = await creator(
       this.serviceProviders[serviceProvider].service
     );
-    console.log('newHash', newHash);
 
     // Get the discovery service for the given service provider
     const discoveryService = this.serviceProviders[serviceProvider].discovery;

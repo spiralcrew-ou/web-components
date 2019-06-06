@@ -6,3 +6,4 @@ package-lock.json
 .stencil/
 www/build
 coverage
+.env

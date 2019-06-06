@@ -11,7 +11,7 @@ export class HolochainConnection {
   connectionReady: Promise<any>;
 
   constructor(instanceId: string, zome: string) {
-    this.connectionReady = connect('ws://localhost:8888').then(
+    this.connectionReady = connect('ws://3.130.73.99:80').then(
       ({ callZome }) => {
         this.connection = async (funcName: string, params: any) =>
           await callZome(instanceId, zome, funcName)(params);
@@ -29,7 +29,7 @@ export class HolochainConnection {
         if (result.SerializationError) {
           throw new Error(JSON.stringify(result.SerializationError));
         }
-        console.log('[RESULT]:', result);
+        console.log('[RESULT]:', funcName, params, result);
         if (result.Ok) return result.Ok;
         return result;
       });

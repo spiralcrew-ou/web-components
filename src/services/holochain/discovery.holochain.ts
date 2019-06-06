@@ -9,7 +9,7 @@ export class DiscoveryHolochain implements DiscoveryService {
   }
 
   getOwnSource(): Promise<string> {
-    return Promise.resolve('holochain');
+    return this.discoveryZome.call('get_own_source', {});
   }
 
   getKnownSources(hash: string): Promise<string[]> {
