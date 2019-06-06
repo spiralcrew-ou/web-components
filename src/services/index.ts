@@ -20,58 +20,62 @@ dotenv.config();
 
 let draft = null
 let defaultService = 'https://www.collectiveone.org/uprtcl/1';
-// let defaultService = process.env.DFT_SERVICE;
 
 switch (defaultService) {
-case 'local':
+  case 'local':
     draft = new DraftLocal();
     break;
 
-case 'https://www.collectiveone.org/uprtcl/1':
+  case 'https://www.collectiveone.org/uprtcl/1':
     draft = new DraftCollectiveOne();
     break;
 
-default:
+  default:
     console.error('unexpected default service ' + defaultService);
 }
 
-export const uprtclMultiplatform = new UprtclMultiplatform(
-  {
-    local: { 
-      service: new UprtclLocal(), 
-      discovery: null 
-    },
-
-    'https://www.collectiveone.org/uprtcl/1': { 
-      service: new UprtclCollectiveOne(), 
-      discovery: new DiscoveryCollectiveOne() 
-    },
-
-    holochain: {
-      service: new UprtclHolochain(),
-      discovery: new DiscoveryHolochain()
-    }
+let uprtclConfig = {
+  local: {
+    service: new UprtclLocal(),
+    discovery: null
   },
+
+  'https://www.collectiveone.org/uprtcl/1': {
+    service: new UprtclCollectiveOne(),
+    discovery: new DiscoveryCollectiveOne()
+  }
+}
+
+let dataConfig = {
+  local: {
+    service: new DataLocal(),
+    discovery: null
+  },
+
+  'https://www.collectiveone.org/uprtcl/1': {
+    service: new DataCollectiveOne(),
+    discovery: new DiscoveryCollectiveOne()
+  }
+}
+
+if (defaultService.includes('holochain')) {
+  uprtclConfig['holochain'] = {
+    service: new UprtclHolochain(),
+    discovery: new DiscoveryHolochain()
+  }
+  dataConfig['holochain'] = {
+    service: new DataHolochain(),
+    discovery: new DiscoveryHolochain()
+  }
+}
+
+export const uprtclMultiplatform = new UprtclMultiplatform(
+  uprtclConfig,
   'https://www.collectiveone.org/uprtcl/1'
 );
 
 export const dataMultiplatform = new DataMultiplatform(
-  {
-    local: { 
-      service: new DataLocal(), 
-      discovery: null 
-    },
-
-    'https://www.collectiveone.org/uprtcl/1': { 
-      service: new DataCollectiveOne(), 
-      discovery: new DiscoveryCollectiveOne() 
-    },
-
-    holochain: {
-      service: new DataHolochain(),
-      discovery: new DiscoveryHolochain()
-    }
-  },
+  dataConfig,
   draft,
   defaultService
 );
