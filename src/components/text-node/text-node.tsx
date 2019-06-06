@@ -76,8 +76,11 @@ export class TextNodeElement {
         {this.loading ? (
           <span>Loading...</span>
         ) : (
-          <div class='node'>
-            <text-block text={this.getRenderingData().text} />
+          <div class="node">
+            <div class="flex-row">
+              <text-block text={this.getRenderingData().text} />
+              <button class="commit-button" onClick={() => this.commitContent()}>Commit</button>
+            </div>
 
             {this.getRenderingData().links.map(link => (
               <text-node

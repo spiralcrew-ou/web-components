@@ -15,16 +15,17 @@ import { DraftCollectiveOne } from './c1/draft.c1';
 import { UprtclCollectiveOne } from './c1/uprtcl.c1';
 import { DiscoveryCollectiveOne } from './c1/discovery.c1';
 
-import * as dotenv from "dotenv";
+import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-let draft = null
+let draft = null;
 
-let holochainOrigin = 'holochain://QmZzGUdC7C6ZDKGzMCWX3b4gV8cXH8W934JUwNLYLDs2az';
-// let defaultService = holochainOrigin;
+let holochainOrigin =
+  'holochain://QmZzGUdC7C6ZDKGzMCWX3b4gV8cXH8W934JUwNLYLDs2az';
+let defaultService = holochainOrigin;
 
-let defaultService = 'https://www.collectiveone.org/uprtcl/1';
+//let defaultService = 'https://www.collectiveone.org/uprtcl/1';
 
 switch (defaultService) {
   case 'local':
@@ -53,7 +54,7 @@ let uprtclConfig = {
     service: new UprtclCollectiveOne(),
     discovery: new DiscoveryCollectiveOne()
   }
-}
+};
 
 let dataConfig = {
   local: {
@@ -65,17 +66,17 @@ let dataConfig = {
     service: new DataCollectiveOne(),
     discovery: new DiscoveryCollectiveOne()
   }
-}
+};
 
 if (defaultService.includes('holochain')) {
   uprtclConfig[holochainOrigin] = {
     service: new UprtclHolochain(),
     discovery: new DiscoveryHolochain()
-  }
+  };
   dataConfig[holochainOrigin] = {
     service: new DataHolochain(),
     discovery: new DiscoveryHolochain()
-  }
+  };
 }
 
 export const uprtclMultiplatform = new UprtclMultiplatform(

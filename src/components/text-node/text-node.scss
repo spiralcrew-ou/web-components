@@ -8,3 +8,20 @@
 .node:hover {
   background-color: rgba(150, 150, 150, 0.2);
 }
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.commit-button {
+  opacity: 0;
+}
+
+.commit-button:hover {
+  opacity: 1;
+}
+
+text-block {
+  flex: 1;
+}

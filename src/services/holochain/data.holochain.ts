@@ -8,11 +8,24 @@ export class DataHolochain<T = any> implements DataService<T> {
     this.documentsZome = new HolochainConnection('test-instance', 'documents');
   }
 
-  getData(dataId: string): Promise<T> {
-    return this.documentsZome.call('get_text_node', { address: dataId });
+  async getData(dataId: string): Promise<T> {
+    const response = await this.documentsZome.call('get_text_node', {
+      address: dataId
+    });
+    const entry = await this.documentsZome.parseEntryResult<T>(response);
+    const data = entry.entry;
+    if (data['links']) {
+      data['links'] = data['links'].map(link => ({ link }));
+    }
+    return data;
   }
 
   createData(data: T): Promise<string> {
-    return this.documentsZome.call('create_text_node', data);
+    if (data['links']) {
+      data['links'] = data['links'].map(l => l.link);
+    }
+    return this.documentsZome.call('create_text_node', {
+      node: data
+    });
   }
 }

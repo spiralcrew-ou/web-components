@@ -82,7 +82,7 @@ export class Multiplatform<T> {
           const discoverService = this.serviceProviders[source].discovery;
           if (discoverService) {
             // The get call succeeded but didn't return the object, remove the source from the known sources
-            discoverService.removeKnownSource(hash, source);
+            await discoverService.removeKnownSource(hash, source);
           }
         }
       } catch (e) {

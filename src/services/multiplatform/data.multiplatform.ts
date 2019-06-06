@@ -7,7 +7,7 @@ import { DraftService } from '../draft.service';
 export class DataMultiplatform extends Multiplatform<DataService<TextNode>>
   implements DataService<TextNode>, DraftService {
   draftService: DraftService<TextNode>;
-  draftSource: string;
+  defaultServiceProvider: string;
 
   constructor(
     serviceProviders: Dictionary<{
@@ -15,25 +15,24 @@ export class DataMultiplatform extends Multiplatform<DataService<TextNode>>
       discovery: DiscoveryService;
     }>,
     draftService: DraftService,
-    draftSource: string
+    defaultServiceProvider: string
   ) {
     super(serviceProviders);
     this.draftService = draftService;
-    this.draftSource = draftSource;
+    this.defaultServiceProvider = defaultServiceProvider;
   }
 
   getData(dataId: string): Promise<TextNode> {
     return this.discoverObject(
       dataId,
       (service, hash) => service.getData(hash),
-      data => [...data.links.map(link => link.link)]
+      data => data.links.map(link => link.link)
     );
   }
 
   createData(data: TextNode): Promise<string> {
-    const serviceProvider = Object.keys(this.serviceProviders)[0];
     return this.createWithLinks(
-      serviceProvider,
+      this.defaultServiceProvider,
       service => service.createData(data),
       data.links.map(link => link.link)
     );
@@ -45,7 +44,7 @@ export class DataMultiplatform extends Multiplatform<DataService<TextNode>>
     if (draft) {
       await this.discoverLinksSources(
         draft.links.map(link => link.link),
-        this.draftSource
+        this.defaultServiceProvider
       );
     }
 
