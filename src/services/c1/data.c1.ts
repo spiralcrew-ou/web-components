@@ -1,9 +1,7 @@
 import { DataService } from '../data.service';
 import { TextNode } from '../../types';
 import { DataC1If, DataC1 } from './data.if';
-import { Http } from './http';
-  
-const http = new Http();
+import { http } from './http';
 
 export class DataCollectiveOne implements DataService {
 

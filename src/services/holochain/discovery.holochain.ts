@@ -4,7 +4,7 @@ import { HolochainConnection } from './holochain.connection';
 export class DiscoveryHolochain implements DiscoveryService {
   discoveryZome: HolochainConnection;
 
-  constructor() {
+  connect() {
     this.discoveryZome = new HolochainConnection('test-instance', 'discovery');
   }
 
