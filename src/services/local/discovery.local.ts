@@ -1,40 +1,29 @@
 import { DiscoveryService } from '../discovery.service';
-import {insertKnownSources,getKnownSources, KnownSources} from './dataservices'
+import {
+  insertKnownSources,
+  getKnownSources,
+  KnownSources
+} from './dataservices';
 
 export class DiscoveryLocal implements DiscoveryService {
+  constructor() {}
 
-  constructor() {   
-    
+  getOwnSource(): Promise<string> {
+    return Promise.resolve('local');
   }
 
   getKnownSources(hash: string): Promise<string[]> {
-    return getKnownSources(hash)
+    return getKnownSources(hash);
   }
 
   async addKnownSources(hash: string, sources: string[]): Promise<void> {
-    /*
-    let knownSources = await this.knownSources.get(hash);
-    if (!knownSources) {
-      knownSources = [];
-    }
-    for (const source of sources) {
-      if (!knownSources.includes(source)) {
-        knownSources.push(source);
-      }
-    }*/
-    await insertKnownSources(new KnownSources(hash,sources))
-
-    //await this.knownSources.put(knownSources, hash);
+    await insertKnownSources(new KnownSources(hash, sources));
   }
 
-  async removeKnownSource(_hash: string, _source: string): Promise<void> {
-    /*
-    let knownSources = await this.knownSources.get(hash);
+  async removeKnownSource(hash: string, source: string): Promise<void> {
+    let knownSources = await this.getKnownSources(hash);
     knownSources = knownSources.filter(s => s !== source);
 
-    await this.knownSources.put(knownSources, hash);*/
-    throw new Error("Method not implemented.");
+    await insertKnownSources(new KnownSources(hash, knownSources));
   }
-  
-  
 }

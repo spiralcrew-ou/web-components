@@ -183,3 +183,14 @@ module.exports = {
   // Whether to use watchman for file crawling
   // watchman: true,
 };
+
+/*
+module.exports = {
+    roots: [
+        '<rootDir>/src'
+    ],
+    transform: {
+        '^.+\\.tsx?$': 'ts-jest'
+    },
+    moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+}*/

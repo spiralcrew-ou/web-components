@@ -89,7 +89,7 @@ class LocalDatabase extends Dexie {
             commits: 'id',
             contexts: 'id',
             drafts: 'id',
-            knowSources: 'id'
+            knowSources: 'hash'
         })
         this.contexts.mapToClass(Context)
         this.perspectives.mapToClass(Perspective)
@@ -129,6 +129,10 @@ export const getPerspective = (perspectiveId:string):Promise<IPerspective> => {
     return db.perspectives.get(perspectiveId)
 }
 
+export const getCommit = (commitId:string):Promise<ICommit> => {
+    return db.commits.get(commitId)
+}
+
 export const insertDraft = (draft:Draft):Promise<any> => {
     return db.drafts.add(draft)
 }
@@ -137,8 +141,8 @@ export const getDraft = (id:string):Promise<any> => {
     return db.drafts.get(id)
 }
 
-export const getKnownSources = (id:string): Promise<string[]> => {
-    return db.knowSources.get(id).then(result => {
+export const getKnownSources = (hash:string): Promise<string[]> => {
+    return db.knowSources.get(hash).then(result => {
         if (!result)
             return []
         else
@@ -146,7 +150,7 @@ export const getKnownSources = (id:string): Promise<string[]> => {
     })
 }
 
-export const insertKnownSources = (knowSources:KnownSources): Promise<any> => {
-    return db.knowSources.add(knowSources)
+export const insertKnownSources = (knownSources:KnownSources): Promise<any> => {
+    return db.knowSources.put(knownSources)
 }
 

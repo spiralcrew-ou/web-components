@@ -1,0 +1,7 @@
+@import "../../globals/variables.scss";
+
+[contenteditable=true]:empty:before {
+  content: attr(data-placeholder);
+  display: block; /* For Firefox */
+  opacity: 0.7;
+}
