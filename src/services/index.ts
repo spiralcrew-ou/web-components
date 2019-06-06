@@ -19,9 +19,9 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-const holochainOrigin =
+export const holochainServiceProvider =
   'holochain://QmZzGUdC7C6ZDKGzMCWX3b4gV8cXH8W934JUwNLYLDs2az';
-// let defaultService = holochainOrigin;
+export const c1ServiceProvider = 'https://www.collectiveone.org/uprtcl/1';
 
 let uprtclConfig = {
   local: {
@@ -29,11 +29,11 @@ let uprtclConfig = {
     discovery: null
   },
 
-  'https://www.collectiveone.org/uprtcl/1': {
+  [c1ServiceProvider]: {
     service: new UprtclCollectiveOne(),
     discovery: new DiscoveryCollectiveOne()
   },
-  [holochainOrigin]: {
+  [holochainServiceProvider]: {
     service: new UprtclHolochain(),
     discovery: new DiscoveryHolochain()
   }
@@ -46,22 +46,18 @@ let dataConfig = {
     draft: new DraftLocal()
   },
 
-  'https://www.collectiveone.org/uprtcl/1': {
+  [c1ServiceProvider]: {
     service: new DataCollectiveOne(),
     discovery: new DiscoveryCollectiveOne(),
     draft: new DraftCollectiveOne()
   },
-  [holochainOrigin]: {
+  [holochainServiceProvider]: {
     service: new DataHolochain(),
     discovery: new DiscoveryHolochain(),
     draft: new DraftHolochain()
   }
 };
 
-export const uprtclMultiplatform = new UprtclMultiplatform(
-  uprtclConfig
-);
+export const uprtclMultiplatform = new UprtclMultiplatform(uprtclConfig);
 
-export const dataMultiplatform = new DataMultiplatform(
-  dataConfig
-);
+export const dataMultiplatform = new DataMultiplatform(dataConfig);

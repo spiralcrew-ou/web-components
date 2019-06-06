@@ -2,7 +2,7 @@ import { Component, State } from '@stencil/core';
 import {
   uprtclMultiplatform,
   dataMultiplatform,
-  holochainServiceProvider
+  c1ServiceProvider
 } from '../../services';
 import { TextNode } from '../../types';
 
@@ -14,7 +14,7 @@ import { TextNode } from '../../types';
 export class CoEditor {
   @State() perspectiveId: string;
   @State() loading: boolean = true;
-  @State() defaultService = holochainServiceProvider;
+  @State() defaultService = c1ServiceProvider;
 
   // Multiplatform service is already instantiated, get a reference to it
   uprtcl = uprtclMultiplatform;
