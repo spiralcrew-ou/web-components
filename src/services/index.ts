@@ -19,30 +19,9 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-let draft = null;
-
-let holochainOrigin =
+const holochainOrigin =
   'holochain://QmZzGUdC7C6ZDKGzMCWX3b4gV8cXH8W934JUwNLYLDs2az';
-let defaultService = holochainOrigin;
-
-//let defaultService = 'https://www.collectiveone.org/uprtcl/1';
-
-switch (defaultService) {
-  case 'local':
-    draft = new DraftLocal();
-    break;
-
-  case 'https://www.collectiveone.org/uprtcl/1':
-    draft = new DraftCollectiveOne();
-    break;
-
-  case holochainOrigin:
-    draft = new DraftHolochain();
-    break;
-
-  default:
-    console.error('unexpected default service ' + defaultService);
-}
+// let defaultService = holochainOrigin;
 
 let uprtclConfig = {
   local: {
@@ -53,39 +32,36 @@ let uprtclConfig = {
   'https://www.collectiveone.org/uprtcl/1': {
     service: new UprtclCollectiveOne(),
     discovery: new DiscoveryCollectiveOne()
+  },
+  [holochainOrigin]: {
+    service: new UprtclHolochain(),
+    discovery: new DiscoveryHolochain()
   }
 };
 
 let dataConfig = {
   local: {
     service: new DataLocal(),
-    discovery: null
+    discovery: null,
+    draft: new DraftLocal()
   },
 
   'https://www.collectiveone.org/uprtcl/1': {
     service: new DataCollectiveOne(),
-    discovery: new DiscoveryCollectiveOne()
+    discovery: new DiscoveryCollectiveOne(),
+    draft: new DraftCollectiveOne()
+  },
+  [holochainOrigin]: {
+    service: new DataHolochain(),
+    discovery: new DiscoveryHolochain(),
+    draft: new DraftHolochain()
   }
 };
 
-if (defaultService.includes('holochain')) {
-  uprtclConfig[holochainOrigin] = {
-    service: new UprtclHolochain(),
-    discovery: new DiscoveryHolochain()
-  };
-  dataConfig[holochainOrigin] = {
-    service: new DataHolochain(),
-    discovery: new DiscoveryHolochain()
-  };
-}
-
 export const uprtclMultiplatform = new UprtclMultiplatform(
-  uprtclConfig,
-  defaultService
+  uprtclConfig
 );
 
 export const dataMultiplatform = new DataMultiplatform(
-  dataConfig,
-  draft,
-  defaultService
+  dataConfig
 );

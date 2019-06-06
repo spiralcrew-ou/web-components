@@ -3,19 +3,15 @@ import { Context, Perspective, Commit, Dictionary } from '../../types';
 import { Multiplatform } from './multiplatform';
 import { DiscoveryService } from '../discovery.service';
 
-export class UprtclMultiplatform extends Multiplatform<UprtclService>
-  implements UprtclService {
-  defaultServiceProvider: string;
+export class UprtclMultiplatform extends Multiplatform<UprtclService> {
 
   constructor(
     serviceProviders: Dictionary<{
       service: UprtclService;
       discovery: DiscoveryService;
-    }>,
-    defaultServiceProvider: string
+    }>
   ) {
     super(serviceProviders);
-    this.defaultServiceProvider = defaultServiceProvider;
   }
 
   async getContext(contextId: string): Promise<Context> {
@@ -40,23 +36,25 @@ export class UprtclMultiplatform extends Multiplatform<UprtclService>
     );
   }
 
-  async getRootContextId(): Promise<string> {
-    let rootContextId = await this.getDefaultServiceProvider().getRootContextId();
-    const rootContext = await this.getDefaultServiceProvider().getContext(
+  async getRootContextId(serviceProvider: string): Promise<string> {
+    const provider = this.getServiceProvider(serviceProvider);
+    let rootContextId = await provider.getRootContextId();
+    const rootContext = await provider.getContext(
       rootContextId
     );
 
-    const defaultDiscovery = this.serviceProviders[this.defaultServiceProvider]
+    const defaultDiscovery = this.serviceProviders[serviceProvider]
       .discovery;
-    let defaultSource = this.defaultServiceProvider;
+    let defaultSource = serviceProvider;
     if (defaultDiscovery) {
       defaultSource = await defaultDiscovery.getOwnSource();
     }
 
     if (!rootContext) {
-      rootContextId = await this.createContext(0, 0);
+      rootContextId = await this.createContext(serviceProvider, 0, 0);
       // Create an empty perspective
       const perspectiveId = await this.createPerspective(
+        serviceProvider,
         rootContextId,
         'User Context',
         new Date().getTime(),
@@ -68,10 +66,6 @@ export class UprtclMultiplatform extends Multiplatform<UprtclService>
     return rootContextId;
   }
 
-  getContextId(context: Context): Promise<string> {
-    return this.getDefaultServiceProvider().getContextId(context);
-  }
-
   getContextPerspectives(contextId: string): Promise<Perspective[]> {
     return this.discoverArray(
       contextId,
@@ -80,54 +74,56 @@ export class UprtclMultiplatform extends Multiplatform<UprtclService>
     );
   }
 
-  createContext(timestamp: number, nonce: number): Promise<string> {
+  createContext(serviceProvider: string, timestamp: number, nonce: number): Promise<string> {
     return this.createWithLinks(
-      this.defaultServiceProvider,
+      serviceProvider,
       service => service.createContext(timestamp, nonce),
       []
     );
   }
 
-  createPerspective(
+  async createPerspective(
+    serviceProvider: string,
     contextId: string,
     name: string,
     timestamp: number,
-    headId: string
+    headId: string,
   ): Promise<string> {
     const links = [contextId];
     if (headId) {
       links.push(headId);
     }
     return this.createWithLinks(
-      this.defaultServiceProvider,
+      serviceProvider,
       service => service.createPerspective(contextId, name, timestamp, headId),
       links
     );
   }
 
   createCommit(
+    serviceProvider: string,
     timestamp: number,
     message: string,
     parentsIds: string[],
     dataId: string
   ): Promise<string> {
     return this.createWithLinks(
-      this.defaultServiceProvider,
+      serviceProvider,
       service => service.createCommit(timestamp, message, parentsIds, dataId),
       [...parentsIds, dataId]
     );
   }
 
-  cloneContext(context: Context): Promise<string> {
-    return this.getDefaultServiceProvider().cloneContext(context);
+  cloneContext(serviceProvider: string, context: Context): Promise<string> {
+    return this.getServiceProvider(serviceProvider).cloneContext(context);
   }
 
-  clonePerspective(perspective: Perspective): Promise<string> {
-    return this.getDefaultServiceProvider().clonePerspective(perspective);
+  clonePerspective(serviceProvider: string, perspective: Perspective): Promise<string> {
+    return this.getServiceProvider(serviceProvider).clonePerspective(perspective);
   }
 
-  cloneCommit(commit: Commit): Promise<string> {
-    return this.getDefaultServiceProvider().cloneCommit(commit);
+  cloneCommit(serviceProvider: string, commit: Commit): Promise<string> {
+    return this.getServiceProvider(serviceProvider).cloneCommit(commit);
   }
 
   async updateHead(perspectiveId: string, headId: string): Promise<void> {
@@ -141,9 +137,4 @@ export class UprtclMultiplatform extends Multiplatform<UprtclService>
     );
   }
 
-  /** Service Providers */
-
-  getDefaultServiceProvider(): UprtclService {
-    return this.serviceProviders[this.defaultServiceProvider].service;
-  }
 }

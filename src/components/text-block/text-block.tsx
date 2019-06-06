@@ -27,6 +27,10 @@ export class TextBlock {
   // Keep timeout to cancel debounce typing
   changeTextTimeout = null;
 
+  componentDidLoad() {
+    this.element.shadowRoot.getElementById('text').focus();
+  }
+
   componentWillUpdate() {
     this.element.shadowRoot.getElementById('text').innerHTML = this.text;
   }

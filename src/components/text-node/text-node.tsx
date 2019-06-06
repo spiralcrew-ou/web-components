@@ -9,7 +9,6 @@ import {
   Method
 } from '@stencil/core';
 import { TextNode, Perspective, Commit } from '../../types';
-import { UprtclService } from '../../services/uprtcl.service';
 import { uprtclMultiplatform, dataMultiplatform } from '../../services';
 
 @Component({
@@ -20,7 +19,7 @@ import { uprtclMultiplatform, dataMultiplatform } from '../../services';
 export class TextNodeElement {
   @Element() private element: HTMLElement;
 
-  @Prop() perspectiveId: string;
+  @Prop({ mutable: true }) perspectiveId: string;
 
   @State() perspective: Perspective;
   @State() commit: Commit;
@@ -38,13 +37,15 @@ export class TextNodeElement {
   })
   createSibling: EventEmitter;
 
-  uprtclService: UprtclService = uprtclMultiplatform;
+  uprtclService = uprtclMultiplatform;
   dataService = dataMultiplatform;
 
   async loadPerspective() {
     this.perspective = await this.uprtclService.getPerspective(
       this.perspectiveId
     );
+
+    this.draft = await this.dataService.getDraft(this.perspective.origin, this.perspectiveId);
 
     // Head can be null, only go get it if it exists
     if (this.perspective.headId) {
@@ -59,14 +60,9 @@ export class TextNodeElement {
     this.loading = true;
 
     // We can load the perspective with its contents and its draft at the same time
-    await Promise.all([
-      this.loadPerspective(),
-      this.dataService
-        .getDraft(this.perspectiveId)
-        .then(draft => (this.draft = draft))
-    ]);
+    await this.loadPerspective(),
 
-    this.loading = false;
+      this.loading = false;
   }
 
   hasChanges() {
@@ -101,20 +97,20 @@ export class TextNodeElement {
         {this.loading ? (
           <span>Loading...</span>
         ) : (
-          <div class="node">
-            <text-block text={this.getRenderingData().text} />
-            {this.hasChanges() ? <div class="indicator" /> : ''}
+            <div class="node">
+              <text-block text={this.getRenderingData().text} />
+              {this.hasChanges() ? <div class="indicator" /> : ''}
 
-            {this.getRenderingData().links.map(link => (
-              <text-node
-                class="child-node"
-                isRootNode={false}
-                perspectiveId={link.link}
-                onCreateSibling={() => this.createNewChild()}
-              />
-            ))}
-          </div>
-        )}
+              {this.getRenderingData().links.map(link => (
+                <text-node
+                  class="child-node"
+                  isRootNode={false}
+                  perspectiveId={link.link}
+                  onCreateSibling={() => this.createNewChild()}
+                />
+              ))}
+            </div>
+          )}
       </div>
     );
   }
@@ -141,18 +137,33 @@ export class TextNodeElement {
     }
   }
 
+
+  @Method()
+  public async createPerspective(serviceProvider: string, name: string) {
+    // Create new perspective
+    const newPerspectiveId = await this.createNewPerspective(serviceProvider, this.perspective.contextId, name);
+
+    await Promise.all([
+      this.uprtclService.updateHead(this.perspectiveId, this.perspective.headId),
+      this.dataService.setDraft(serviceProvider, newPerspectiveId, this.draft)
+    ]);
+
+    this.perspectiveId = newPerspectiveId;
+    await this.loadPerspective();
+  }
+
   // Creates a new perspective and adds it to the current draft
   async createNewChild() {
     // Create new perspective
-    const newPerspectiveId = await this.createNewPerspective();
+    const newPerspectiveId = await this.createNewPerspective(this.perspective.origin, null);
 
     // Create a new draft to the said perspective
-    await this.dataService.setDraft(newPerspectiveId, this.newNode());
+    await this.dataService.setDraft(this.perspective.origin, newPerspectiveId, this.newNode());
 
     // Add a link to the new perspective to draft
     this.draft.links.push({ link: newPerspectiveId });
     this.draft = { ...this.draft };
-    await this.dataService.setDraft(this.perspectiveId, this.draft);
+    await this.dataService.setDraft(this.perspective.origin, this.perspectiveId, this.draft);
   }
 
   @Listen('content-changed')
@@ -161,7 +172,7 @@ export class TextNodeElement {
 
     this.draft.text = event.detail;
     this.draft = { ...this.draft };
-    this.dataService.setDraft(this.perspectiveId, this.draft);
+    this.dataService.setDraft(this.perspective.origin, this.perspectiveId, this.draft);
   }
 
   @Method()
@@ -176,10 +187,11 @@ export class TextNodeElement {
   }
 
   private async commitContent() {
-    const dataId = await this.dataService.createData(this.draft);
+    const dataId = await this.dataService.createData(this.perspective.origin, this.draft);
     const parentsIds = this.perspective.headId ? [this.perspective.headId] : [];
 
     const commitId = await this.uprtclService.createCommit(
+      this.perspective.origin,
       Date.now(),
       'Commit at ' + Date.now(),
       parentsIds,
@@ -187,18 +199,18 @@ export class TextNodeElement {
     );
 
     await this.uprtclService.updateHead(this.perspectiveId, commitId);
-
-    this.perspective.headId = commitId;
-    this.commit = await this.uprtclService.getCommit(commitId);
-    this.node = this.draft;
+    await this.loadPerspective();
   }
 
-  // Creates a new context and perspective
-  async createNewPerspective(): Promise<string> {
-    const contextId = await this.uprtclService.createContext(Date.now(), 0);
-    return await this.uprtclService.createPerspective(
+  // Creates a new context (if contextId is null) and perspective
+  async createNewPerspective(serviceProvider: string, contextId: string, name: string = 'master'): Promise<string> {
+    if (!contextId) {
+      contextId = await this.uprtclService.createContext(serviceProvider, Date.now(), 0);
+    }
+    return this.uprtclService.createPerspective(
+      serviceProvider,
       contextId,
-      'master',
+      name,
       Date.now(),
       null
     );

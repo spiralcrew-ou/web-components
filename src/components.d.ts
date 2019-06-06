@@ -25,6 +25,7 @@ export namespace Components {
 
   interface TextNode {
     'createCommit': () => Promise<any[]>;
+    'createPerspective': (serviceProvider: string, name: string) => Promise<void>;
     'isRootNode': boolean;
     'perspectiveId': string;
   }
@@ -33,6 +34,14 @@ export namespace Components {
     'onCreateSibling'?: (event: CustomEvent) => void;
     'perspectiveId'?: string;
   }
+
+  interface TextBlock {
+    'text': string;
+  }
+  interface TextBlockAttributes extends StencilHTMLAttributes {
+    'onContent-changed'?: (event: CustomEvent) => void;
+    'text'?: string;
+  }
 }
 
 declare global {
@@ -40,12 +49,14 @@ declare global {
     'CoEditor': Components.CoEditor;
     'TextBlock': Components.TextBlock;
     'TextNode': Components.TextNode;
+    'TextBlock': Components.TextBlock;
   }
 
   interface StencilIntrinsicElements {
     'co-editor': Components.CoEditorAttributes;
     'text-block': Components.TextBlockAttributes;
     'text-node': Components.TextNodeAttributes;
+    'text-block': Components.TextBlockAttributes;
   }
 
 
@@ -67,16 +78,24 @@ declare global {
     new (): HTMLTextNodeElement;
   };
 
+  interface HTMLTextBlockElement extends Components.TextBlock, HTMLStencilElement {}
+  var HTMLTextBlockElement: {
+    prototype: HTMLTextBlockElement;
+    new (): HTMLTextBlockElement;
+  };
+
   interface HTMLElementTagNameMap {
     'co-editor': HTMLCoEditorElement
     'text-block': HTMLTextBlockElement
     'text-node': HTMLTextNodeElement
+    'text-block': HTMLTextBlockElement
   }
 
   interface ElementTagNameMap {
     'co-editor': HTMLCoEditorElement;
     'text-block': HTMLTextBlockElement;
     'text-node': HTMLTextNodeElement;
+    'text-block': HTMLTextBlockElement;
   }
 
 
