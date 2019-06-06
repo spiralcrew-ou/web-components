@@ -19,7 +19,7 @@ export class DataHolochain<T = any> implements DataService<T> {
     }
     return data;
   }
-
+  
   createData(data: T): Promise<string> {
     if (data['links']) {
       data['links'] = data['links'].map(l => l.link);

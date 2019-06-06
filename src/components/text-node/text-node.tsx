@@ -3,9 +3,10 @@ import {
   Prop,
   State,
   Listen,
-  Watch,
   Event,
-  EventEmitter
+  Element,
+  EventEmitter,
+  Method
 } from '@stencil/core';
 import { TextNode, Perspective, Commit } from '../../types';
 import { UprtclService } from '../../services/uprtcl.service';
@@ -17,6 +18,8 @@ import { uprtclMultiplatform, dataMultiplatform } from '../../services';
   shadow: true
 })
 export class TextNodeElement {
+  @Element() private element: HTMLElement;
+
   @Prop() perspectiveId: string;
 
   @State() perspective: Perspective;
@@ -27,7 +30,7 @@ export class TextNodeElement {
 
   @State() loading: boolean = true;
 
-  // Necessary to add to diferentiate when to add a child node or when to emit createSibling event
+  // Necessary to add to differentiate when to add a child node or when to emit createSibling event
   @Prop() isRootNode: boolean = true;
 
   @Event({
@@ -50,7 +53,8 @@ export class TextNodeElement {
     }
   }
 
-  @Watch('perspectiveId')
+  // TODO: fix bug when getting newly created commit and uncomment this:
+  // @Watch('perspectiveId')
   async componentWillLoad() {
     this.loading = true;
 
@@ -66,22 +70,24 @@ export class TextNodeElement {
   }
 
   hasChanges() {
-    if(!this.node) {
+    if (!this.node) {
       return true;
     }
 
     if (this.draft != null) {
       let textEqual = this.node.text.localeCompare(this.draft.text) == 0;
-      let linksEqual = this.node.links.length != this.draft.links.length;
+      let linksEqual = this.node.links.length === this.draft.links.length;
       for (let i = 0; i < this.node.links.length; i++) {
-        linksEqual = linksEqual && this.node.links[i].link.localeCompare(this.draft.links[i].link) == 0
+        linksEqual =
+          linksEqual &&
+          this.node.links[i].link.localeCompare(this.draft.links[i].link) == 0;
         // TODO: compare position...
       }
 
-      return textEqual && linksEqual;
+      return !(textEqual && linksEqual);
     }
 
-    return false;    
+    return false;
   }
 
   getRenderingData() {
@@ -97,10 +103,11 @@ export class TextNodeElement {
         ) : (
           <div class="node">
             <text-block text={this.getRenderingData().text} />
-            { this.hasChanges() ? <div class="indicator"></div> : ''}
+            {this.hasChanges() ? <div class="indicator" /> : ''}
 
             {this.getRenderingData().links.map(link => (
               <text-node
+                class="child-node"
                 isRootNode={false}
                 perspectiveId={link.link}
                 onCreateSibling={() => this.createNewChild()}
@@ -144,19 +151,31 @@ export class TextNodeElement {
 
     // Add a link to the new perspective to draft
     this.draft.links.push({ link: newPerspectiveId });
-    await this.dataService.setDraft(this.perspectiveId, this.draft);
     this.draft = { ...this.draft };
+    await this.dataService.setDraft(this.perspectiveId, this.draft);
   }
 
   @Listen('content-changed')
   contentChanged(event: CustomEvent) {
     event.stopPropagation();
+
     this.draft.text = event.detail;
+    this.draft = { ...this.draft };
     this.dataService.setDraft(this.perspectiveId, this.draft);
   }
 
-  // Unused method for now, to be called when we want to commit to the current perspective
-  async commitContent() {
+  @Method()
+  public async createCommit() {
+    const nodes: Array<any> = Array.from(
+      this.element.shadowRoot.querySelectorAll('.child-node')
+    );
+    return Promise.all([
+      this.commitContent(),
+      ...nodes.map(node => node.createCommit())
+    ]);
+  }
+
+  private async commitContent() {
     const dataId = await this.dataService.createData(this.draft);
     const parentsIds = this.perspective.headId ? [this.perspective.headId] : [];
 
@@ -166,7 +185,12 @@ export class TextNodeElement {
       parentsIds,
       dataId
     );
+
     await this.uprtclService.updateHead(this.perspectiveId, commitId);
+
+    this.perspective.headId = commitId;
+    this.commit = await this.uprtclService.getCommit(commitId);
+    this.node = this.draft;
   }
 
   // Creates a new context and perspective

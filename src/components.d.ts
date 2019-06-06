@@ -24,6 +24,7 @@ export namespace Components {
   }
 
   interface TextNode {
+    'createCommit': () => Promise<any[]>;
     'isRootNode': boolean;
     'perspectiveId': string;
   }

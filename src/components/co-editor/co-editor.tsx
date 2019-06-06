@@ -1,4 +1,4 @@
-import { Component, State } from '@stencil/core';
+import { Component, State, Element } from '@stencil/core';
 import { UprtclService } from '../../services/uprtcl.service';
 import { uprtclMultiplatform, dataMultiplatform } from '../../services';
 import { TextNode } from '../../types';
@@ -9,6 +9,8 @@ import { TextNode } from '../../types';
   shadow: true
 })
 export class CoEditor {
+  @Element() private element: HTMLElement;
+
   @State() perspectiveId: string;
   @State() loading: boolean = true;
 
@@ -78,9 +80,31 @@ export class CoEditor {
         {this.loading ? (
           <span>Loading...</span>
         ) : (
-          <text-node perspectiveId={this.perspectiveId} />
+          <div class="flex-column">
+            <div class="flex-row">
+              <select>
+                <option />
+              </select>
+              <button
+                class="perspective-button"
+                onClick={() => this.createPerspective()}
+              >
+                Commit
+              </button>
+              <button class="commit-button" onClick={() => this.createCommit()}>
+                Commit
+              </button>
+            </div>
+            <text-node id="root-node" perspectiveId={this.perspectiveId} />
+          </div>
         )}
       </div>
     );
+  }
+
+  createPerspective() {}
+  createCommit() {
+    const node: any = this.element.shadowRoot.getElementById('root-node');
+    node.createCommit();
   }
 }
