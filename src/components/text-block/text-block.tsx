@@ -36,6 +36,7 @@ export class TextBlock {
       <div>
         <span
           id='text'
+          class='text-block'
           data-placeholder='Start typing...'
           contenteditable='true'
         >

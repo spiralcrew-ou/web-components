@@ -21,9 +21,7 @@ export class DataCollectiveOne implements DataService {
         const dataC1 = new DataC1();
         dataC1.type = 'NODE';
         dataC1.jsonData = JSON.stringify(data);
-        return http.post('/data', [ dataC1 ]).then(ids => {
-            return ids[0];
-        })
+        return http.post('/data', [ dataC1 ]);
     }
    
 }

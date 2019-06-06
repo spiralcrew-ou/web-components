@@ -65,9 +65,28 @@ export class TextNodeElement {
     this.loading = false;
   }
 
+  hasChanges() {
+    if(!this.node) {
+      return true;
+    }
+
+    if (this.draft != null) {
+      let textEqual = this.node.text.localeCompare(this.draft.text) == 0;
+      let linksEqual = this.node.links.length != this.draft.links.length;
+      for (let i = 0; i < this.node.links.length; i++) {
+        linksEqual = linksEqual && this.node.links[i].link.localeCompare(this.draft.links[i].link) == 0
+        // TODO: compare position...
+      }
+
+      return textEqual && linksEqual;
+    }
+
+    return false;    
+  }
+
   getRenderingData() {
     // If draft is null, we can render the node directly
-    return this.draft ? this.draft : this.node;
+    return this.draft != null ? this.draft : this.node;
   }
 
   render() {
@@ -77,10 +96,8 @@ export class TextNodeElement {
           <span>Loading...</span>
         ) : (
           <div class="node">
-            <div class="flex-row">
-              <text-block text={this.getRenderingData().text} />
-              <button class="commit-button" onClick={() => this.commitContent()}>Commit</button>
-            </div>
+            <text-block text={this.getRenderingData().text} />
+            { this.hasChanges() ? <div class="indicator"></div> : ''}
 
             {this.getRenderingData().links.map(link => (
               <text-node

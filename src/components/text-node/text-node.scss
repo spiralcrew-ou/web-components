@@ -3,6 +3,7 @@
 .node {
   padding: 4px;
   border-radius: 4px;
+  position: relative;
 }
 
 .node:hover {
@@ -20,6 +21,16 @@
 
 .commit-button:hover {
   opacity: 1;
+}
+
+.indicator {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  height: 6px;
+  width: 6px;
+  background-color: rgba(255, 0, 0, 0.5);
+  border-radius: 3px;
 }
 
 text-block {

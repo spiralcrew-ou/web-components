@@ -23,9 +23,9 @@ let draft = null;
 
 let holochainOrigin =
   'holochain://QmZzGUdC7C6ZDKGzMCWX3b4gV8cXH8W934JUwNLYLDs2az';
-let defaultService = holochainOrigin;
+// let defaultService = holochainOrigin;
 
-//let defaultService = 'https://www.collectiveone.org/uprtcl/1';
+let defaultService = 'https://www.collectiveone.org/uprtcl/1';
 
 switch (defaultService) {
   case 'local':
