@@ -23,6 +23,8 @@ export const holochainServiceProvider =
   'holochain://QmZzGUdC7C6ZDKGzMCWX3b4gV8cXH8W934JUwNLYLDs2az';
 export const c1ServiceProvider = 'https://www.collectiveone.org/uprtcl/1';
 
+export const localServiceProvider = 'local://'
+
 let uprtclConfig = {
   local: {
     service: new UprtclLocal(),

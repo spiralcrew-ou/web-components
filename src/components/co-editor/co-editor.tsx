@@ -2,7 +2,7 @@ import { Component, State } from '@stencil/core';
 import {
   uprtclMultiplatform,
   dataMultiplatform,
-  c1ServiceProvider,
+  localServiceProvider
 } from '../../services';
 import { TextNode } from '../../types';
 
@@ -14,11 +14,41 @@ import { TextNode } from '../../types';
 export class CoEditor {
   @State() perspectiveId: string;
   @State() loading: boolean = true;
-  @State() defaultService = c1ServiceProvider;
+  @State() defaultService = localServiceProvider
 
   // Multiplatform service is already instantiated, get a reference to it
   uprtcl = uprtclMultiplatform;
   dataService = dataMultiplatform;
+
+  async componentWillLoad() {
+    this.loading = true;
+
+    /** MVP assumes one root perspective per user in platform */
+    const rootContextId = await this.uprtcl.getRootContextId(
+      this.defaultService
+    );
+    const rootPerspectives = await this.uprtcl.getContextPerspectives(
+      rootContextId
+    );
+    const rootPerspectiveId = rootPerspectives[0].id;
+
+    const draft = await this.dataService.getDraft(
+      this.defaultService,
+      rootPerspectiveId
+    );
+
+    if (draft && draft.links.length > 0) {
+      // MVP shows one document per user only
+      this.perspectiveId = draft.links[0].link;
+    } else {
+      this.perspectiveId = await this.createPerspectiveWithDraftUnder(
+        { text: '', links: [] },
+        rootPerspectiveId
+      );
+    }
+
+    this.loading = false;
+  }
 
   async createPerspectiveWithDraft(
     serviceProvider: string,
@@ -73,35 +103,7 @@ export class CoEditor {
     return perspectiveId;
   }
 
-  async componentWillLoad() {
-    this.loading = true;
-
-    /** MVP assumes one root perspective per user in platform */
-    const rootContextId = await this.uprtcl.getRootContextId(
-      this.defaultService
-    );
-    const rootPerspectives = await this.uprtcl.getContextPerspectives(
-      rootContextId
-    );
-    const rootPerspectiveId = rootPerspectives[0].id;
-
-    const draft = await this.dataService.getDraft(
-      this.defaultService,
-      rootPerspectiveId
-    );
-
-    if (draft && draft.links.length > 0) {
-      // MVP shows one document per user only
-      this.perspectiveId = draft.links[0].link;
-    } else {
-      this.perspectiveId = await this.createPerspectiveWithDraftUnder(
-        { text: '', links: [] },
-        rootPerspectiveId
-      );
-    }
-
-    this.loading = false;
-  }
+  
 
   render() {
     return (
