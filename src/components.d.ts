@@ -8,6 +8,9 @@
 import '@stencil/core';
 
 
+import {
+  Perspective,
+} from './types';
 
 
 export namespace Components {
@@ -24,6 +27,8 @@ export namespace Components {
   }
 
   interface TextNode {
+    'createCommit': () => Promise<any[]>;
+    'createPerspective': (serviceProvider: string, name: string) => Promise<void>;
     'isRootNode': boolean;
     'perspectiveId': string;
   }
@@ -32,6 +37,19 @@ export namespace Components {
     'onCreateSibling'?: (event: CustomEvent) => void;
     'perspectiveId'?: string;
   }
+
+  interface UprtclToolbar {
+    'perspective': Perspective;
+  }
+  interface UprtclToolbarAttributes extends StencilHTMLAttributes {
+    'onCreateCommit'?: (event: CustomEvent<void>) => void;
+    'onCreatePerspective'?: (event: CustomEvent<{
+      name: string;
+      serviceProvider: string;
+    }>) => void;
+    'onSelectPerspective'?: (event: CustomEvent<string>) => void;
+    'perspective'?: Perspective;
+  }
 }
 
 declare global {
@@ -39,12 +57,14 @@ declare global {
     'CoEditor': Components.CoEditor;
     'TextBlock': Components.TextBlock;
     'TextNode': Components.TextNode;
+    'UprtclToolbar': Components.UprtclToolbar;
   }
 
   interface StencilIntrinsicElements {
     'co-editor': Components.CoEditorAttributes;
     'text-block': Components.TextBlockAttributes;
     'text-node': Components.TextNodeAttributes;
+    'uprtcl-toolbar': Components.UprtclToolbarAttributes;
   }
 
 
@@ -66,16 +86,24 @@ declare global {
     new (): HTMLTextNodeElement;
   };
 
+  interface HTMLUprtclToolbarElement extends Components.UprtclToolbar, HTMLStencilElement {}
+  var HTMLUprtclToolbarElement: {
+    prototype: HTMLUprtclToolbarElement;
+    new (): HTMLUprtclToolbarElement;
+  };
+
   interface HTMLElementTagNameMap {
     'co-editor': HTMLCoEditorElement
     'text-block': HTMLTextBlockElement
     'text-node': HTMLTextNodeElement
+    'uprtcl-toolbar': HTMLUprtclToolbarElement
   }
 
   interface ElementTagNameMap {
     'co-editor': HTMLCoEditorElement;
     'text-block': HTMLTextBlockElement;
     'text-node': HTMLTextNodeElement;
+    'uprtcl-toolbar': HTMLUprtclToolbarElement;
   }
 
 

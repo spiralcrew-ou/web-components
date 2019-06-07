@@ -15,33 +15,13 @@ import { DraftCollectiveOne } from './c1/draft.c1';
 import { UprtclCollectiveOne } from './c1/uprtcl.c1';
 import { DiscoveryCollectiveOne } from './c1/discovery.c1';
 
-import * as dotenv from "dotenv";
+import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-let draft = null
-
-let holochainOrigin = 'holochain://QmZzGUdC7C6ZDKGzMCWX3b4gV8cXH8W934JUwNLYLDs2az';
-// let defaultService = holochainOrigin;
-
-let defaultService = 'https://www.collectiveone.org/uprtcl/1';
-
-switch (defaultService) {
-  case 'local':
-    draft = new DraftLocal();
-    break;
-
-  case 'https://www.collectiveone.org/uprtcl/1':
-    draft = new DraftCollectiveOne();
-    break;
-
-  case holochainOrigin:
-    draft = new DraftHolochain();
-    break;
-
-  default:
-    console.error('unexpected default service ' + defaultService);
-}
+export const holochainServiceProvider =
+  'holochain://QmZzGUdC7C6ZDKGzMCWX3b4gV8cXH8W934JUwNLYLDs2az';
+export const c1ServiceProvider = 'https://www.collectiveone.org/uprtcl/1';
 
 let uprtclConfig = {
   local: {
@@ -49,42 +29,35 @@ let uprtclConfig = {
     discovery: null
   },
 
-  'https://www.collectiveone.org/uprtcl/1': {
+  [c1ServiceProvider]: {
     service: new UprtclCollectiveOne(),
     discovery: new DiscoveryCollectiveOne()
+  },
+  [holochainServiceProvider]: {
+    service: new UprtclHolochain(),
+    discovery: new DiscoveryHolochain()
   }
-}
+};
 
 let dataConfig = {
   local: {
     service: new DataLocal(),
-    discovery: null
+    discovery: null,
+    draft: new DraftLocal()
   },
 
-  'https://www.collectiveone.org/uprtcl/1': {
+  [c1ServiceProvider]: {
     service: new DataCollectiveOne(),
-    discovery: new DiscoveryCollectiveOne()
-  }
-}
-
-if (defaultService.includes('holochain')) {
-  uprtclConfig[holochainOrigin] = {
-    service: new UprtclHolochain(),
-    discovery: new DiscoveryHolochain()
-  }
-  dataConfig[holochainOrigin] = {
+    discovery: new DiscoveryCollectiveOne(),
+    draft: new DraftCollectiveOne()
+  },
+  [holochainServiceProvider]: {
     service: new DataHolochain(),
-    discovery: new DiscoveryHolochain()
+    discovery: new DiscoveryHolochain(),
+    draft: new DraftHolochain()
   }
-}
+};
 
-export const uprtclMultiplatform = new UprtclMultiplatform(
-  uprtclConfig,
-  defaultService
-);
+export const uprtclMultiplatform = new UprtclMultiplatform(uprtclConfig);
 
-export const dataMultiplatform = new DataMultiplatform(
-  dataConfig,
-  draft,
-  defaultService
-);
+export const dataMultiplatform = new DataMultiplatform(dataConfig);

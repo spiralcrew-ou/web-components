@@ -4,34 +4,27 @@ import { TextNode, Dictionary } from '../../types';
 import { DiscoveryService } from '../discovery.service';
 import { DraftService } from '../draft.service';
 
-export class DataMultiplatform extends Multiplatform<DataService<TextNode>>
-  implements DataService<TextNode>, DraftService {
-  draftService: DraftService<TextNode>;
-  draftSource: string;
+export class DataMultiplatform extends Multiplatform<DataService<TextNode>> {
 
   constructor(
     serviceProviders: Dictionary<{
       service: DataService;
       discovery: DiscoveryService;
-    }>,
-    draftService: DraftService,
-    draftSource: string
+      draft: DraftService;
+    }>
   ) {
     super(serviceProviders);
-    this.draftService = draftService;
-    this.draftSource = draftSource;
   }
 
   getData(dataId: string): Promise<TextNode> {
     return this.discoverObject(
       dataId,
       (service, hash) => service.getData(hash),
-      data => [...data.links.map(link => link.link)]
+      data => data.links.map(link => link.link)
     );
   }
 
-  createData(data: TextNode): Promise<string> {
-    const serviceProvider = Object.keys(this.serviceProviders)[0];
+  createData(serviceProvider: string, data: TextNode): Promise<string> {
     return this.createWithLinks(
       serviceProvider,
       service => service.createData(data),
@@ -39,20 +32,20 @@ export class DataMultiplatform extends Multiplatform<DataService<TextNode>>
     );
   }
 
-  async getDraft(objectId: string): Promise<TextNode> {
-    const draft = await this.draftService.getDraft(objectId);
+  async getDraft(serviceProvider: string, objectId: string): Promise<TextNode> {
+    const draft = await this.serviceProviders[serviceProvider]['draft'].getDraft(objectId);
 
     if (draft) {
       await this.discoverLinksSources(
         draft.links.map(link => link.link),
-        this.draftSource
+        serviceProvider
       );
     }
 
     return draft;
   }
 
-  setDraft(objectId: string, draft: any): Promise<any> {
-    return this.draftService.setDraft(objectId, draft);
+  setDraft(serviceProvider: string, objectId: string, draft: any): Promise<any> {
+    return this.serviceProviders[serviceProvider]['draft'].setDraft(objectId, draft);
   }
 }

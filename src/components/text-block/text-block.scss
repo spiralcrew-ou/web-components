@@ -2,6 +2,15 @@
 
 [contenteditable=true]:empty:before {
   content: attr(data-placeholder);
-  display: block; /* For Firefox */
   opacity: 0.7;
+}
+
+[contenteditable] {
+  display: block; /* For Firefox */
+  font-family: "Open Sans", sans-serif;
+  font-size: 22px;
+}
+
+[contenteditable=true]:focus {
+  outline: 0px solid transparent;
 }
