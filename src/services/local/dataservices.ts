@@ -3,7 +3,8 @@ import {
     Perspective as IPerspective,
     Commit as ICommit,
     Context as IContext,
-    Draft as IDraft
+    Draft as IDraft,
+    TextNode as ITextNode
 } from '../../types';
 
 import Dexie from 'dexie';
@@ -66,6 +67,18 @@ export class Draft implements IDraft {
     }
 }
 
+export class TextNode implements ITextNode {
+    id?: string;    text: string;
+    links: { 
+        position?: import("../../types").Position; 
+        link: string; }[];
+
+    constructor(_id: string, _links:any){
+        this.id= _id
+        this.links = _links
+    }
+}
+
 export class KnownSources {
     hash: string
     sources: string[]
@@ -80,6 +93,7 @@ class LocalDatabase extends Dexie {
     commits: Dexie.Table<Commit, string>
     contexts: Dexie.Table<Context,string>
     drafts: Dexie.Table<Draft,string>
+    textNode: Dexie.Table<TextNode,string>
     knowSources: Dexie.Table<KnownSources,string>
 
     constructor() {
@@ -89,13 +103,15 @@ class LocalDatabase extends Dexie {
             commits: 'id',
             contexts: 'id',
             drafts: 'id',
-            knowSources: 'hash'
+            knowSources: 'hash',
+            textNode: 'id'
         })
         this.contexts.mapToClass(Context)
         this.perspectives.mapToClass(Perspective)
         this.commits.mapToClass(Commit)
         this.drafts.mapToClass(Draft)
         this.knowSources.mapToClass(KnownSources)
+        this.textNode.mapToClass(TextNode)
     }
 }
 
@@ -154,3 +170,10 @@ export const insertKnownSources = (knownSources:KnownSources): Promise<any> => {
     return db.knowSources.put(knownSources)
 }
 
+export const insertTextNode = (object:TextNode): Promise<any> => {
+    return db.textNode.add(object)
+}
+
+export const getTextNode = (id:string): Promise<TextNode> => {
+    return db.textNode.get(id)
+}
