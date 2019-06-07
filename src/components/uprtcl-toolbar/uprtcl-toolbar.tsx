@@ -54,7 +54,11 @@ export class UptrclToolbar {
         <div class="flex-row">
           <select
             disabled={this.contextPerspectives.length === 0}
-            onChange={console.log}
+            onChange={ (e: any) => { 
+              this.selectPerspective.emit(
+                e.target.selectedOptions[0].value 
+              );              
+            } }
           >
             {this.contextPerspectives.length === 0 ? (
               <option>Loading...</option>
@@ -94,7 +98,7 @@ export class UptrclToolbar {
 
     this.createPerspectiveEvent.emit({
       name: name['value'],
-      serviceProvider: provider
+      serviceProvider: provider.selectedOptions[0].value
     });
     this.creatingPerspective = false;
   }

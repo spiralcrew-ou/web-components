@@ -105,8 +105,8 @@ export class TextNodeElement {
                 onCreateCommit={() => this.createCommit()}
                 onCreatePerspective={e =>
                   this.createPerspective(
-                    e.detail.name,
-                    e.detail.serviceProvider
+                    e.detail.serviceProvider,
+                    e.detail.name
                   )
                 }
                 onSelectPerspective={e => this.selectPerspective(e.detail)}
