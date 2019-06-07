@@ -14,7 +14,7 @@ export class DraftCollectiveOne implements DraftService {
             switch (dataC1.type) {
                 case 'NODE':
                     const data = <TextNode> JSON.parse(dataC1.jsonData);
-                    data.id = dataC1.id;
+                    if (data != null) data.id = dataC1.id;
                     return data;
             }
             

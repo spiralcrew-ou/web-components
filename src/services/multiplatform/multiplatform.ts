@@ -35,7 +35,10 @@ export class Multiplatform<T> {
       // Discover known sources of link from the discover service
       await Promise.all(
         links.map(async link => {
-          let knownSources = await discoverService.getKnownSources(link);
+          let knownSources = await this.knownSources.getKnownSources(link);
+          if (!knownSources || knownSources.length === 0) {
+            knownSources = await discoverService.getKnownSources(link);
+          }
 
           // If there are no known sources, assume that the source of the object is the original source
           if (knownSources) {
@@ -60,6 +63,10 @@ export class Multiplatform<T> {
     getter: (service: T, hash: string) => Promise<O>,
     linksSelector: (object: O) => string[] = () => []
   ): Promise<O> {
+    if (typeof hash !== 'string') {
+      debugger;
+    }
+
     // Retrieve the known sources from the local store
     const knownSources = await this.knownSources.getKnownSources(hash);
 
@@ -82,7 +89,7 @@ export class Multiplatform<T> {
           const discoverService = this.serviceProviders[source].discovery;
           if (discoverService) {
             // The get call succeeded but didn't return the object, remove the source from the known sources
-            discoverService.removeKnownSource(hash, source);
+            await discoverService.removeKnownSource(hash, source);
           }
         }
       } catch (e) {
