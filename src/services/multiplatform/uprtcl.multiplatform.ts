@@ -24,7 +24,7 @@ export class UprtclMultiplatform extends Multiplatform<UprtclService> {
     return await this.discoverObject(
       perspectiveId,
       (service, hash) => service.getPerspective(hash),
-      perspective => (perspective.headId ? [perspective.headId] : [])
+      perspective => ([perspective.headId, perspective.contextId])
     );
   }
 

@@ -2,7 +2,7 @@ import { Component, State } from '@stencil/core';
 import {
   uprtclMultiplatform,
   dataMultiplatform,
-  localServiceProvider
+  c1ServiceProvider as serviceProvider
 } from '../../services';
 import { TextNode } from '../../types';
 
@@ -14,7 +14,7 @@ import { TextNode } from '../../types';
 export class CoEditor {
   @State() perspectiveId: string;
   @State() loading: boolean = true;
-  @State() defaultService = localServiceProvider
+  @State() defaultService = serviceProvider;
 
   // Multiplatform service is already instantiated, get a reference to it
   uprtcl = uprtclMultiplatform;

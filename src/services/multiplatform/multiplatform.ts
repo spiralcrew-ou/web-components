@@ -35,14 +35,16 @@ export class Multiplatform<T> {
       // Discover known sources of link from the discover service
       await Promise.all(
         links.map(async link => {
-          let knownSources = await this.knownSources.getKnownSources(link);
-          if (!knownSources || knownSources.length === 0) {
-            knownSources = await discoverService.getKnownSources(link);
-          }
-
-          // If there are no known sources, assume that the source of the object is the original source
-          if (knownSources) {
-            await this.knownSources.addKnownSources(link, knownSources);
+          if (link != null) {
+            let knownSources = await this.knownSources.getKnownSources(link);
+            if (!knownSources || knownSources.length === 0) {
+              knownSources = await discoverService.getKnownSources(link);
+            }
+  
+            // If there are no known sources, assume that the source of the object is the original source
+            if (knownSources) {
+              await this.knownSources.addKnownSources(link, knownSources);
+            }
           }
         })
       );
