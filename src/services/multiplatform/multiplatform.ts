@@ -21,6 +21,10 @@ export class Multiplatform<T> {
     this.serviceProviders = serviceProviders;
   }
 
+  public async getKnownSources(hash: string): Promise<string[]> {
+    return this.knownSources.getKnownSources(hash);
+  }
+
   /**
    * Discover the sources of the given links from the discover service of the originSource
    * and store them locally for future operations
@@ -66,7 +70,7 @@ export class Multiplatform<T> {
     linksSelector: (object: O) => string[] = () => []
   ): Promise<O> {
     if (typeof hash !== 'string') {
-      debugger;
+      return null;
     }
 
     // Retrieve the known sources from the local store

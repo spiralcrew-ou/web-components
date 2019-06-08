@@ -15,6 +15,7 @@ import {
 export class TextBlock {
   @Element() private element: HTMLElement;
 
+  @Prop() id: string;
   @Prop() text: string;
 
   @Event({
@@ -28,18 +29,18 @@ export class TextBlock {
   changeTextTimeout = null;
 
   componentDidLoad() {
-    this.element.shadowRoot.getElementById('text').focus();
+    this.element.shadowRoot.getElementById(this.id).focus();
   }
 
   componentWillUpdate() {
-    this.element.shadowRoot.getElementById('text').innerHTML = this.text;
+    this.element.shadowRoot.getElementById(this.id).innerHTML = this.text;
   }
 
   render() {
     return (
       <div>
         <span
-          id='text'
+          id={this.id}
           class='text-block'
           data-placeholder='Start typing...'
           contenteditable='true'
@@ -62,7 +63,7 @@ export class TextBlock {
 
       this.changeTextTimeout = setTimeout(() => {
         // Get the new text and emit it
-        const newText = this.element.shadowRoot.getElementById('text')
+        const newText = this.element.shadowRoot.getElementById(this.id)
           .innerText;
         this.contentChanged.emit(newText);
       }, 2000);

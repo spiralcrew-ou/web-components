@@ -7,6 +7,7 @@ import {
   State
 } from '@stencil/core';
 import { Perspective } from '../../types';
+import { uprtclData } from '../../services/uprtcl-data';
 import { uprtclMultiplatform } from '../../services';
 
 @Component({
@@ -18,6 +19,7 @@ export class UptrclToolbar {
   @Element() private element: HTMLElement;
 
   @Prop() perspective: Perspective;
+  @Prop() defaultService: string;
 
   @State() creatingPerspective: boolean = false;
   @State() contextPerspectives: Perspective[] = [];
@@ -48,12 +50,20 @@ export class UptrclToolbar {
     );
   }
 
+  async logUprtcl () {
+    const prettyString = await uprtclData.pretty(this.perspective.id);
+    console.log(prettyString);
+  }
+
+  componentDidLoad() {
+  }
+
   render() {
     return (
       <div class="flex-column">
         <div class="flex-row">
           <select
-            disabled={this.contextPerspectives.length === 0}
+            disabled={ this.contextPerspectives.length === 0 }
             onChange={ (e: any) => { 
               this.selectPerspective.emit(
                 e.target.selectedOptions[0].value 
@@ -72,6 +82,7 @@ export class UptrclToolbar {
             New Perspective
           </button>
           <button onClick={() => this.createCommit.emit()}>Commit</button>
+          <button onClick={() => this.logUprtcl()}>Log</button>
         </div>
         {this.creatingPerspective ? (
           <div class="flex-row">

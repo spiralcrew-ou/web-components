@@ -20,6 +20,7 @@ export class TextNodeElement {
   @Element() private element: HTMLElement;
 
   @Prop({ mutable: true }) perspectiveId: string;
+  @Prop() defaultService: string;
 
   @State() perspective: Perspective;
   @State() commit: Commit;
@@ -101,6 +102,7 @@ export class TextNodeElement {
           <div class="flex-column">
             {this.isRootNode ? (
               <uprtcl-toolbar
+                defaultService={this.defaultService}
                 perspective={this.perspective}
                 onCreateCommit={() => this.createCommit()}
                 onCreatePerspective={e =>
@@ -116,11 +118,12 @@ export class TextNodeElement {
             )}
 
             <div class="node">
-              <text-block text={this.getRenderingData().text} />
+              <text-block id={this.perspectiveId} text={this.getRenderingData().text} />
               {this.hasChanges() ? <div class="indicator" /> : ''}
 
               {this.getRenderingData().links.map(link => (
                 <text-node
+                  id={this.perspectiveId}
                   class="child-node"
                   isRootNode={false}
                   perspectiveId={link.link}

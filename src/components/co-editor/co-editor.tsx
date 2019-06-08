@@ -4,6 +4,7 @@ import {
   dataMultiplatform,
   c1ServiceProvider as serviceProvider
 } from '../../services';
+import { uprtclData } from '../../services/uprtcl-data';
 import { TextNode } from '../../types';
 
 @Component({
@@ -12,6 +13,7 @@ import { TextNode } from '../../types';
   shadow: true
 })
 export class CoEditor {
+  @State() rootPerspectiveId: string;
   @State() perspectiveId: string;
   @State() loading: boolean = true;
   @State() defaultService = serviceProvider;
@@ -30,11 +32,11 @@ export class CoEditor {
     const rootPerspectives = await this.uprtcl.getContextPerspectives(
       rootContextId
     );
-    const rootPerspectiveId = rootPerspectives[0].id;
+    this.rootPerspectiveId = rootPerspectives[0].id;
 
     const draft = await this.dataService.getDraft(
       this.defaultService,
-      rootPerspectiveId
+      this.rootPerspectiveId
     );
 
     if (draft && draft.links.length > 0) {
@@ -43,7 +45,7 @@ export class CoEditor {
     } else {
       this.perspectiveId = await this.createPerspectiveWithDraftUnder(
         { text: '', links: [] },
-        rootPerspectiveId
+        this.rootPerspectiveId
       );
     }
 
@@ -103,7 +105,10 @@ export class CoEditor {
     return perspectiveId;
   }
 
-  
+  async logUprtcl () {
+    const prettyString = await uprtclData.pretty(this.rootPerspectiveId);
+    console.log(prettyString);
+  }
 
   render() {
     return (
@@ -111,7 +116,13 @@ export class CoEditor {
         {this.loading ? (
           <span>Loading...</span>
         ) : (
-          <text-node perspectiveId={this.perspectiveId} />
+          <div>
+            <button onClick={() => this.logUprtcl()}>Log</button>
+            <text-node 
+            id={this.perspectiveId} 
+            perspectiveId={this.perspectiveId} 
+            defaultService={this.defaultService}/>
+          </div>
         )}
       </div>
     );

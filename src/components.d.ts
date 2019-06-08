@@ -19,9 +19,11 @@ export namespace Components {
   interface CoEditorAttributes extends StencilHTMLAttributes {}
 
   interface TextBlock {
+    'id': string;
     'text': string;
   }
   interface TextBlockAttributes extends StencilHTMLAttributes {
+    'id'?: string;
     'onContent-changed'?: (event: CustomEvent) => void;
     'text'?: string;
   }
@@ -29,19 +31,23 @@ export namespace Components {
   interface TextNode {
     'createCommit': () => Promise<any[]>;
     'createPerspective': (serviceProvider: string, name: string) => Promise<void>;
+    'defaultService': string;
     'isRootNode': boolean;
     'perspectiveId': string;
   }
   interface TextNodeAttributes extends StencilHTMLAttributes {
+    'defaultService'?: string;
     'isRootNode'?: boolean;
     'onCreateSibling'?: (event: CustomEvent) => void;
     'perspectiveId'?: string;
   }
 
   interface UprtclToolbar {
+    'defaultService': string;
     'perspective': Perspective;
   }
   interface UprtclToolbarAttributes extends StencilHTMLAttributes {
+    'defaultService'?: string;
     'onCreateCommit'?: (event: CustomEvent<void>) => void;
     'onCreatePerspective'?: (event: CustomEvent<{
       name: string;
