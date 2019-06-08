@@ -36,12 +36,8 @@ export class UprtclData {
     commitFull.creatorId = commit.creatorId;
     commitFull.timestamp = commit.timestamp;
     commitFull.message = commit.message;
-
-    for (let i=0; i<commit.parentsIds.length; i++) {
-      const parent = await this.getCommitFull(commit.parentsIds[0]);
-      if (commitFull.parents) commitFull.parents.push(parent);
-    }
-
+    commitFull.parentsIds = commit.parentsIds;
+    
     commitFull.data = await await this.getTextNodeFull(data);
     
     return commitFull;

@@ -29,11 +29,13 @@ export class TextBlock {
   changeTextTimeout = null;
 
   componentDidLoad() {
-    this.element.shadowRoot.getElementById(this.id).focus();
+    const element = this.element.shadowRoot.getElementById(this.id);
+    if (element) element.focus();
   }
 
   componentWillUpdate() {
-    this.element.shadowRoot.getElementById(this.id).innerHTML = this.text;
+    const element = this.element.shadowRoot.getElementById(this.id);
+    if (element) element.innerHTML = this.text;
   }
 
   render() {

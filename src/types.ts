@@ -67,7 +67,7 @@ export class CommitFull {
   creatorId: string;
   timestamp: number;
   message: string;
-  parents: Array<CommitFull> = [];
+  parentsIds: Array<String> = [];
   data: TextNodeFull;
 }
 
