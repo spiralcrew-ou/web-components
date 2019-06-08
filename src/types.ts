@@ -31,7 +31,6 @@ export interface Position {
 
 export interface TextNode {
   id?: string;
-
   text: string;
   links: Array<{
     position?: Position;
@@ -45,3 +44,38 @@ export type Draft = {
 };
 
 export type Dictionary<T> = { [key: string]: T };
+
+export class ContextFull {
+  id?: string;
+  creatorId: string;
+  timestamp: number;
+  nonce: number;
+}
+export class PerspectiveFull {
+  id: string;
+  origin: string;
+  creatorId: string;
+  timestamp: number;
+  context: Context;
+  name: string;
+  draft: TextNodeFull;
+  head: CommitFull;
+}
+
+export class CommitFull {
+  id?: string;
+  creatorId: string;
+  timestamp: number;
+  message: string;
+  parents: Array<CommitFull> = [];
+  data: TextNodeFull;
+}
+
+export class TextNodeFull {
+  id?: string;
+  text: string;
+  links: Array<{
+    position?: Position;
+    link: PerspectiveFull;
+  }> = [];
+}

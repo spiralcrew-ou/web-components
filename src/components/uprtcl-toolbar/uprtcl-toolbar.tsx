@@ -51,8 +51,8 @@ export class UptrclToolbar {
   }
 
   async logUprtcl () {
-    const prettyString = await uprtclData.pretty(this.perspective.id);
-    console.log(prettyString);
+    const perspectiveFull = await uprtclData.getPerspectiveFull(this.perspective.id);
+    console.log(perspectiveFull);
   }
 
   componentDidLoad() {

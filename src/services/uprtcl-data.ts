@@ -1,61 +1,67 @@
 import { uprtclMultiplatform, dataMultiplatform } from './index';
+import { PerspectiveFull, CommitFull, TextNodeFull, TextNode } from './../types';
 
 export class UprtclData {
 
   uprtcl = uprtclMultiplatform;
   dataService = dataMultiplatform;
 
-  async pretty(perspectiveId: string) {
+  async getPerspectiveFull(perspectiveId: string): Promise<PerspectiveFull> {
     const perspective = await this.uprtcl.getPerspective(perspectiveId);
-    const context = await this.uprtcl.getContext(perspective.contextId);
-    const head = await this.uprtcl.getCommit(perspective.headId);
-    const data = (head != null) ? await this.dataService.getData(head.dataId) : null;
+    const perspectiveFull = new PerspectiveFull()
+
     const draft = await this.dataService.getDraft(perspective.origin, perspectiveId);
+
+    perspectiveFull.id = perspective.id
+    perspectiveFull.origin = perspective.origin
+    perspectiveFull.creatorId = perspective.creatorId
+    perspectiveFull.timestamp = perspective.timestamp
+    perspectiveFull.context = await this.uprtcl.getContext(perspective.contextId)
+    perspectiveFull.name = perspective.name
+    perspectiveFull.draft = await this.getTextNodeFull(draft);
+    perspectiveFull.head = await this.getCommitFull(perspective.headId);
+
+    return perspectiveFull;
+  }
+
+  async getCommitFull(commitId: string): Promise<CommitFull> {
+    const commit = await this.uprtcl.getCommit(commitId);
+    if (!commit) return null;
+
+    const data = await this.dataService.getData(commit.dataId);
+
+    const commitFull = new CommitFull();
+
+    commitFull.id = commit.id;
+    commitFull.creatorId = commit.creatorId;
+    commitFull.timestamp = commit.timestamp;
+    commitFull.message = commit.message;
+
+    for (let i=0; i<commit.parentsIds.length; i++) {
+      const parent = await this.getCommitFull(commit.parentsIds[0]);
+      if (commitFull.parents) commitFull.parents.push(parent);
+    }
+
+    commitFull.data = await await this.getTextNodeFull(data);
     
-    let logDraftLinks = `
-            {`;
+    return commitFull;
+  }
 
-    for (let i=0; i<draft.links.length; i++) {
-      const thisLog = await this.pretty(draft.links[i].link);
-      logDraftLinks = logDraftLinks.concat(thisLog);
-    };
-    logDraftLinks.concat(`
-            }`)
+  async getTextNodeFull(textNode: TextNode): Promise<TextNodeFull> {
+    const textNodeFull = new TextNodeFull();
 
-    const log = `
-    {
-      id: ${perspective.id},
-      origin: ${perspective.origin},
-      creatorId: ${perspective.creatorId},
-      timestamp: ${perspective.timestamp},
-      context: {
-        id: ${context.id},
-        creatorId: ${context.creatorId},
-        timestamp: ${context.timestamp},
-        nonce: ${context.nonce}
-      },
-      name: ${perspective.name},
-      draft: ${draft != null ? `{
-        text: ${draft.text},
-        links: ${logDraftLinks}
-      }` : 'null'}
-      head: ${head != null ? `{
-        id: ${head.id},
-        creatorId: ${head.creatorId},
-        timestamp: ${head.timestamp},
-        message: ${head.message},
-        parentsIds: ${head.parentsIds.toString},
-        data: ${ (data != null) ? `{
-          id: ${data.id},
-          text: ${data.text},
-          links: {
-            ${data.links.map(async link => await this.pretty(link.link)).join(',')}
-          }
-        }` : 'null'}
-      }` : 'null'}
-    }`;
+    textNodeFull.id = textNode.id;
+    textNodeFull.text = textNode.text;
 
-    return log;
+    for (let i=0; i<textNode.links.length; i++) {
+      const linkedPerspective = await this.getPerspectiveFull(textNode.links[i].link);
+      if (textNodeFull.links) textNodeFull.links.push({
+        link: linkedPerspective, 
+        position: textNode.links[i].position
+      });
+    }
+
+    return textNodeFull;
   }
 }
 
