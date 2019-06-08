@@ -10,6 +10,7 @@ import {
 } from '@stencil/core';
 import { TextNode, Perspective, Commit } from '../../types';
 import { uprtclMultiplatform, dataMultiplatform } from '../../services';
+import { uprtclData } from '../../services/uprtcl-data';
 
 @Component({
   tag: 'text-node',
@@ -167,26 +168,19 @@ export class TextNodeElement {
   @Method()
   public async createPerspective(serviceProvider: string, name: string) {
     // Create new perspective
-    const newPerspectiveId = await this.createNewPerspective(
-      serviceProvider,
-      this.perspective.contextId,
-      name
-    );
-
-    await Promise.all([
-      this.uprtclService.updateHead(
-        this.perspectiveId,
-        this.perspective.headId
-      ),
-      this.dataService.setDraft(serviceProvider, newPerspectiveId, this.draft)
-    ]);
+    const newPerspectiveId = await uprtclData.createGlobalPerspective(
+      serviceProvider, this.perspectiveId, name);
 
     this.perspectiveId = newPerspectiveId;
     await this.loadPerspective();
   }
 
   // Creates a new perspective and adds it to the current draft
-  async createNewChild() {
+  
+  /** TODO: This is critical function, I suggest we move it to uprtclData
+   * to have one place in which it is implemented. */
+  
+   async createNewChild() {
     // Create new perspective
     const newPerspectiveId = await this.createNewPerspective(
       this.perspective.origin,
@@ -201,6 +195,13 @@ export class TextNodeElement {
     );
 
     // Add a link to the new perspective to draft
+    /** TODO: I am not sure but it seems that the draft should be referred to with a getter like
+     * this.getDraft() that will create it if it is null, or return it if it exist. and a setter 
+     * that will persist it.
+     * 
+     * This way the logic of the draft maintainance dont need to be handled by its users. */
+
+    if (this.draft == null) this.draft = {...this.node}
     this.draft.links.push({ link: newPerspectiveId });
     this.draft = { ...this.draft };
     await this.dataService.setDraft(
@@ -225,6 +226,9 @@ export class TextNodeElement {
 
   @Method()
   public async createCommit() {
+    /* TODO: recursivity is using the DOM links as the criteria for 
+       for recursivity. It should is the object lins instead and 
+       the DOM should react. */    
     const nodes: Array<any> = Array.from(
       this.element.shadowRoot.querySelectorAll('.child-node')
     );

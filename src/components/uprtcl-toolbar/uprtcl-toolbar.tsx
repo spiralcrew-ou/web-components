@@ -51,7 +51,7 @@ export class UptrclToolbar {
   }
 
   async logUprtcl () {
-    const perspectiveFull = await uprtclData.getPerspectiveFull(this.perspective.id);
+    const perspectiveFull = await uprtclData.getPerspectiveFull(this.perspective.id, 5);
     console.log(perspectiveFull);
   }
 

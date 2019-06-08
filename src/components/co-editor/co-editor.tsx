@@ -106,7 +106,7 @@ export class CoEditor {
   }
 
   async logUprtcl () {
-    const perspectiveFull = await uprtclData.getPerspectiveFull(this.rootPerspectiveId);
+    const perspectiveFull = await uprtclData.getPerspectiveFull(this.rootPerspectiveId, 10);
     console.log(perspectiveFull);
   }
 
