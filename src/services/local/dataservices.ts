@@ -7,6 +7,8 @@ import {
     TextNode as ITextNode
 } from '../../types';
 
+import {generateSha256} from '../../main_functions';
+
 import Dexie from 'dexie';
 
 export class Perspective implements IPerspective {
@@ -129,6 +131,10 @@ export const insertPerspective = (perspective): Promise<any> => {
     return db.perspectives.add(perspective)
 }
 
+export const updatePerspectiveHead =(perspectiveId, commitId): Promise<any> => {
+    return  db.perspectives.where('id').equals(perspectiveId).modify({headId:commitId})
+}
+
 export const insertContext = (context): Promise<any> => {
     return db.contexts.add(context)
 }
@@ -178,7 +184,10 @@ export const insertKnownSources = (knownSources:KnownSources): Promise<any> => {
     return db.knowSources.put(knownSources)
 }
 
-export const insertTextNode = (object:TextNode): Promise<any> => {
+export const insertTextNode = async (object:TextNode): Promise<any> => {
+    
+    object.id = await generateSha256(object.text)
+    debugger
     return db.textNode.add(object)
 }
 

@@ -247,7 +247,6 @@ export class TextNodeElement {
       this.draft
     );
     const parentsIds = this.perspective.headId ? [this.perspective.headId] : [];
-
     const commitId = await this.uprtclService.createCommit(
       this.perspective.origin,
       Date.now(),

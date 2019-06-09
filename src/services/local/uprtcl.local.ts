@@ -19,6 +19,7 @@ import {
   getPerpectives,
   getPerspective,
   getCommit,
+  updatePerspectiveHead,
   // Draft
 } from './dataservices';
 
@@ -88,7 +89,7 @@ export class UprtclLocal implements UprtclService {
     // TO-REVIEW: createPerspective method may be will return Perspective instead of string (to check with pepo)
   }
 
-  createCommit(_timestamp: number, _message: string, _parentsIds: string[], _dataId: string): Promise<string> {
+  createCommit(_timestamp: number, _message: string, _parentsIds: string[], _dataId: string): Promise<string> { 
     const creatorId = 'anon'
     const commitId = generateCommitId(creatorId, _parentsIds, _message, _dataId)
     return insertCommit(new Commit(commitId, new Date().getDate(), _message, _parentsIds, _dataId))
@@ -107,7 +108,7 @@ export class UprtclLocal implements UprtclService {
   }
 
   updateHead(_perspectiveId: string, _commitId: string): Promise<void> {
-    throw new Error("Method not implemented.");
+    return updatePerspectiveHead(_perspectiveId,_commitId)
   }
 
 
