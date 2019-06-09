@@ -2,7 +2,7 @@ import { UprtclService } from '../uprtcl.service';
 import {
   generateCID,
   generateCommitId,
-  generateUserContext
+  generateUserContextId
 } from '../../main_functions';
 
 import {
@@ -10,6 +10,7 @@ import {
   Commit as ICommit,
   Context as IContext
 } from '../../types';
+
 import {
   insertPerspective, Perspective,
   insertContext, Context,
@@ -17,7 +18,8 @@ import {
   getContext, 
   getPerpectives,
   getPerspective,
-  getCommit
+  getCommit,
+  // Draft
 } from './dataservices';
 
 
@@ -41,7 +43,19 @@ export class UprtclLocal implements UprtclService {
   }
 
    async getRootContextId(): Promise<string> {
-    return generateUserContext('anon');
+    let rootContextId = generateUserContextId('anon');
+    const rootContext = await getContext(rootContextId)
+
+    if (rootContext)
+      return rootContextId
+    
+    // Asume that is first time and will need create contextRoot
+    rootContextId = await this.createContext(0,0)
+    const commit = await this.createCommit(new Date().getTime(),'First commit', [],null)
+    await this.createPerspective(rootContextId,'Root Perspective',new Date().getTime(),commit)
+    return rootContextId
+
+ 
   }
 
   getContextId(_context: IContext): Promise<string> {
@@ -57,7 +71,7 @@ export class UprtclLocal implements UprtclService {
     const creatorId = 'anon'
     let cid = ''
     if ((_timestamp===0) && (_nonce === 0)) //MonkeyPatch: create user context. Check this with pepo
-      cid = generateUserContext(creatorId)
+      cid = generateUserContextId(creatorId)
     else
       cid = generateCID(creatorId)
    
@@ -67,7 +81,7 @@ export class UprtclLocal implements UprtclService {
   createPerspective(_contextId: string, _name: string, _timestamp: number, _headId: string): Promise<string> {
     // TODO: Get userID or userCreator
     const creatorId = 'anon'
-    const origin = 'local://'
+    const origin = 'local'
     const cid = generateCID(creatorId, [], 'First Commit')
     return insertPerspective(new Perspective(cid, origin, creatorId, _timestamp, _contextId, _name, _headId))
 

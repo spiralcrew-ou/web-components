@@ -2,7 +2,8 @@ import { Component, State } from '@stencil/core';
 import {
   uprtclMultiplatform,
   dataMultiplatform,
-  c1ServiceProvider as serviceProvider
+  //c1ServiceProvider as serviceProvider,
+  localServiceProvider
 } from '../../services';
 import { uprtclData } from '../../services/uprtcl-data';
 import { TextNode } from '../../types';
@@ -16,7 +17,7 @@ export class CoEditor {
   @State() rootPerspectiveId: string;
   @State() perspectiveId: string;
   @State() loading: boolean = true;
-  @State() defaultService = serviceProvider;
+  @State() defaultService = localServiceProvider;
 
   // Multiplatform service is already instantiated, get a reference to it
   uprtcl = uprtclMultiplatform;
@@ -34,6 +35,7 @@ export class CoEditor {
     );
     this.rootPerspectiveId = rootPerspectives[0].id;
 
+    
     const draft = await this.dataService.getDraft(
       this.defaultService,
       this.rootPerspectiveId
@@ -48,7 +50,6 @@ export class CoEditor {
         this.rootPerspectiveId
       );
     }
-
     this.loading = false;
   }
 

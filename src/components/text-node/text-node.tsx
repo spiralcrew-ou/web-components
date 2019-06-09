@@ -47,10 +47,13 @@ export class TextNodeElement {
       this.perspectiveId
     );
 
+    
     this.draft = await this.dataService.getDraft(
       this.perspective.origin,
       this.perspectiveId
     );
+
+    
 
     // Head can be null, only go get it if it exists
     if (this.perspective.headId) {

@@ -68,7 +68,8 @@ export class Draft implements IDraft {
 }
 
 export class TextNode implements ITextNode {
-    id?: string;    text: string;
+    id?: string;    
+    text: string;
     links: { 
         position?: import("../../types").Position; 
         link: string; }[];
@@ -87,6 +88,7 @@ export class KnownSources {
         this.sources=_sources
     }
 }
+
 
 class LocalDatabase extends Dexie {
     perspectives: Dexie.Table<Perspective,string>
@@ -116,6 +118,8 @@ class LocalDatabase extends Dexie {
 }
 
 const db = new LocalDatabase()
+
+window['db'] = db
 
 export const fetchPerspective = (_id:string)=> {
     return db.perspectives.where('id').equals(_id) 
@@ -155,6 +159,10 @@ export const insertDraft = (draft:Draft):Promise<any> => {
 
 export const getDraft = (id:string):Promise<any> => {
     return db.drafts.get(id)
+}
+
+export const modifyDraft = (draft: Draft):void => {
+    db.drafts.where('id').equals(draft.id).modify(draft)
 }
 
 export const getKnownSources = (hash:string): Promise<string[]> => {

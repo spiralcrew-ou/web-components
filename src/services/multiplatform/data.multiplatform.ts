@@ -34,14 +34,12 @@ export class DataMultiplatform extends Multiplatform<DataService<TextNode>> {
 
   async getDraft(serviceProvider: string, objectId: string): Promise<TextNode> {
     const draft = await this.serviceProviders[serviceProvider]['draft'].getDraft(objectId);
-
     if (draft) {
       await this.discoverLinksSources(
         draft.links.map(link => link.link),
         serviceProvider
       );
     }
-
     return draft;
   }
 

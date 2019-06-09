@@ -17,7 +17,7 @@ export const generateCID = creatorId => {
 }
 
 
-export const generateUserContext = (userID)  => {
+export const generateUserContextId = (userID)  => {
     const body = {
         '@creatorid': userID,
         "@timestamp": 0
