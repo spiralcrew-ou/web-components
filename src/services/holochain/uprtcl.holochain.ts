@@ -5,6 +5,7 @@ import { Perspective, Commit, Context } from '../../types';
 
 export class UprtclHolochain implements UprtclService {
   uprtclZome: HolochainConnection;
+  proxyZome: HolochainConnection;
   formatter: ConnectionFormatter;
 
   objectRelation = {
@@ -26,11 +27,12 @@ export class UprtclHolochain implements UprtclService {
   constructor() {
     this.formatter = new ConnectionFormatter(this.objectRelation);
     this.uprtclZome = new HolochainConnection('test-instance', 'uprtcl');
+    this.proxyZome = new HolochainConnection('test-instance', 'proxy');
   }
 
   getEntry(entryId: string): Promise<EntryResult> {
-    return this.uprtclZome
-      .call('get_entry', { address: entryId })
+    return this.proxyZome
+      .call('get_proxied_entry', { address: entryId })
       .then(entry => this.uprtclZome.parseEntryResult(entry));
   }
 

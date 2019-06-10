@@ -4,6 +4,11 @@ import { Multiplatform } from './multiplatform';
 import { DiscoveryService } from '../discovery.service';
 
 export class UprtclMultiplatform extends Multiplatform<UprtclService> {
+  linksFromPerspective = (perspective: Perspective) => [
+    perspective.contextId,
+    perspective.headId
+  ];
+  linksFromCommit = (commit: Commit) => [commit.dataId, ...commit.parentsIds];
 
   constructor(
     serviceProviders: Dictionary<{
@@ -24,7 +29,7 @@ export class UprtclMultiplatform extends Multiplatform<UprtclService> {
     return await this.discoverObject(
       perspectiveId,
       (service, hash) => service.getPerspective(hash),
-      perspective => ([perspective.headId, perspective.contextId])
+      perspective => [perspective.headId, perspective.contextId]
     );
   }
 
@@ -32,19 +37,16 @@ export class UprtclMultiplatform extends Multiplatform<UprtclService> {
     return await this.discoverObject(
       commitId,
       (service, hash) => service.getCommit(hash),
-      commit => [commit.dataId, ...commit.parentsIds]
+      this.linksFromCommit
     );
   }
 
   async getRootContextId(serviceProvider: string): Promise<string> {
     const provider = this.getServiceProvider(serviceProvider);
     let rootContextId = await provider.getRootContextId();
-    const rootContext = await provider.getContext(
-      rootContextId
-    );
+    const rootContext = await provider.getContext(rootContextId);
 
-    const defaultDiscovery = this.serviceProviders[serviceProvider]
-      .discovery;
+    const defaultDiscovery = this.serviceProviders[serviceProvider].discovery;
     let defaultSource = serviceProvider;
     if (defaultDiscovery) {
       defaultSource = await defaultDiscovery.getOwnSource();
@@ -66,15 +68,26 @@ export class UprtclMultiplatform extends Multiplatform<UprtclService> {
     return rootContextId;
   }
 
-  getContextPerspectives(contextId: string): Promise<Perspective[]> {
-    return this.discoverArray(
+  async getContextPerspectives(contextId: string): Promise<Perspective[]> {
+    const perspectives = await this.getFromAllSources(
       contextId,
       (service, hash) => service.getContextPerspectives(hash),
-      perspective => (perspective.headId ? [perspective.headId] : [])
+      (perspectives: Perspective[]) =>
+        perspectives.reduce(
+          (links, p) => [...links, ...this.linksFromPerspective(p)],
+          []
+        )
     );
+
+    // Flatten the perspective array
+    return perspectives.reduce((a, e) => a.concat(...e), []);
   }
 
-  createContext(serviceProvider: string, timestamp: number, nonce: number): Promise<string> {
+  createContext(
+    serviceProvider: string,
+    timestamp: number,
+    nonce: number
+  ): Promise<string> {
     return this.createWithLinks(
       serviceProvider,
       service => service.createContext(timestamp, nonce),
@@ -87,7 +100,7 @@ export class UprtclMultiplatform extends Multiplatform<UprtclService> {
     contextId: string,
     name: string,
     timestamp: number,
-    headId: string,
+    headId: string
   ): Promise<string> {
     const links = [contextId];
     if (headId) {
@@ -118,8 +131,13 @@ export class UprtclMultiplatform extends Multiplatform<UprtclService> {
     return this.getServiceProvider(serviceProvider).cloneContext(context);
   }
 
-  clonePerspective(serviceProvider: string, perspective: Perspective): Promise<string> {
-    return this.getServiceProvider(serviceProvider).clonePerspective(perspective);
+  clonePerspective(
+    serviceProvider: string,
+    perspective: Perspective
+  ): Promise<string> {
+    return this.getServiceProvider(serviceProvider).clonePerspective(
+      perspective
+    );
   }
 
   cloneCommit(serviceProvider: string, commit: Commit): Promise<string> {
@@ -136,5 +154,4 @@ export class UprtclMultiplatform extends Multiplatform<UprtclService> {
       headId
     );
   }
-
 }
