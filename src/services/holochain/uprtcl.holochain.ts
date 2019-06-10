@@ -56,17 +56,16 @@ export class UprtclHolochain implements UprtclService {
   }
 
   async getPerspectiveHead(perspectiveId: string): Promise<string> {
-    let headId = null;
     try {
-      headId = await this.uprtclZome.call('get_perspective_head', {
+      return await this.uprtclZome.call('get_perspective_head', {
         perspective_address: perspectiveId
       });
     } catch (e) {
       if (e.message !== '{"Internal":"given perspective has no commits"}') {
         throw new Error(e);
       }
+      return null;
     }
-    return headId;
   }
 
   getPerspective(perspectiveId: string): Promise<Perspective> {

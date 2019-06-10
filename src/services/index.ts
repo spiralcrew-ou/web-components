@@ -16,6 +16,7 @@ import { UprtclCollectiveOne } from './c1/uprtcl.c1';
 import { DiscoveryCollectiveOne } from './c1/discovery.c1';
 
 import * as dotenv from 'dotenv';
+import { DataIpfs } from './data.ipfs';
 
 dotenv.config();
 
@@ -61,6 +62,11 @@ if (holochainEnabled) {
     service: new DataHolochain(),
     discovery: new DiscoveryHolochain(),
     draft: new DraftHolochain()
+  };
+  dataConfig['ipfs'] = {
+    service: new DataIpfs('ipfs.infura.io'),
+    discovery: null,
+    draft: null
   };
 }
 

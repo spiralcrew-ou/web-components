@@ -22,17 +22,18 @@ export class HolochainConnection {
   public async call(funcName: string, params: any): Promise<any> {
     await this.ready();
     console.log('[CALL ZOME FUNCTION]:', funcName, params);
-    return this.connection(funcName, params)
-      .then(jsonString => JSON.parse(jsonString))
-      .then(result => {
-        if (result.Err) throw new Error(JSON.stringify(result.Err));
-        if (result.SerializationError) {
-          throw new Error(JSON.stringify(result.SerializationError));
-        }
-        console.log('[RESULT]:', funcName, params, result);
-        if (result.Ok) return result.Ok;
-        return result;
-      });
+    const jsonString = await this.connection(funcName, params);
+    
+    const result = JSON.parse(jsonString);
+
+    if (result.Err) throw new Error(JSON.stringify(result.Err));
+    if (result.SerializationError) {
+      throw new Error(JSON.stringify(result.SerializationError));
+    }
+    
+    console.log('[RESULT]:', funcName, params, result);
+    if (result.Ok) return result.Ok;
+    return result;
   }
 
   public ready(): Promise<void> {

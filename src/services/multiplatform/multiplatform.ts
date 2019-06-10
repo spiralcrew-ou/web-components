@@ -66,6 +66,9 @@ export class Multiplatform<T> {
     }
   }
 
+  /**
+   * Removes the given known source from the given hash, if a discovery service from the source exists
+   */
   private async removeKnownSource(source: string, hash: string): Promise<void> {
     const discoverService = this.serviceProviders[source].discovery;
     if (discoverService) {
@@ -73,6 +76,9 @@ export class Multiplatform<T> {
     }
   }
 
+  /**
+   * Gets the object identified with the given hash from the given source
+   */
   private async getFromSource<O>(
     source: string,
     hash: string,
@@ -132,11 +138,11 @@ export class Multiplatform<T> {
     }
 
     // All known sources failed, throw error
-    throw new Error(`Object with hash ${hash} not found in any of the sources`);
+    throw new Error(`Object with hash ${hash} not found in any of the known sources`);
   }
 
   /**
-   * Retrieves the objects from all the service provider
+   * Retrieves the objects from all the service providers
    *
    * @param hash: the hash of the object to be discovered
    * @param getter: function that executes the call to get the object from the hash
@@ -160,6 +166,7 @@ export class Multiplatform<T> {
         linksSelector
       );
       if (object) {
+        // If object is an array, we should add to the known sources each element of the array
         if (object instanceof Array) {
           const addToKnownSources = object.map(element =>
             this.knownSources.addKnownSources(idSelector(element), [source])
