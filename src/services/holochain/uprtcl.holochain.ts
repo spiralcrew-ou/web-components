@@ -25,9 +25,6 @@ export class UprtclHolochain implements UprtclService {
 
   constructor() {
     this.formatter = new ConnectionFormatter(this.objectRelation);
-  }
-
-  connect() {
     this.uprtclZome = new HolochainConnection('test-instance', 'uprtcl');
   }
 

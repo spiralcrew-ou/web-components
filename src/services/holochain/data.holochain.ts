@@ -4,7 +4,7 @@ import { HolochainConnection } from './holochain.connection';
 export class DataHolochain<T = any> implements DataService<T> {
   documentsZome: HolochainConnection;
 
-  connect() {
+  constructor() {
     this.documentsZome = new HolochainConnection('test-instance', 'documents');
   }
 

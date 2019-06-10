@@ -4,7 +4,7 @@ import { DraftService } from '../draft.service';
 export class DraftHolochain<T> implements DraftService<T> {
   draftZome: HolochainConnection;
 
-  connect() {
+  constructor() {
     this.draftZome = new HolochainConnection('test-instance', 'draft');
   }
 
