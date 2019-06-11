@@ -19,6 +19,7 @@ export class Perspective implements IPerspective {
     contextId: string;
     name: string;
     headId: string;
+
     constructor(_id, _origin,_creatorId, _timestamp,_contextId,_name,_headId){
         this.id = _id
         this.origin = _origin
@@ -36,6 +37,7 @@ export class Commit implements ICommit {
     message: string;
     parentsIds: string[];
     dataId: string;
+
     constructor(_id,_timestamp,_message,_parentsId,_dataId) {
         this.id = _id
         this.timestamp = _timestamp
@@ -50,6 +52,7 @@ export class Context implements IContext {
     creatorId: string;
     timestamp: number;
     nonce: number;
+
     constructor(_id,_creatorId,_timestamp,_nonce) {
         this.id = _id
         this.creatorId = _creatorId
@@ -62,6 +65,7 @@ export class Draft implements IDraft {
     perspectiveId: string;    
     dataId: string;
     id: string
+
     constructor(_id:string,_perspectiveId:string,_dataId:string){
         this.id = _id
         this.perspectiveId= _perspectiveId
@@ -90,7 +94,6 @@ export class KnownSources {
         this.sources=_sources
     }
 }
-
 
 class LocalDatabase extends Dexie {
     perspectives: Dexie.Table<Perspective,string>
@@ -186,7 +189,7 @@ export const insertKnownSources = (knownSources:KnownSources): Promise<any> => {
 
 export const insertTextNode = async (object:TextNode): Promise<any> => {
     object.id = await generateSha256(object.text)
-    return db.textNode.put(object)
+    return db.textNode.add(object)
 }
 
 export const getTextNode = (id:string): Promise<TextNode> => {
