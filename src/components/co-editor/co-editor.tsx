@@ -17,11 +17,7 @@ export class CoEditor {
   @State() rootPerspectiveId: string;
   @State() perspectiveId: string;
   @State() loading: boolean = true;
-<<<<<<< HEAD
   @State() defaultService = serviceProvider;
-=======
-  @State() defaultService = c1ServiceProvider;
->>>>>>> a9e6c78ca193fb0efd45914fd77c6d14068b5da8
 
   // Multiplatform service is already instantiated, get a reference to it
   uprtcl = uprtclMultiplatform;
