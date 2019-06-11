@@ -26,6 +26,27 @@ export class Multiplatform<T> {
   }
 
   /**
+   * Discover the sources of the given link from the discover service of the originSource
+   * and store them locally for future operations
+   */
+  private async discoverLinkSource(
+    link: string,
+    originSource: string
+  ): Promise<void> {
+    const discoverService = this.serviceProviders[originSource].discovery;
+
+    let knownSources = await this.knownSources.getKnownSources(link);
+    if (!knownSources || knownSources.length === 0) {
+      knownSources = await discoverService.getKnownSources(link);
+    }
+
+    // If there are no known sources, assume that the source of the object is the original source
+    if (knownSources) {
+      await this.knownSources.addKnownSources(link, knownSources);
+    }
+  }
+
+  /**
    * Discover the sources of the given links from the discover service of the originSource
    * and store them locally for future operations
    */
@@ -38,6 +59,7 @@ export class Multiplatform<T> {
     if (discoverService) {
       // Discover known sources of link from the discover service
       await Promise.all(
+<<<<<<< HEAD
         links.filter(link => link != null).map(async link => {
           let knownSources = await this.knownSources.getKnownSources(link);
           if (!knownSources || knownSources.length === 0) {
@@ -49,7 +71,55 @@ export class Multiplatform<T> {
             await this.knownSources.addKnownSources(link, knownSources);
           }
         })
+=======
+        links
+          .filter(link => link != null)
+          .map(link => this.discoverLinkSource(link, originSource))
+>>>>>>> a9e6c78ca193fb0efd45914fd77c6d14068b5da8
       );
+    }
+  }
+
+  /**
+   * Removes the given known source from the given hash, if a discovery service from the source exists
+   */
+  private async removeKnownSource(source: string, hash: string): Promise<void> {
+    const discoverService = this.serviceProviders[source].discovery;
+    if (discoverService) {
+      await discoverService.removeKnownSource(hash, source);
+    }
+  }
+
+  /**
+   * Gets the object identified with the given hash from the given source
+   */
+  private async getFromSource<O>(
+    source: string,
+    hash: string,
+    getter: (service: T, hash: string) => Promise<O>,
+    linksSelector: (object: O) => string[] = () => []
+  ): Promise<O> {
+    if (typeof hash !== 'string') {
+      return null;
+    }
+
+    try {
+      // Try to retrieve the object
+      const object = await getter(this.serviceProviders[source].service, hash);
+
+      if (object) {
+        // Object retrieved successfully, discover the known sources of the links the object points to
+        const links = linksSelector(object);
+        await this.discoverLinksSources(links, source);
+
+        return object;
+      } else {
+        // The get call succeeded but didn't return the object, remove the source from the known sources
+        this.removeKnownSource(source, hash);
+      }
+    } catch (e) {
+      // The get call failed, don't remove the known source as it could be a network error
+      console.error(e);
     }
   }
 
@@ -67,99 +137,64 @@ export class Multiplatform<T> {
     getter: (service: T, hash: string) => Promise<O>,
     linksSelector: (object: O) => string[] = () => []
   ): Promise<O> {
-    if (typeof hash !== 'string') {
-      return null;
-    }
-
     // Retrieve the known sources from the local store
     const knownSources = await this.knownSources.getKnownSources(hash);
 
     // Iterate through the known sources until a source successfully returns the object
     for (const source of knownSources) {
-      try {
-        // Try to retrieve the object
-        const object = await getter(
-          this.serviceProviders[source].service,
-          hash
-        );
-
-        if (object) {
-          // Object retrieved successfully, discover the known sources of the links the object points to
-          const links = linksSelector(object);
-          await this.discoverLinksSources(links, source);
-
-          return object;
-        } else {
-          const discoverService = this.serviceProviders[source].discovery;
-          if (discoverService) {
-            // The get call succeeded but didn't return the object, remove the source from the known sources
-            await discoverService.removeKnownSource(hash, source);
-          }
-        }
-      } catch (e) {
-        // The get call failed, don't remove the known source as it could be a network error
-        console.error(e);
-      }
+      const object = await this.getFromSource(
+        source,
+        hash,
+        getter,
+        linksSelector
+      );
+      if (object) return object;
     }
 
     // All known sources failed, throw error
-    throw new Error(`Object with hash ${hash} not found in any of the sources`);
+    throw new Error(`Object with hash ${hash} not found in any of the known sources`);
   }
 
   /**
-   * Retrieves the known source for the given hash, and uses the source's service provider to get the object
-   * Finally, asks for the known sources of the links contained in the object
+   * Retrieves the objects from all the service providers
    *
    * @param hash: the hash of the object to be discovered
    * @param getter: function that executes the call to get the object from the hash
    * @param linksToObjects: function that gets the links from the retrieved object to ask for their sources
-   * @returns the object retrieved
+   * @returns the array of objects retrieved
    */
-  protected async discoverArray<O>(
+  protected async getFromAllSources<O>(
     hash: string,
-    getter: (service: T, hash: string) => Promise<Array<O>>,
+    getter: (service: T, hash: string) => Promise<O>,
     linksSelector: (object: O) => string[] = () => [],
     idSelector: (object: O) => string = o => o['id']
   ): Promise<Array<O>> {
-    // Retrieve the known sources from the local store
-    const knownSources = await this.knownSources.getKnownSources(hash);
+    let results = [];
 
     // Iterate through the known sources until a source successfully returns the array of objects
-    for (const source of knownSources) {
-      try {
-        // Try to retrieve the object
-        const array = await getter(this.serviceProviders[source].service, hash);
-
-        if (array) {
-          // Array retrieved successfully, iterate through the array
-          for (const object of array) {
-            // Store the object id to the add known sources
-            const objectId = idSelector(object);
-            await this.knownSources.addKnownSources(objectId, [source]);
-
-            // Discover the known sources of the links the object points to
-            const links = linksSelector(object);
-            await this.discoverLinksSources(links, source);
-          }
-
-          return array;
+    for (const source of this.getServiceProviders()) {
+      const object = await this.getFromSource(
+        source,
+        hash,
+        getter,
+        linksSelector
+      );
+      if (object) {
+        // If object is an array, we should add to the known sources each element of the array
+        if (object instanceof Array) {
+          const addToKnownSources = object.map(element =>
+            this.knownSources.addKnownSources(idSelector(element), [source])
+          );
+          await Promise.all(addToKnownSources);
         } else {
-          const discoverService = this.serviceProviders[source].discovery;
-          if (discoverService) {
-            // The get call succeeded but didn't return the object, remove the source from the known sources
-            discoverService.removeKnownSource(hash, source);
-          }
+          await this.knownSources.addKnownSources(hash, [source]);
         }
-      } catch (e) {
-        // The get call failed, don't remove the known source as it could be a network error
-        console.error(e);
+
+        results.push(object);
       }
     }
 
-    // All known sources failed, throw error
-    throw new Error(
-      `Array with relation to hash ${hash} not found in any of the sources`
-    );
+    return results;
   }
 
   /**

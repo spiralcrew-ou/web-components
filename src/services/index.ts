@@ -16,10 +16,11 @@ import { UprtclCollectiveOne } from './c1/uprtcl.c1';
 import { DiscoveryCollectiveOne } from './c1/discovery.c1';
 
 import * as dotenv from 'dotenv';
+import { DataIpfs } from './data.ipfs';
 
 dotenv.config();
 
-export const holochainEnabled = false;
+export const holochainEnabled = true;
 export const holochainServiceProvider =
   'holochain://Qme47WvAbj3a3W8RwChUd2Dcid1AVYWge4zDEztBkUjeMY';
 export const c1ServiceProvider = 'https://www.collectiveone.org/uprtcl/1';
@@ -61,6 +62,11 @@ if (holochainEnabled) {
     service: new DataHolochain(),
     discovery: new DiscoveryHolochain(),
     draft: new DraftHolochain()
+  };
+  dataConfig['ipfs'] = {
+    service: new DataIpfs('ipfs.infura.io'),
+    discovery: null,
+    draft: null
   };
 }
 
