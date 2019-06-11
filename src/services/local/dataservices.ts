@@ -185,10 +185,8 @@ export const insertKnownSources = (knownSources:KnownSources): Promise<any> => {
 }
 
 export const insertTextNode = async (object:TextNode): Promise<any> => {
-    
     object.id = await generateSha256(object.text)
-    debugger
-    return db.textNode.add(object)
+    return db.textNode.put(object)
 }
 
 export const getTextNode = (id:string): Promise<TextNode> => {

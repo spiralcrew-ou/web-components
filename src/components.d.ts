@@ -18,6 +18,9 @@ export namespace Components {
   interface CoEditor {}
   interface CoEditorAttributes extends StencilHTMLAttributes {}
 
+  interface CoLogin {}
+  interface CoLoginAttributes extends StencilHTMLAttributes {}
+
   interface TextBlock {
     'id': string;
     'text': string;
@@ -61,6 +64,7 @@ export namespace Components {
 declare global {
   interface StencilElementInterfaces {
     'CoEditor': Components.CoEditor;
+    'CoLogin': Components.CoLogin;
     'TextBlock': Components.TextBlock;
     'TextNode': Components.TextNode;
     'UprtclToolbar': Components.UprtclToolbar;
@@ -68,6 +72,7 @@ declare global {
 
   interface StencilIntrinsicElements {
     'co-editor': Components.CoEditorAttributes;
+    'co-login': Components.CoLoginAttributes;
     'text-block': Components.TextBlockAttributes;
     'text-node': Components.TextNodeAttributes;
     'uprtcl-toolbar': Components.UprtclToolbarAttributes;
@@ -78,6 +83,12 @@ declare global {
   var HTMLCoEditorElement: {
     prototype: HTMLCoEditorElement;
     new (): HTMLCoEditorElement;
+  };
+
+  interface HTMLCoLoginElement extends Components.CoLogin, HTMLStencilElement {}
+  var HTMLCoLoginElement: {
+    prototype: HTMLCoLoginElement;
+    new (): HTMLCoLoginElement;
   };
 
   interface HTMLTextBlockElement extends Components.TextBlock, HTMLStencilElement {}
@@ -100,6 +111,7 @@ declare global {
 
   interface HTMLElementTagNameMap {
     'co-editor': HTMLCoEditorElement
+    'co-login': HTMLCoLoginElement
     'text-block': HTMLTextBlockElement
     'text-node': HTMLTextNodeElement
     'uprtcl-toolbar': HTMLUprtclToolbarElement
@@ -107,6 +119,7 @@ declare global {
 
   interface ElementTagNameMap {
     'co-editor': HTMLCoEditorElement;
+    'co-login': HTMLCoLoginElement;
     'text-block': HTMLTextBlockElement;
     'text-node': HTMLTextNodeElement;
     'uprtcl-toolbar': HTMLUprtclToolbarElement;

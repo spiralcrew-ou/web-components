@@ -112,6 +112,7 @@ export class CoEditor {
   }
 
   render() {
+    
     return (
       <div>
         {this.loading ? (
@@ -127,5 +128,6 @@ export class CoEditor {
         )}
       </div>
     );
+    
   }
 }
