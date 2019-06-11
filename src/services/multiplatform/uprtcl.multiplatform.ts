@@ -4,11 +4,13 @@ import { Multiplatform } from './multiplatform';
 import { DiscoveryService } from '../discovery.service';
 
 export class UprtclMultiplatform extends Multiplatform<UprtclService> {
-  linksFromPerspective = (perspective: Perspective) => [
-    perspective.contextId,
-    perspective.headId
-  ];
-  linksFromCommit = (commit: Commit) => [commit.dataId, ...commit.parentsIds];
+  linksFromPerspective(perspective: Perspective) {
+    return [ perspective.contextId, perspective.headId ]
+  };
+
+  linksFromCommit(commit: Commit) {
+    return [ commit.dataId, ...commit.parentsIds ]
+  };
 
   constructor(
     serviceProviders: Dictionary<{

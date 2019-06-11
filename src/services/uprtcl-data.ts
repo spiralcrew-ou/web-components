@@ -95,8 +95,7 @@ export class UprtclData {
 
       /** a new commit is created to point to the new perspectives
        * of the children that were just created */
-
-      let newCommit = null;
+      let newCommit = perspective.headId;
 
       if (links.length > 0) {
         let newNode = {
@@ -112,7 +111,7 @@ export class UprtclData {
           `creating new global perspective ${name}`,
           [ head.id ],
           newDataId)
-      }
+      } 
             
       return this.uprtcl.createPerspective(
         serviceProvider,

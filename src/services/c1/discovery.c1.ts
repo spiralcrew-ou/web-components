@@ -14,9 +14,11 @@ export class DiscoveryCollectiveOne implements DiscoveryService {
     return http.get(`/discovery/${hash}`);
   }
   addKnownSources(hash: string, sources: string[]): Promise<void> {
-    console.log(hash);
-    console.log(sources);
-    return Promise.resolve();
+    return new Promise<void>((resolve) => {
+      http.put(`/discovery/${hash}`, sources).then(() => {
+        resolve();
+      })
+    });
   }
   removeKnownSource(hash: string, source: string): Promise<void> {
     console.log(hash);

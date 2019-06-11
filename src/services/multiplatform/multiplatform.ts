@@ -85,10 +85,6 @@ export class Multiplatform<T> {
     getter: (service: T, hash: string) => Promise<O>,
     linksSelector: (object: O) => string[] = () => []
   ): Promise<O> {
-    if (typeof hash !== 'string') {
-      return null;
-    }
-
     try {
       // Try to retrieve the object
       const object = await getter(this.serviceProviders[source].service, hash);
@@ -123,6 +119,10 @@ export class Multiplatform<T> {
     getter: (service: T, hash: string) => Promise<O>,
     linksSelector: (object: O) => string[] = () => []
   ): Promise<O> {
+    if (typeof hash !== 'string') {
+      return null;
+    }
+
     // Retrieve the known sources from the local store
     const knownSources = await this.knownSources.getKnownSources(hash);
 
@@ -155,6 +155,10 @@ export class Multiplatform<T> {
     linksSelector: (object: O) => string[] = () => [],
     idSelector: (object: O) => string = o => o['id']
   ): Promise<Array<O>> {
+    if (typeof hash !== 'string') {
+      return null;
+    }
+    
     let results = [];
 
     // Iterate through the known sources until a source successfully returns the array of objects
