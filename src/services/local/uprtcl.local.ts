@@ -23,9 +23,6 @@ import {
   // Draft
 } from './dataservices';
 
-
-
-
 export class UprtclLocal implements UprtclService {
 
   constructor() {
@@ -43,25 +40,9 @@ export class UprtclLocal implements UprtclService {
     return getCommit(_commitId);
   }
 
-   async getRootContextId(): Promise<string> {
+  async getRootContextId(): Promise<string> {
     let rootContextId = generateUserContextId('anon');
-    const rootContext = await getContext(rootContextId)
-
-    if (rootContext)
-      return rootContextId
-    
-    // Asume that is first time and will need create contextRoot
-    rootContextId = await this.createContext(0,0)
-    const commit = await this.createCommit(new Date().getTime(),'First commit', [],null)
-    await this.createPerspective(rootContextId,'Root Perspective',new Date().getTime(),commit)
     return rootContextId
-
- 
-  }
-
-  getContextId(_context: IContext): Promise<string> {
-    // TODO: To see with Pepo. Too much weed?? 
-    throw new Error("Method not implemented.");
   }
 
   getContextPerspectives(_contextId: string): Promise<IPerspective[]> {

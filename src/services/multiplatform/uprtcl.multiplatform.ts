@@ -67,10 +67,10 @@ export class UprtclMultiplatform extends Multiplatform<UprtclService> {
   }
 
   getContextPerspectives(contextId: string): Promise<Perspective[]> {
-    return this.discoverArray(
+    return this.getFromAllSources(
       contextId,
       (service, hash) => service.getContextPerspectives(hash),
-      perspective => (perspective.headId ? [perspective.headId] : [])
+      perspective => ([perspective.headId, perspective.contextId])
     );
   }
 

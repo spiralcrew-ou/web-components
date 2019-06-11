@@ -96,20 +96,24 @@ export class UprtclData {
       /** a new commit is created to point to the new perspectives
        * of the children that were just created */
 
-      let newNode = {
-        text: data.text,
-        links: newLinks
+      let newCommit = null;
+
+      if (links.length > 0) {
+        let newNode = {
+          text: data.text,
+          links: newLinks
+        }
+  
+        const newDataId = await this.dataService.createData(serviceProvider, newNode);
+  
+        newCommit = await this.uprtcl.createCommit(
+          serviceProvider, 
+          Date.now(), 
+          `creating new global perspective ${name}`,
+          [ head.id ],
+          newDataId)
       }
-
-      const newDataId = await this.dataService.createData(serviceProvider, newNode);
-
-      const newCommit = await this.uprtcl.createCommit(
-        serviceProvider, 
-        Date.now(), 
-        `creating new global perspective ${name}`,
-        [ head.id ],
-        newDataId)
-      
+            
       return this.uprtcl.createPerspective(
         serviceProvider,
         perspective.contextId,

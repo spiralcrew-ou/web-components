@@ -14,7 +14,7 @@ export class UprtclHolochain implements UprtclService {
     perspective: {
       creatorId: 'creator',
       contextId: 'context_address',
-      headId: 'head'
+      headId: 'head_address'
     },
     commit: {
       creatorId: 'creator',
@@ -38,13 +38,6 @@ export class UprtclHolochain implements UprtclService {
     return this.uprtclZome
       .call('get_root_context_id', {})
       .then(result => (result.Ok ? result.Ok : result));
-  }
-
-  getContextId(context: Context): Promise<string> {
-    return this.uprtclZome.call(
-      'get_context_address',
-      this.formatter.formatUiToServer<Context>('context', context)
-    );
   }
 
   getContext(contextId: string): Promise<Context> {
@@ -73,7 +66,7 @@ export class UprtclHolochain implements UprtclService {
       this.getPerspectiveHead(perspectiveId)
     ]).then(([result, headAddress]: [EntryResult, string]) => {
       const perspective = result.entry;
-      perspective.head = headAddress;
+      perspective['head_address'] = headAddress;
       return this.formatter.formatServerToUi<Perspective>(
         'perspective',
         perspective
@@ -128,7 +121,7 @@ export class UprtclHolochain implements UprtclService {
       context_address: contextId,
       name: name,
       timestamp: timestamp,
-      head: headId
+      head_address: headId
     });
   }
 

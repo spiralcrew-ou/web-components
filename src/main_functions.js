@@ -21,9 +21,6 @@ function digestMessage(message) {
   return window.crypto.subtle.digest('SHA-256', data);
 }
 
-
-
-
 export const generateCID = creatorId => {
 
   const body = {
@@ -70,9 +67,6 @@ export const generateDataId = () => {
   var hashids = new Hashids();
   return hashids.encode(new Date().getTime().toString())
 }
-
-
-
 
 export const createEmptyContext = creatorId => {
 

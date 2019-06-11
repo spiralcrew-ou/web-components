@@ -41,7 +41,7 @@ export class TextNodeElement {
 
   uprtclService = uprtclMultiplatform;
   dataService = dataMultiplatform;
-
+  
   async loadPerspective() {
     this.perspective = await this.uprtclService.getPerspective(
       this.perspectiveId
