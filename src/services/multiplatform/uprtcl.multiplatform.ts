@@ -68,13 +68,6 @@ export class UprtclMultiplatform extends Multiplatform<UprtclService> {
     return rootContextId;
   }
 
-<<<<<<< HEAD
-  getContextPerspectives(contextId: string): Promise<Perspective[]> {
-    return this.getFromAllSources(
-      contextId,
-      (service, hash) => service.getContextPerspectives(hash),
-      perspective => ([perspective.headId, perspective.contextId])
-=======
   async getContextPerspectives(contextId: string): Promise<Perspective[]> {
     const perspectives = await this.getFromAllSources(
       contextId,
@@ -84,7 +77,6 @@ export class UprtclMultiplatform extends Multiplatform<UprtclService> {
           (links, p) => [...links, ...this.linksFromPerspective(p)],
           []
         )
->>>>>>> a9e6c78ca193fb0efd45914fd77c6d14068b5da8
     );
 
     // Flatten the perspective array
