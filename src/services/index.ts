@@ -20,7 +20,7 @@ import { DataIpfs } from './data.ipfs';
 
 dotenv.config();
 
-export const holochainEnabled = true;
+export const holochainEnabled = false;
 export const holochainServiceProvider =
   'holochain://Qme47WvAbj3a3W8RwChUd2Dcid1AVYWge4zDEztBkUjeMY';
 export const c1ServiceProvider = 'https://www.collectiveone.org/uprtcl/1';
