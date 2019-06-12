@@ -12,11 +12,8 @@ const  initialState = {
             id:'',
             status: '',
             content: '',
-            locator: {
-                perspectiveId: '',
-                contextId: '',
-                commitId: ''
-            }
+            view: ''
+            
         },
         tree: []
     }

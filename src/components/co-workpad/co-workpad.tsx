@@ -50,7 +50,8 @@ export class COWorkPad {
       event.stopPropagation();
       let block = this.findBlock(idBlockUpdated)
       block.content = event['path'][0].innerText
-      this.newBlock(new Block('DRAFT', ''), this.blocks,idBlockUpdated)
+      
+      this.newBlock(new Block('DRAFT', ''), idBlockUpdated)
     }
 
     if (event.key === 'Backspace') {
