@@ -1,5 +1,5 @@
 import {
-  Component, State, Listen, Prop
+  Component, State, Listen, Prop, Element
 } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
 import { newBlock, updateTree } from '../../actions';
@@ -28,6 +28,7 @@ const unCommited = 'text-gray-800 p-2 mx-8 font-light break-words'
 })
 export class COWorkPad {
 
+  @Element() _element: HTMLElement;
   @State() blocks: Array<Block>
   @Prop({ context: 'store' }) store: Store;
 
@@ -44,14 +45,12 @@ export class COWorkPad {
       this.updateTree(Object.assign([],this.blocks))
     } 
       
-
     if (event.key === 'Enter') {
       event.preventDefault();
       event.stopPropagation();
       let block = this.findBlock(idBlockUpdated)
       block.content = event['path'][0].innerText
-      //block.status = 'DRAFT'
-      this.newBlock(new Block('DRAFT', ''), this.blocks)
+      this.newBlock(new Block('DRAFT', ''), this.blocks,idBlockUpdated)
     }
 
     if (event.key === 'Backspace') {
@@ -77,6 +76,14 @@ export class COWorkPad {
     this.updateTree(newTree)
   }
 
+  /*
+  componentWillUpdate() {
+    this.blocks.forEach(b => {
+      const element = this.element.shadowRoot.getElementById(b.id)
+      if (element) element.innerHTML = b.content;
+    })
+  }*/
+
   componentWillLoad() {
     const b = []
     b.push(new Block('DRAFT', ''))
@@ -88,7 +95,7 @@ export class COWorkPad {
       newBlock,
       updateTree
     })
-    this.newBlock(firstBlock, [])
+    this.newBlock(firstBlock, [],null)
 
     this.store.mapStateToProps(this, state => {
       return {
@@ -100,6 +107,7 @@ export class COWorkPad {
   }
 
   render() {
+    window['blocks'] = this.blocks
     return (
       <div class='container'>
         {this.blocks.map((b:Block) => (

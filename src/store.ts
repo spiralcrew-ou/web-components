@@ -8,7 +8,16 @@ const composeEnhancer = window['__REDUX_DEVTOOLS_EXTENSION_COMPOSE__'] || compos
 
 const  initialState = {
     workpad: {
-        block: null,
+        block: {
+            id:'',
+            status: '',
+            content: '',
+            locator: {
+                perspectiveId: '',
+                contextId: '',
+                commitId: ''
+            }
+        },
         tree: []
     }
 }
