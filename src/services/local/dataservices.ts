@@ -21,6 +21,7 @@ export class Perspective implements IPerspective {
   headId: string;
 
   constructor(_origin, _creatorId, _timestamp, _contextId, _name, _headId) {
+    this.id = null;
     this.origin = _origin
     this.creatorId = _creatorId
     this.timestamp = _timestamp
@@ -29,7 +30,7 @@ export class Perspective implements IPerspective {
     this.headId = _headId
   }
 
-  async setId(base: string, version: string, codec: string, type: string) {
+  async setId(base: string, version: number, codec: string, type: string) {
     const plain = {
       'origin': this.origin,
       'creatorId': this.creatorId,
@@ -55,6 +56,7 @@ export class Commit implements ICommit {
   dataId: string;
 
   constructor(_creatorId, _timestamp, _message, _parentsId, _dataId) {
+    this.id = null;
     this.creatorId = _creatorId
     this.timestamp = _timestamp
     this.message = _message
@@ -62,7 +64,7 @@ export class Commit implements ICommit {
     this.dataId = _dataId
   }
 
-  async setId(base: string, version: string, codec: string, type: string) {
+  async setId(base: string, version: number, codec: string, type: string) {
     const plain = {
       'creatorId': this.creatorId,
       'timestamp': this.timestamp,
@@ -87,12 +89,13 @@ export class Context implements IContext {
   nonce: number;
 
   constructor(_creatorId, _timestamp, _nonce) {
+    this.id = null;
     this.creatorId = _creatorId
     this.timestamp = _timestamp
     this.nonce = _nonce
   }
 
-  async setId(base: string, version: string, codec: string, type: string) {
+  async setId(base: string, version: number, codec: string, type: string) {
     const plain = {
       'creatorId': this.creatorId,
       'timestamp': this.timestamp,
@@ -117,11 +120,12 @@ export class TextNode implements ITextNode {
   }[];
 
   constructor(_text: string, _links: any) {
+    this.id = null;
     this.text = _text
     this.links = _links
   }
 
-  async setId(base: string, version: string, codec: string, type: string) {
+  async setId(base: string, version: number, codec: string, type: string) {
     const plain = {
       'text': this.text,
       'links': this.links.toString(),

@@ -22,16 +22,8 @@ const userId = 'anon';
 const origin = 'local';
 
 /** standard C1 settings */
-const BASE = 'base58btc';
-const VERSION = 'v1';
-const CODEC = 'raw';
-const TYPE = 'sha3-256';
-
-/** standard Holochain settings */
-// const BASE = 'base58btc';
-// const VERSION = 0;
-// const CODEC = 'dag-pg';
-// const TYPE = 'sha2-256';
+// import { c1Cid as cidConfig } from './cid.config';
+import { hcCid as cidConfig } from './cid.config';
 
 export class UprtclLocal implements UprtclService {
 
@@ -52,47 +44,46 @@ export class UprtclLocal implements UprtclService {
 
   async getRootContextId(): Promise<string> {
     let context = new Context(userId, 0, 0);
-    context.setId(BASE, VERSION, CODEC, TYPE);
-    return context.id;
+    await context.setId(cidConfig.base, cidConfig.version, cidConfig.codec, cidConfig.type);
+    return Promise.resolve(context.id);
   }
 
-  getContextPerspectives(_contextId: string): Promise<IPerspective[]> {
+  async getContextPerspectives(_contextId: string): Promise<IPerspective[]> {
     return getPerpectives(_contextId) 
   }
 
   async createContext(_timestamp: number, _nonce: number): Promise<string> {
     let context = new Context(userId, _timestamp, _nonce)
-    context.setId(BASE, VERSION, CODEC, TYPE);
-    await insertContext(context);
-    return context.id;
+    await context.setId(cidConfig.base, cidConfig.version, cidConfig.codec, cidConfig.type);
+    return insertContext(context);
   }
 
-  createPerspective(_contextId: string, _name: string, _timestamp: number, _headId: string): Promise<string> {
+  async createPerspective(_contextId: string, _name: string, _timestamp: number, _headId: string): Promise<string> {
     // TODO: Get userID or userCreator
     let perspective = new Perspective(origin, userId, _timestamp, _contextId, _name, _headId);
-    perspective.setId(BASE, VERSION, CODEC, TYPE);
+    await perspective.setId(cidConfig.base, cidConfig.version, cidConfig.codec, cidConfig.type);
     return insertPerspective(perspective);
   }
 
-  createCommit(_timestamp: number, _message: string, _parentsIds: string[], _dataId: string): Promise<string> { 
+  async createCommit(_timestamp: number, _message: string, _parentsIds: string[], _dataId: string): Promise<string> { 
     let commit = new Commit(userId, new Date().getDate(), _message, _parentsIds, _dataId);
-    commit.setId(BASE, VERSION, CODEC, TYPE);
+    await commit.setId(cidConfig.base, cidConfig.version, cidConfig.codec, cidConfig.type);
     return insertCommit(commit);
   }
 
-  cloneContext(_context: IContext): Promise<string> {
+  async cloneContext(_context: IContext): Promise<string> {
     throw new Error("Method not implemented.");
   }
 
-  clonePerspective(_perspective: IPerspective): Promise<string> {
+  async clonePerspective(_perspective: IPerspective): Promise<string> {
     throw new Error("Method not implemented.");
   }
 
-  cloneCommit(_commit: ICommit): Promise<string> {
+  async cloneCommit(_commit: ICommit): Promise<string> {
     throw new Error("Method not implemented.");
   }
 
-  updateHead(_perspectiveId: string, _commitId: string): Promise<void> {
+  async updateHead(_perspectiveId: string, _commitId: string): Promise<void> {
     return updatePerspectiveHead(_perspectiveId,_commitId)
   }
 
