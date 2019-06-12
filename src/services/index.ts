@@ -19,7 +19,7 @@ import { DataIpfs } from './data.ipfs';
 
 export const holochainEnabled = false;
 export const holochainServiceProvider =
-  'holochain://QmSNbSXcnyh4ntJUK4KuvepBJq4awYZsmNArquvgEJXuir';
+  'holochain://Qme47WvAbj3a3W8RwChUd2Dcid1AVYWge4zDEztBkUjeMY';
 
 export const c1Enabled = false;
 export const c1ServiceProvider = 'https://www.collectiveone.org/uprtcl/1';
