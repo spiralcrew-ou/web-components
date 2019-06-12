@@ -1,0 +1,16 @@
+
+@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+@import '../../globals/style.css';
+
+div {
+    font-family: 'Open Sans', sans-serif;
+}
+
+[contentEditable=true]:empty:not(:focus):before{
+    content:attr(data-text)
+}
+
+body {
+    color: black
+}
+

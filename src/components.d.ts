@@ -7,7 +7,7 @@
 
 import '@stencil/core';
 
-
+import '@stencil/redux';
 import {
   Perspective,
 } from './types';
@@ -20,6 +20,9 @@ export namespace Components {
 
   interface CoLogin {}
   interface CoLoginAttributes extends StencilHTMLAttributes {}
+
+  interface CoWorkpad {}
+  interface CoWorkpadAttributes extends StencilHTMLAttributes {}
 
   interface TextBlock {
     'id': string;
@@ -65,6 +68,7 @@ declare global {
   interface StencilElementInterfaces {
     'CoEditor': Components.CoEditor;
     'CoLogin': Components.CoLogin;
+    'CoWorkpad': Components.CoWorkpad;
     'TextBlock': Components.TextBlock;
     'TextNode': Components.TextNode;
     'UprtclToolbar': Components.UprtclToolbar;
@@ -73,6 +77,7 @@ declare global {
   interface StencilIntrinsicElements {
     'co-editor': Components.CoEditorAttributes;
     'co-login': Components.CoLoginAttributes;
+    'co-workpad': Components.CoWorkpadAttributes;
     'text-block': Components.TextBlockAttributes;
     'text-node': Components.TextNodeAttributes;
     'uprtcl-toolbar': Components.UprtclToolbarAttributes;
@@ -89,6 +94,12 @@ declare global {
   var HTMLCoLoginElement: {
     prototype: HTMLCoLoginElement;
     new (): HTMLCoLoginElement;
+  };
+
+  interface HTMLCoWorkpadElement extends Components.CoWorkpad, HTMLStencilElement {}
+  var HTMLCoWorkpadElement: {
+    prototype: HTMLCoWorkpadElement;
+    new (): HTMLCoWorkpadElement;
   };
 
   interface HTMLTextBlockElement extends Components.TextBlock, HTMLStencilElement {}
@@ -112,6 +123,7 @@ declare global {
   interface HTMLElementTagNameMap {
     'co-editor': HTMLCoEditorElement
     'co-login': HTMLCoLoginElement
+    'co-workpad': HTMLCoWorkpadElement
     'text-block': HTMLTextBlockElement
     'text-node': HTMLTextNodeElement
     'uprtcl-toolbar': HTMLUprtclToolbarElement
@@ -120,6 +132,7 @@ declare global {
   interface ElementTagNameMap {
     'co-editor': HTMLCoEditorElement;
     'co-login': HTMLCoLoginElement;
+    'co-workpad': HTMLCoWorkpadElement;
     'text-block': HTMLTextBlockElement;
     'text-node': HTMLTextNodeElement;
     'uprtcl-toolbar': HTMLUprtclToolbarElement;

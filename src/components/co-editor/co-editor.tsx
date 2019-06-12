@@ -1,4 +1,4 @@
-import { Component, State } from '@stencil/core';
+import { Component, State, Prop } from '@stencil/core';
 import {
   uprtclMultiplatform,
   dataMultiplatform,
@@ -7,6 +7,10 @@ import {
 } from '../../services';
 import { uprtclData } from '../../services/uprtcl-data';
 import { TextNode } from '../../types';
+
+import { Store } from '@stencil/redux';
+import {configureStore} from '../../store.js';
+
 
 @Component({
   tag: 'co-editor',
@@ -18,6 +22,7 @@ export class CoEditor {
   @State() perspectiveId: string;
   @State() loading: boolean = true;
   @State() defaultService = localServiceProvider;
+  @Prop({ context: 'store' }) store: Store;
 
   // Multiplatform service is already instantiated, get a reference to it
   uprtcl = uprtclMultiplatform;
@@ -25,6 +30,7 @@ export class CoEditor {
 
   async componentWillLoad() {
     this.loading = true;
+    this.store.setStore(configureStore());
 
     /** MVP assumes one root perspective per user in platform */
     const rootContextId = await this.uprtcl.getRootContextId(
@@ -113,7 +119,7 @@ export class CoEditor {
 
   render() {
     
-    return (
+    /*return (
       <div>
         {this.loading ? (
           <span>Loading...</span>
@@ -127,7 +133,12 @@ export class CoEditor {
           </div>
         )}
       </div>
-    );
+    );*/
+
+
+    return (<div>
+      <co-workpad></co-workpad>
+    </div>)
     
   }
 }
