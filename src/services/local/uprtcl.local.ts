@@ -87,7 +87,4 @@ export class UprtclLocal implements UprtclService {
     return updatePerspectiveHead(_perspectiveId,_commitId)
   }
 
-
-
-
 }
