@@ -23,10 +23,6 @@
       return await http.get<string>('/u/rootContextId');
     }
 
-    async getContextId(context: Context): Promise<string> {
-      return await http.put('/ctxId', context)[0]
-    }
-
     async getContextPerspectives(contextId: string): Promise<Perspective[]> {
       return await http.get<Perspective[]>(`/ctx/${contextId}/perspectives`)
     }

@@ -1,13 +1,18 @@
 import { DataService } from '../data.service';
-import { TextNode } from '../../types';
-import {insertTextNode,getTextNode} from '../local/dataservices';
+import { TextNode as TextNodeIf } from '../../types';
+import { insertTextNode, getTextNode, TextNode } from '../local/dataservices';
 
-//SHA2 256 para generar los ID
+import { c1Cid as cidConfig } from './cid.config';
+
 export class DataLocal implements DataService {
-  createData(data: TextNode): Promise<string> {
-    return insertTextNode(data)
+  
+  async createData(data: TextNodeIf): Promise<string> {
+    let newData = new TextNode(data.text, data.links);
+    await newData.setId(cidConfig.base, cidConfig.version, cidConfig.codec, cidConfig.type);
+    return insertTextNode(newData);
   }
-  getData(dataId: string): Promise<TextNode> {
+
+  getData(dataId: string): Promise<TextNodeIf> {
     return getTextNode(dataId)
   }
 }

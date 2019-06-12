@@ -24,12 +24,6 @@ export interface UprtclService {
    * hash algorithm, allowing the same context to exist with different IDs depending
    * on the hash algorithm (twin ids).
   */
-  getContextId(context: Context): Promise<string>;
-
-  /** getContextId() returns the id of a given context using the platform native
-   * hash algorithm, allowing the same context to exist with different IDs depending
-   * on the hash algorithm (twin ids).
-  */
   getContextPerspectives(contextId: string): Promise<Perspective[]>;
 
    /** --------------- 

@@ -1,9 +1,4 @@
 import { UprtclService } from '../uprtcl.service';
-import {
-  generateCID,
-  generateCommitId,
-  generateUserContextId
-} from '../../main_functions';
 
 import {
   Perspective as IPerspective,
@@ -23,8 +18,12 @@ import {
   // Draft
 } from './dataservices';
 
+const userId = 'anon';
+const origin = 'local';
 
-
+/** standard C1 settings */
+// import { c1Cid as cidConfig } from './cid.config';
+import { hcCid as cidConfig } from './cid.config';
 
 export class UprtclLocal implements UprtclService {
 
@@ -43,75 +42,49 @@ export class UprtclLocal implements UprtclService {
     return getCommit(_commitId);
   }
 
-   async getRootContextId(): Promise<string> {
-    let rootContextId = generateUserContextId('anon');
-    const rootContext = await getContext(rootContextId)
-
-    if (rootContext)
-      return rootContextId
-    
-    // Asume that is first time and will need create contextRoot
-    rootContextId = await this.createContext(0,0)
-    const commit = await this.createCommit(new Date().getTime(),'First commit', [],null)
-    await this.createPerspective(rootContextId,'Root Perspective',new Date().getTime(),commit)
-    return rootContextId
-
- 
+  async getRootContextId(): Promise<string> {
+    let context = new Context(userId, 0, 0);
+    await context.setId(cidConfig.base, cidConfig.version, cidConfig.codec, cidConfig.type);
+    return Promise.resolve(context.id);
   }
 
-  getContextId(_context: IContext): Promise<string> {
-    // TODO: To see with Pepo. Too much weed?? 
-    throw new Error("Method not implemented.");
-  }
-
-  getContextPerspectives(_contextId: string): Promise<IPerspective[]> {
+  async getContextPerspectives(_contextId: string): Promise<IPerspective[]> {
     return getPerpectives(_contextId) 
   }
 
-  createContext(_timestamp: number, _nonce: number): Promise<string> {
-    const creatorId = 'anon'
-    let cid = ''
-    if ((_timestamp===0) && (_nonce === 0)) //MonkeyPatch: create user context. Check this with pepo
-      cid = generateUserContextId(creatorId)
-    else
-      cid = generateCID(creatorId)
-   
-    return insertContext(new Context(cid, creatorId, _timestamp, _nonce)).then(() => { return cid })
+  async createContext(_timestamp: number, _nonce: number): Promise<string> {
+    let context = new Context(userId, _timestamp, _nonce)
+    await context.setId(cidConfig.base, cidConfig.version, cidConfig.codec, cidConfig.type);
+    return insertContext(context);
   }
 
-  createPerspective(_contextId: string, _name: string, _timestamp: number, _headId: string): Promise<string> {
+  async createPerspective(_contextId: string, _name: string, _timestamp: number, _headId: string): Promise<string> {
     // TODO: Get userID or userCreator
-    const creatorId = 'anon'
-    const origin = 'local'
-    const cid = generateCID(creatorId, [], 'First Commit')
-    return insertPerspective(new Perspective(cid, origin, creatorId, _timestamp, _contextId, _name, _headId))
-
-    // TO-REVIEW: createPerspective method may be will return Perspective instead of string (to check with pepo)
+    let perspective = new Perspective(origin, userId, _timestamp, _contextId, _name, _headId);
+    await perspective.setId(cidConfig.base, cidConfig.version, cidConfig.codec, cidConfig.type);
+    return insertPerspective(perspective);
   }
 
-  createCommit(_timestamp: number, _message: string, _parentsIds: string[], _dataId: string): Promise<string> { 
-    const creatorId = 'anon'
-    const commitId = generateCommitId(creatorId, _parentsIds, _message, _dataId)
-    return insertCommit(new Commit(commitId, new Date().getDate(), _message, _parentsIds, _dataId))
+  async createCommit(_timestamp: number, _message: string, _parentsIds: string[], _dataId: string): Promise<string> { 
+    let commit = new Commit(userId, new Date().getDate(), _message, _parentsIds, _dataId);
+    await commit.setId(cidConfig.base, cidConfig.version, cidConfig.codec, cidConfig.type);
+    return insertCommit(commit);
   }
 
-  cloneContext(_context: IContext): Promise<string> {
+  async cloneContext(_context: IContext): Promise<string> {
     throw new Error("Method not implemented.");
   }
 
-  clonePerspective(_perspective: IPerspective): Promise<string> {
+  async clonePerspective(_perspective: IPerspective): Promise<string> {
     throw new Error("Method not implemented.");
   }
 
-  cloneCommit(_commit: ICommit): Promise<string> {
+  async cloneCommit(_commit: ICommit): Promise<string> {
     throw new Error("Method not implemented.");
   }
 
-  updateHead(_perspectiveId: string, _commitId: string): Promise<void> {
+  async updateHead(_perspectiveId: string, _commitId: string): Promise<void> {
     return updatePerspectiveHead(_perspectiveId,_commitId)
   }
-
-
-
 
 }

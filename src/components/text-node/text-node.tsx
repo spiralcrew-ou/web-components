@@ -41,19 +41,16 @@ export class TextNodeElement {
 
   uprtclService = uprtclMultiplatform;
   dataService = dataMultiplatform;
-
+  
   async loadPerspective() {
     this.perspective = await this.uprtclService.getPerspective(
       this.perspectiveId
     );
 
-    
     this.draft = await this.dataService.getDraft(
       this.perspective.origin,
       this.perspectiveId
     );
-
-    
 
     // Head can be null, only go get it if it exists
     if (this.perspective.headId) {
@@ -103,7 +100,7 @@ export class TextNodeElement {
         {this.loading ? (
           <span>Loading...</span>
         ) : (
-          <div class="flex-column">
+          <div class='flex-column'>
             {this.isRootNode ? (
               <uprtcl-toolbar
                 defaultService={this.defaultService}
@@ -121,14 +118,17 @@ export class TextNodeElement {
               ''
             )}
 
-            <div class="node">
-              <text-block id={this.perspectiveId} text={this.getRenderingData().text} />
-              {this.hasChanges() ? <div class="indicator" /> : ''}
+            <div class='node'>
+              <text-block
+                id={this.perspectiveId}
+                text={this.getRenderingData().text}
+              />
+              {this.hasChanges() ? <div class='indicator' /> : ''}
 
               {this.getRenderingData().links.map(link => (
                 <text-node
                   id={this.perspectiveId}
-                  class="child-node"
+                  class='child-node'
                   isRootNode={false}
                   perspectiveId={link.link}
                   onCreateSibling={() => this.createNewChild()}
@@ -172,18 +172,21 @@ export class TextNodeElement {
   public async createPerspective(serviceProvider: string, name: string) {
     // Create new perspective
     const newPerspectiveId = await uprtclData.createGlobalPerspective(
-      serviceProvider, this.perspectiveId, name);
+      serviceProvider,
+      this.perspectiveId,
+      name
+    );
 
     this.perspectiveId = newPerspectiveId;
     await this.loadPerspective();
   }
 
   // Creates a new perspective and adds it to the current draft
-  
+
   /** TODO: This is critical function, I suggest we move it to uprtclData
-   * to have one place in which it is implemented. */
-  
-   async createNewChild() {
+   * to have one place in which it is implemented. */ 
+
+  async createNewChild() {
     // Create new perspective
     const newPerspectiveId = await this.createNewPerspective(
       this.perspective.origin,
@@ -199,12 +202,12 @@ export class TextNodeElement {
 
     // Add a link to the new perspective to draft
     /** TODO: I am not sure but it seems that the draft should be referred to with a getter like
-     * this.getDraft() that will create it if it is null, or return it if it exist. and a setter 
+     * this.getDraft() that will create it if it is null, or return it if it exist. and a setter
      * that will persist it.
-     * 
+     *
      * This way the logic of the draft maintainance dont need to be handled by its users. */
 
-    if (this.draft == null) this.draft = {...this.node}
+    if (this.draft == null) this.draft = { ...this.node };
     this.draft.links.push({ link: newPerspectiveId });
     this.draft = { ...this.draft };
     await this.dataService.setDraft(
@@ -218,6 +221,7 @@ export class TextNodeElement {
   contentChanged(event: CustomEvent) {
     event.stopPropagation();
 
+    if (this.draft == null) this.draft = { ...this.node };
     this.draft.text = event.detail;
     this.draft = { ...this.draft };
     this.dataService.setDraft(
@@ -231,7 +235,8 @@ export class TextNodeElement {
   public async createCommit() {
     /* TODO: recursivity is using the DOM links as the criteria for 
        for recursivity. It should is the object lins instead and 
-       the DOM should react. */    
+       the DOM should react. */
+
     const nodes: Array<any> = Array.from(
       this.element.shadowRoot.querySelectorAll('.child-node')
     );
