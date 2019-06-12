@@ -128,7 +128,7 @@ export class TextNode implements ITextNode {
   async setId(base: string, version: number, codec: string, type: string) {
     const plain = {
       'text': this.text,
-      'links': this.links.toString(),
+      'links': this.links,
     };
 
     this.id = await ipldService.generateCid(

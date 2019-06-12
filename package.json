@@ -28,8 +28,6 @@
     "cids": "^0.6.0",
     "codex-notifier": "^1.1.2",
     "dexie": "^2.0.4",
-    "dotenv": "^8.0.0",
-    "hashids": "^1.2.2",
     "ipfs-http-client": "^32.0.1",
     "libp2p-crypto-secp256k1": "^0.3.0",
     "moment": "^2.24.0",

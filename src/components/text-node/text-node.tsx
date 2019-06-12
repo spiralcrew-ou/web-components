@@ -41,7 +41,7 @@ export class TextNodeElement {
 
   uprtclService = uprtclMultiplatform;
   dataService = dataMultiplatform;
-  
+
   async loadPerspective() {
     this.perspective = await this.uprtclService.getPerspective(
       this.perspectiveId
@@ -100,43 +100,43 @@ export class TextNodeElement {
         {this.loading ? (
           <span>Loading...</span>
         ) : (
-          <div class='flex-column'>
-            {this.isRootNode ? (
-              <uprtcl-toolbar
-                defaultService={this.defaultService}
-                perspective={this.perspective}
-                onCreateCommit={() => this.createCommit()}
-                onCreatePerspective={e =>
-                  this.createPerspective(
-                    e.detail.serviceProvider,
-                    e.detail.name
-                  )
-                }
-                onSelectPerspective={e => this.selectPerspective(e.detail)}
-              />
-            ) : (
-              ''
-            )}
-
-            <div class='node'>
-              <text-block
-                id={this.perspectiveId}
-                text={this.getRenderingData().text}
-              />
-              {this.hasChanges() ? <div class='indicator' /> : ''}
-
-              {this.getRenderingData().links.map(link => (
-                <text-node
-                  id={this.perspectiveId}
-                  class='child-node'
-                  isRootNode={false}
-                  perspectiveId={link.link}
-                  onCreateSibling={() => this.createNewChild()}
+            <div class='flex-column'>
+              {this.isRootNode ? (
+                <uprtcl-toolbar
+                  defaultService={this.defaultService}
+                  perspective={this.perspective}
+                  onCreateCommit={() => this.createCommit()}
+                  onCreatePerspective={e =>
+                    this.createPerspective(
+                      e.detail.serviceProvider,
+                      e.detail.name
+                    )
+                  }
+                  onSelectPerspective={e => this.selectPerspective(e.detail)}
                 />
-              ))}
+              ) : (
+                  ''
+                )}
+
+              <div class='node'>
+                <text-block
+                  id={this.perspectiveId}
+                  text={this.getRenderingData().text}
+                />
+                {this.hasChanges() ? <div class='indicator' /> : ''}
+
+                {this.getRenderingData().links.map(link => (
+                  <text-node
+                    id={this.perspectiveId}
+                    class='child-node'
+                    isRootNode={false}
+                    perspectiveId={link.link}
+                    onCreateSibling={() => this.createNewChild()}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
       </div>
     );
   }
@@ -184,7 +184,7 @@ export class TextNodeElement {
   // Creates a new perspective and adds it to the current draft
 
   /** TODO: This is critical function, I suggest we move it to uprtclData
-   * to have one place in which it is implemented. */ 
+   * to have one place in which it is implemented. */
 
   async createNewChild() {
     // Create new perspective
@@ -247,6 +247,10 @@ export class TextNodeElement {
   }
 
   private async commitContent() {
+    if (!this.hasChanges()) {
+      return
+    }
+    
     const dataId = await this.dataService.createData(
       this.perspective.origin,
       this.draft
