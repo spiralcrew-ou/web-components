@@ -7,9 +7,15 @@ import {
 } from '../../types';
 
 import {
-  insertPerspective, Perspective,
-  insertContext, Context,
-  insertCommit, Commit,
+  Perspective,
+  Commit,
+  Context
+} from '../../objects';
+
+import {
+  insertPerspective,
+  insertContext,
+  insertCommit,
   getContext, 
   getPerpectives,
   getPerspective,
@@ -22,8 +28,8 @@ const userId = 'anon';
 const origin = 'local';
 
 /** standard C1 settings */
-// import { c1Cid as cidConfig } from './cid.config';
-import { hcCid as cidConfig } from './cid.config';
+import { c1Cid as cidConfig } from './cid.config';
+//import { hcCid as cidConfig } from './cid.config';
 
 export class UprtclLocal implements UprtclService {
 
@@ -42,6 +48,21 @@ export class UprtclLocal implements UprtclService {
     return getCommit(_commitId);
   }
 
+  async existContext(_contextId: string): Promise<Boolean> {
+    const contextId = await this.getContext(_contextId);
+    return contextId != null;
+  }
+
+  async existPerspective(_perspectiveId: string): Promise<Boolean> {
+    const perspectiveId = await this.getPerspective(_perspectiveId);
+    return perspectiveId != null;
+  }
+
+  async existCommit(_commitId: string): Promise<Boolean> {
+    const commitId = await this.getContext(_commitId);
+    return commitId != null;
+  }
+
   async getRootContextId(): Promise<string> {
     let context = new Context(userId, 0, 0);
     await context.setId(cidConfig.base, cidConfig.version, cidConfig.codec, cidConfig.type);
@@ -55,20 +76,22 @@ export class UprtclLocal implements UprtclService {
   async createContext(_timestamp: number, _nonce: number): Promise<string> {
     let context = new Context(userId, _timestamp, _nonce)
     await context.setId(cidConfig.base, cidConfig.version, cidConfig.codec, cidConfig.type);
-    return insertContext(context);
+    const exists = await this.existContext(context.id);
+    return !exists ? insertContext(context) : Promise.resolve(context.id);
   }
 
   async createPerspective(_contextId: string, _name: string, _timestamp: number, _headId: string): Promise<string> {
-    // TODO: Get userID or userCreator
     let perspective = new Perspective(origin, userId, _timestamp, _contextId, _name, _headId);
     await perspective.setId(cidConfig.base, cidConfig.version, cidConfig.codec, cidConfig.type);
-    return insertPerspective(perspective);
+    const exists = await this.existPerspective(perspective.id);
+    return !exists ? insertPerspective(perspective) : Promise.resolve(perspective.id);
   }
 
   async createCommit(_timestamp: number, _message: string, _parentsIds: string[], _dataId: string): Promise<string> { 
     let commit = new Commit(userId, new Date().getDate(), _message, _parentsIds, _dataId);
     await commit.setId(cidConfig.base, cidConfig.version, cidConfig.codec, cidConfig.type);
-    return insertCommit(commit);
+    const exists = await this.existCommit(commit.id);
+    return !exists ? insertCommit(commit) : Promise.resolve(commit.id);
   }
 
   async cloneContext(_context: IContext): Promise<string> {

@@ -6,31 +6,32 @@ export interface EntryResult<T = any> {
   type: string;
 }
 
+const host = 'ws://3.130.73.99:80';
+// const host = 'ws://localhost:8888';
+
 export class HolochainConnection {
   connection: (funcName: string, params: any) => Promise<any>;
   connectionReady: Promise<any>;
 
   constructor(instanceId: string, zome: string) {
-    this.connectionReady = connect('ws://3.130.73.99:80').then(
-      ({ callZome }) => {
-        this.connection = async (funcName: string, params: any) =>
-          await callZome(instanceId, zome, funcName)(params);
-      }
-    );
+    this.connectionReady = connect(host).then(({ callZome }) => {
+      this.connection = async (funcName: string, params: any) =>
+        await callZome(instanceId, zome, funcName)(params);
+    });
   }
 
   public async call(funcName: string, params: any): Promise<any> {
     await this.ready();
     console.log('[CALL ZOME FUNCTION]:', funcName, params);
     const jsonString = await this.connection(funcName, params);
-    
+
     const result = JSON.parse(jsonString);
 
     if (result.Err) throw new Error(JSON.stringify(result.Err));
     if (result.SerializationError) {
       throw new Error(JSON.stringify(result.SerializationError));
     }
-    
+
     console.log('[RESULT]:', funcName, params, result);
     if (result.Ok) return result.Ok;
     return result;

@@ -1,7 +1,7 @@
 import CID from 'cids';
 import multihashing from 'multihashing-async';
 import Buffer from 'buffer/';
-import { c1Cid } from './cid.config';
+import { c1Cid } from './local/cid.config';
 
 export class IpldService {
 

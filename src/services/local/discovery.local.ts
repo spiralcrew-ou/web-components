@@ -1,9 +1,12 @@
 import { DiscoveryService } from '../discovery.service';
 import {
   insertKnownSources,
-  getKnownSources,
-  KnownSources
+  getKnownSources
 } from './dataservices';
+
+import {
+  KnownSources
+} from './../../objects';
 
 export class DiscoveryLocal implements DiscoveryService {
   constructor() {}

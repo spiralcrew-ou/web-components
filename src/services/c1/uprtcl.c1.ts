@@ -85,13 +85,9 @@
       return http.post('/commit', commit);
     }
     
-    updateHead(perspectiveId: string, commitId: string): Promise<void> {
+    async updateHead(perspectiveId: string, commitId: string): Promise<void> {
       /** convert Promise<string> into Promise<void> */
-      return new Promise<void>((resolve) => {
-        http.put(`/persp/${perspectiveId}?headId=${commitId}`, null).then(() => {
-          resolve();
-        })
-      });
+      await http.put(`/persp/${perspectiveId}?headId=${commitId}`, null);      
     }
   
   }

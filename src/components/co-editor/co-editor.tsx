@@ -2,7 +2,7 @@ import { Component, State, Prop } from '@stencil/core';
 import {
   uprtclMultiplatform,
   dataMultiplatform,
-  //c1ServiceProvider as serviceProvider,
+  // c1ServiceProvider as serviceProvider,
   localServiceProvider as serviceProvider
 } from '../../services';
 import { uprtclData } from '../../services/uprtcl-data';
@@ -91,7 +91,7 @@ export class CoEditor {
     if (!newDraft) {
       newDraft = { text: '', links: [] };
     }
-    newDraft.links.push({ link: _link });
+    newDraft.links.push({ link: _link, type: 'node' });
     await this.dataService.setDraft(
       this.defaultService,
       perspectiveId,
