@@ -12,7 +12,13 @@ export const saveDraft = (_block) => {
 const readBlockRec = (perspective, getState.tree) => {
     block {
         parent: 
-        children: persecoive.head.data.links.links
+        children: perspective.head.data.links.map( link => {
+            { 
+                link: link.link,
+                style: switch (link.type) 
+                    case 'leaf': 'paragraph' break; 
+                    case 'node': 'title' break;
+        },         
         block: {
             content:  persecoive.head.data.text
             status: hasChanges(persecoive)
