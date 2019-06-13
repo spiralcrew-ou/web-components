@@ -7,9 +7,15 @@ import {
 } from '../../types';
 
 import {
-  insertPerspective, Perspective,
-  insertContext, Context,
-  insertCommit, Commit,
+  Perspective,
+  Commit,
+  Context
+} from '../../objects';
+
+import {
+  insertPerspective,
+  insertContext,
+  insertCommit,
   getContext, 
   getPerpectives,
   getPerspective,
