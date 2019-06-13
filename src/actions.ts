@@ -8,6 +8,30 @@ const getRandomId = ()  => {
 export const saveDraft = (_block) => {
     // Update draft in tree and service
 }
+/*
+const readBlockRec = (perspective, getState.tree) => {
+    block {
+        parent: 
+        children: persecoive.head.data.links.links
+        block: {
+            content:  persecoive.head.data.text
+            status: hasChanges(persecoive)
+        }
+    }
+
+    getState.tree[perspective.id] = block
+    
+    perspective.head.data.links.links.map(p => readBlockRec(p.id));
+}
+
+export const reloadTree = () =>  {
+    return (dispatch, getState) => {
+        perspectiveFull = await this.uprtcData.getPerspectiveFull(getState.rootId, -1);
+
+        dispatch readBlockRec(perspectiveFull, getState.tree)
+    }
+}
+*/
 
 export const newBlock = (block, parentId) =>  {
     return (dispatch, getState) => {
@@ -75,10 +99,6 @@ export const newBlock = (block, parentId) =>  {
         }*/
     }
 }
-
-
-
-
 
 
 /*
