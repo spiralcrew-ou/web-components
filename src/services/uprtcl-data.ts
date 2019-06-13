@@ -7,6 +7,17 @@ export class UprtclData {
   uprtcl = uprtclMultiplatform;
   data = dataMultiplatform; 
 
+  /** Gets a PerspectiveFull object with the head, context and draft objects nested. 
+   * It may recurse if the head commit or the draft have a TextNode with links, getting 
+   * their content as PerspectiveFull recursively.
+   * 
+   * @param perspectiveId the perspective id.
+   * 
+   * @param levels The recursion levels (only get links if `levels > 0`). Will get
+   * links of links if `levels = 1`, links of links of links if `levels = 2` and so on.
+   * If `levels = -1` the recursion is infinite.
+   * 
+   * @returns A PerspectiveFull with a head, context and draft objects nested. */
   async getPerspectiveFull(perspectiveId: string, levels: number): Promise<PerspectiveFull> {
     const perspective = await this.uprtcl.getPerspective(perspectiveId);
     const perspectiveFull = new PerspectiveFull()
@@ -25,11 +36,19 @@ export class UprtclData {
     return perspectiveFull;
   }
 
+  /** Gets a CommitFull object with the TextNode object nested. It may recurse if
+   * the TextNode has links, getting their head and data.
+   * 
+   * @param commitId the commit id.
+   * 
+   * @param levels The recursion levels (only get links if `levels > 0`). Will get
+   * links of links if `levels = 1`, links of links of links if `levels = 2` and so on.
+   * If `levels = -1` the recursion is infinite.
+   * 
+   * @returns A CommitFull with a TextNodeFull object nested . */
   async getCommitFull(commitId: string, levels: number): Promise<CommitFull> {
     const commit = await this.uprtcl.getCommit(commitId);
     if (!commit) return null;
-
-    const data = await this.data.getData(commit.dataId);
 
     const commitFull = new CommitFull();
 
@@ -39,11 +58,22 @@ export class UprtclData {
     commitFull.message = commit.message;
     commitFull.parentsIds = commit.parentsIds;
     
-    commitFull.data = await await this.getTextNodeFull(data, levels);
+    // TODO: why is the data read here and not inside getTextNodeFull? not sure
+    const data = await this.data.getData(commit.dataId);
+    commitFull.data = await this.getTextNodeFull(data, levels);
     
     return commitFull;
   }
 
+  /** Fills an existing TextNode with perspectives in place of the links.
+   * 
+   * @param textNode the plain TextNode
+   * 
+   * @param levels The recursion levels (only get links if `levels > 0`). Will get
+   * links of links if `levels = 1`, links of links of links if `levels = 2` and so on.
+   * If `levels = -1` the recursion is infinite.
+   * 
+   * @returns A TextNodeFull with perspectives in place of links. */
   async getTextNodeFull(textNode: ITextNode, levels: number): Promise<TextNodeFull> {
     if (textNode == null) return null;
     
@@ -51,7 +81,7 @@ export class UprtclData {
 
     textNodeFull.id = textNode.id;
     textNodeFull.text = textNode.text;
-
+    
     if (levels == 0) {
       /** stop recursion */
       textNodeFull.links = [];
@@ -62,6 +92,7 @@ export class UprtclData {
       const linkedPerspective = await this.getPerspectiveFull(textNode.links[i].link, levels - 1);
       if (textNodeFull.links) textNodeFull.links.push({
         link: linkedPerspective, 
+        type: textNode.links[i].type,
         position: textNode.links[i].position
       });
     }
