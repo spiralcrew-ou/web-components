@@ -47,7 +47,6 @@ export class UprtclMultiplatform extends Multiplatform<UprtclService> {
     const provider = this.getServiceProvider(serviceProvider);
     let rootContextId = await provider.getRootContextId();
     const rootContext = await provider.getContext(rootContextId);
-
     const defaultDiscovery = this.serviceProviders[serviceProvider].discovery;
     let defaultSource = serviceProvider;
     if (defaultDiscovery) {

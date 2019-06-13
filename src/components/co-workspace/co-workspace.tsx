@@ -5,7 +5,7 @@ import {
   //c1ServiceProvider as serviceProvider,
   localServiceProvider as serviceProvider
 } from '../../services';
-import { uprtclData } from '../../services/uprtcl-data';
+// import { uprtclData } from '../../services/uprtcl-data';
 import { TextNode } from '../../types';
 
 import { Store } from '@stencil/redux';
@@ -13,11 +13,11 @@ import {configureStore} from '../../store.js';
 
 
 @Component({
-  tag: 'co-editor',
-  styleUrl: 'co-editor.scss',
+  tag: 'co-workspace',
+  styleUrl: 'co-workspace.scss',
   shadow: true
 })
-export class CoEditor {
+export class COWorkspace {
   @State() rootPerspectiveId: string;
   @State() perspectiveId: string;
   @State() loading: boolean = true;
@@ -112,32 +112,9 @@ export class CoEditor {
     return perspectiveId;
   }
 
-  async logUprtcl () {
-    const perspectiveFull = await uprtclData.getPerspectiveFull(this.rootPerspectiveId, 10);
-    console.log(perspectiveFull);
-  }
-
   render() {
-    
-    /*return (
-      <div>
-        {this.loading ? (
-          <span>Loading...</span>
-        ) : (
-          <div>
-            <button onClick={() => this.logUprtcl()}>Log</button>
-            <text-node 
-            id={this.perspectiveId} 
-            perspectiveId={this.perspectiveId} 
-            defaultService={this.defaultService}/>
-          </div>
-        )}
-      </div>
-    );*/
-
-
     return (<div>
-      <co-workpad></co-workpad>
+      <co-workpad document-id={this.perspectiveId}></co-workpad>
     </div>)
     
   }

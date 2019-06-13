@@ -3,7 +3,6 @@ import {
 } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
 import { newBlock, updateTree } from '../../actions';
-import { generateDataId } from '../../main_functions';
 
 
 class Block {
@@ -12,7 +11,7 @@ class Block {
   content: string = ''
 
   constructor(_status: string, _content: string) {
-    this.id = generateDataId()
+    this.id = 'r'
     this.status = _status
     this.content = _content
   }

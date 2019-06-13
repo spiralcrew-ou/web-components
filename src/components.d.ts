@@ -15,6 +15,13 @@ import {
 
 export namespace Components {
 
+  interface C1Workpad {
+    'documentId': String;
+  }
+  interface C1WorkpadAttributes extends StencilHTMLAttributes {
+    'documentId'?: String;
+  }
+
   interface CoEditor {}
   interface CoEditorAttributes extends StencilHTMLAttributes {}
 
@@ -23,6 +30,9 @@ export namespace Components {
 
   interface CoWorkpad {}
   interface CoWorkpadAttributes extends StencilHTMLAttributes {}
+
+  interface CoWorkspace {}
+  interface CoWorkspaceAttributes extends StencilHTMLAttributes {}
 
   interface TextBlock {
     'id': string;
@@ -66,23 +76,33 @@ export namespace Components {
 
 declare global {
   interface StencilElementInterfaces {
+    'C1Workpad': Components.C1Workpad;
     'CoEditor': Components.CoEditor;
     'CoLogin': Components.CoLogin;
     'CoWorkpad': Components.CoWorkpad;
+    'CoWorkspace': Components.CoWorkspace;
     'TextBlock': Components.TextBlock;
     'TextNode': Components.TextNode;
     'UprtclToolbar': Components.UprtclToolbar;
   }
 
   interface StencilIntrinsicElements {
+    'c1-workpad': Components.C1WorkpadAttributes;
     'co-editor': Components.CoEditorAttributes;
     'co-login': Components.CoLoginAttributes;
     'co-workpad': Components.CoWorkpadAttributes;
+    'co-workspace': Components.CoWorkspaceAttributes;
     'text-block': Components.TextBlockAttributes;
     'text-node': Components.TextNodeAttributes;
     'uprtcl-toolbar': Components.UprtclToolbarAttributes;
   }
 
+
+  interface HTMLC1WorkpadElement extends Components.C1Workpad, HTMLStencilElement {}
+  var HTMLC1WorkpadElement: {
+    prototype: HTMLC1WorkpadElement;
+    new (): HTMLC1WorkpadElement;
+  };
 
   interface HTMLCoEditorElement extends Components.CoEditor, HTMLStencilElement {}
   var HTMLCoEditorElement: {
@@ -100,6 +120,12 @@ declare global {
   var HTMLCoWorkpadElement: {
     prototype: HTMLCoWorkpadElement;
     new (): HTMLCoWorkpadElement;
+  };
+
+  interface HTMLCoWorkspaceElement extends Components.CoWorkspace, HTMLStencilElement {}
+  var HTMLCoWorkspaceElement: {
+    prototype: HTMLCoWorkspaceElement;
+    new (): HTMLCoWorkspaceElement;
   };
 
   interface HTMLTextBlockElement extends Components.TextBlock, HTMLStencilElement {}
@@ -121,18 +147,22 @@ declare global {
   };
 
   interface HTMLElementTagNameMap {
+    'c1-workpad': HTMLC1WorkpadElement
     'co-editor': HTMLCoEditorElement
     'co-login': HTMLCoLoginElement
     'co-workpad': HTMLCoWorkpadElement
+    'co-workspace': HTMLCoWorkspaceElement
     'text-block': HTMLTextBlockElement
     'text-node': HTMLTextNodeElement
     'uprtcl-toolbar': HTMLUprtclToolbarElement
   }
 
   interface ElementTagNameMap {
+    'c1-workpad': HTMLC1WorkpadElement;
     'co-editor': HTMLCoEditorElement;
     'co-login': HTMLCoLoginElement;
     'co-workpad': HTMLCoWorkpadElement;
+    'co-workspace': HTMLCoWorkspaceElement;
     'text-block': HTMLTextBlockElement;
     'text-node': HTMLTextNodeElement;
     'uprtcl-toolbar': HTMLUprtclToolbarElement;
