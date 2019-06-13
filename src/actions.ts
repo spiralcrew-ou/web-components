@@ -34,6 +34,45 @@ export const newBlock = (block, parentId) =>  {
             tree.splice(parentIdx+1,0,block) 
         }
         dispatch({ type: 'NEW_BLOCK', block, tree})
+
+        /*--------
+
+        return (dispatch, getState) => {
+        
+            // perspective tree in indexedDB 
+            // blocks tree in redux as flat map
+    
+            const initNode = blocks[initiatorId];
+    
+            switch (initNode.block.style) {
+                case 'title':
+                    this.uprtcData.initContextUnder(
+                        initNode.serviceProvider,
+                        initNode.id,
+                        0,
+                        block.content)
+                break;
+    
+                case 'paragraph':
+                    parentnode = blocks[initNode.parentPerspectiveID]
+                    index = parentnode.children.indexOf(initiatorId)
+                    newId = this.uprtcData.initContextUnder(
+                        parentnode.serviceProvider,
+                        parentnode.id,
+                        index + 1,
+                        block.content)
+                    
+                    // perspective tree to block tree synchronization 
+                    // Optimistic fast approach 
+                    parentnode.children.splice(index + 1, newId)
+                    
+                break;
+            }
+    
+            // perspective tree to block tree synchronization 
+            // Brute Force
+            blocks = dispatch('reloadTree')
+        }*/
     }
 }
 

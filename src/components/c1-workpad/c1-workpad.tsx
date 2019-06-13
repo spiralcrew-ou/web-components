@@ -67,9 +67,11 @@ export class Workpad {
     this.store.setStore(configureStore());
     this.store.mapDispatchToProps(this, {
       newBlock,
+      // setRoot,
       updateTree
     })
-    this.newBlock({ status: 'DRAFT', content: '', lens: 'paragraph' }, this.documentId)
+    // this.setRoot()
+    // this.reloadTree()
 
     this.store.mapStateToProps(this, state => {
       return {
