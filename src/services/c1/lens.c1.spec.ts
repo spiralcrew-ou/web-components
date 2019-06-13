@@ -1,6 +1,6 @@
 import { LensCollectiveOne } from './lens.c1'
 import { LensService } from '../lens.service';
-import { Perspective, Context } from '../local/dataservices';
+import { Perspective, Context } from '../../objects';
 import { c1Cid as cidConfig } from './../local/cid.config';
 
 const { Response, Request, Headers, fetch } = require('whatwg-fetch');

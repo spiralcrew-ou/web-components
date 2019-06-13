@@ -34,6 +34,7 @@ export interface TextNode {
   text: string;
   links: Array<{
     position?: Position;
+    type?: string,
     link: string;
   }>;
 }
