@@ -18,6 +18,33 @@ export const saveDraft = (_block) => {
     dispatch({type:'SAVE DRAFT'})
   }
 }
+/*
+
+blocksTree id -> {
+    id: "id"
+    parent: "parent id"
+    children: [],
+    block: {
+        content: 
+        status: DRAFT
+    }
+}
+
+const readBlockRec = (perspective, getState.tree) => {
+    block {
+        parent: ""
+        children: perspective.head.data.links.map( link => {
+            { 
+                link: link.link,
+                style: switch (link.type) 
+                    case 'leaf': 'paragraph' break; 
+                    case 'node': 'title' break;
+        },         
+        block: {
+            content:  persecoive.head.data.text
+            status: hasChanges(persecoive)
+        }
+    }
 
 /** This method create initial context 
  * 
