@@ -224,7 +224,7 @@ export class UprtclData {
   }
 
   /** Creates a new context, perspective, and draft combo using this.initContext() 
-   * and adds it as a children of an existing perspective at a given index.
+   * and adds it as a children of **an existing perspective** at a given index.
    * 
    * @param serviceProvider The service provider in which all the new objects
    * will be created.
@@ -274,9 +274,13 @@ export class UprtclData {
 
     let draft = await this.getOrCreateDraft(serviceProvider, onPerspectiveId);
     
-    // TODO accept ix = length and make a push
     if (index != -1) {
-      draft.links.splice(index, 0, { link: perspectiveId });
+      if ((0 < index) && (index < draft.links.length)) {
+        draft.links.splice(index, 0, { link: perspectiveId });
+      } else if (index == draft.links.length){
+        /* accept length as index and interpret as push */
+        draft.links.push({ link: perspectiveId });
+      }
     } else {
       draft.links.push({ link: perspectiveId });
     }
