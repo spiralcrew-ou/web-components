@@ -50,7 +50,7 @@ export class COWorkspace {
 
   render() {
     return (<div>
-      <c1-workpad document-id={this.documentPerspectiveId}></c1-workpad>
+      <co-workpad document-id={this.documentPerspectiveId}></co-workpad>
     </div>)
     
   }
