@@ -9,9 +9,20 @@ export const saveDraft = (_block) => {
     // Update draft in tree and service
 }
 /*
+
+blocksTree id -> {
+    id: "id"
+    parent: "parent id"
+    children: [],
+    block: {
+        content: 
+        status: DRAFT
+    }
+}
+
 const readBlockRec = (perspective, getState.tree) => {
     block {
-        parent: 
+        parent: ""
         children: perspective.head.data.links.map( link => {
             { 
                 link: link.link,
@@ -94,7 +105,7 @@ export const newBlock = (block, parentId) =>  {
                     
                     // perspective tree to block tree synchronization 
                     // Optimistic fast approach 
-                    parentnode.children.splice(index + 1, newId)
+                    // parentnode.children.splice(index + 1, newId)
                     
                 break;
             }
