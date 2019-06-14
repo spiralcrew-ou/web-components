@@ -290,7 +290,7 @@ export class UprtclData {
   }
 
 
-  /** Getter function to get or create and then get a draft on a given perspective.
+  /** Getter function to get or create a draft of/on a given perspective.
    * 
    * @param serviceProvider The service provider from which the draft is to be retrieved.
    * 
@@ -350,7 +350,7 @@ export class UprtclData {
 
     await this.uprtcl.updateHead(perspectiveId, commitId);
   }
-  
+
 }
 
 export const uprtclData = new UprtclData();
