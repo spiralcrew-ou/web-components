@@ -52,7 +52,7 @@ export class CoEditor {
       this.perspectiveId = draft.links[0].link;
     } else {
       this.perspectiveId = await this.createPerspectiveWithDraftUnder(
-        { text: '', links: [] },
+        { text: '', type: 'paragraph', links: [] },
         this.rootPerspectiveId
       );
     }
@@ -89,9 +89,9 @@ export class CoEditor {
       perspectiveId
     );
     if (!newDraft) {
-      newDraft = { text: '', links: [] };
+      newDraft = { text: '', type: 'paragraph', links: [] };
     }
-    newDraft.links.push({ link: _link, type: 'node' });
+    newDraft.links.push({ link: _link });
     await this.dataService.setDraft(
       this.defaultService,
       perspectiveId,

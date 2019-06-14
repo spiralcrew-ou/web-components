@@ -32,9 +32,9 @@ export interface Position {
 export interface TextNode {
   id?: string;
   text: string;
+  type: string;
   links: Array<{
     position?: Position;
-    type?: string,
     link: string;
   }>;
 }

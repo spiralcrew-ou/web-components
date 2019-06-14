@@ -91,7 +91,6 @@ export class UprtclData {
       const linkedPerspective = await this.getPerspectiveFull(textNode.links[i].link, levels - 1);
       if (textNodeFull.links) textNodeFull.links.push({
         link: linkedPerspective,
-        type: textNode.links[i].type,
         position: textNode.links[i].position
       });
     }
@@ -144,6 +143,7 @@ export class UprtclData {
     if (links.length > 0) {
       let newNode = {
         text: data.text,
+        type: data.type,
         links: newLinks
       }
 
@@ -175,18 +175,18 @@ export class UprtclData {
    * 
    * @returns The id of the new **perspective**. 
   */
-  async initContext(
-    serviceProvider: string,
-    content: string): Promise<string> {
+ async initContext(
+  serviceProvider: string,
+  content: string): Promise<string> {
 
-    const contextId = await this.uprtcl.createContext(
-      serviceProvider, Date.now(), 0
-    );
+  const contextId = await this.uprtcl.createContext(
+    serviceProvider, Date.now(), 0
+  );
 
-    return this.initPerspective(
-      serviceProvider,
-      contextId,
-      content);
+  return this.initPerspective(
+    serviceProvider,
+    contextId,
+    content);
   }
 
   /** Creates a new context, perspective, and a draft combo 
@@ -350,7 +350,7 @@ export class UprtclData {
 
     await this.uprtcl.updateHead(perspectiveId, commitId);
   }
-
+  
 }
 
 export const uprtclData = new UprtclData();

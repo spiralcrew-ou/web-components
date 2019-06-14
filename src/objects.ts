@@ -112,9 +112,9 @@ export class Context implements IContext {
 export class TextNode implements ITextNode {
   id?: string;
   text: string;
+  type: string;
   links: {
     position?: Position;
-    type?: string;
     link: string;
   }[];
 
