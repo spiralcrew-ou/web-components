@@ -1,10 +1,8 @@
 import { uprtclMultiplatform, dataMultiplatform } from './index';
 import { PerspectiveFull, CommitFull, TextNodeFull, TextNode as ITextNode } from './../types';
 import { TextNode } from './../objects';
-import { UprtclService } from './uprtcl.service';
-import { DataService } from './data.service';
 
-export class UprtclData implements UprtclService, DataService {
+export class UprtclData {
   
   uprtcl = uprtclMultiplatform;
   data = dataMultiplatform;
@@ -17,43 +15,43 @@ export class UprtclData implements UprtclService, DataService {
     return this.uprtcl.getContext(contextId);
   }
   getPerspective(perspectiveId: string): Promise<import("../types").Perspective> {
-    return this.uprtcl.getContext(contextId);
+    return this.uprtcl.getPerspective(perspectiveId);
   }
   getCommit(commitId: string): Promise<import("../types").Commit> {
-    return this.uprtcl.getContext(contextId);
+    return this.uprtcl.getCommit(commitId);
   }
-  getRootContextId(): Promise<string> {
-    return this.uprtcl.getContext(contextId);
+  getRootContextId(serviceProvider: string): Promise<string> {
+    return this.uprtcl.getRootContextId(serviceProvider);
   }
   getContextPerspectives(contextId: string): Promise<import("../types").Perspective[]> {
-    return this.uprtcl.getContext(contextId);
+    return this.uprtcl.getContextPerspectives(contextId);
   }
-  createContext(timestamp: number, nonce: number): Promise<string> {
-    return this.uprtcl.getContext(contextId);
+  createContext(serviceProvider: string, timestamp: number, nonce: number): Promise<string> {
+    return this.uprtcl.createContext(serviceProvider,timestamp, nonce);
   }
-  createPerspective(contextId: string, name: string, timestamp: number, headId: string): Promise<string> {
-    return this.uprtcl.getContext(contextId);
+  createPerspective(serviceProvider: string, contextId: string, name: string, timestamp: number, headId: string): Promise<string> {
+    return this.uprtcl.createPerspective(serviceProvider, contextId, name, timestamp, headId);
   }
-  createCommit(timestamp: number, message: string, parentsIds: string[], dataId: string): Promise<string> {
-    return this.uprtcl.getContext(contextId);
+  createCommit(serviceProvider: string, timestamp: number, message: string, parentsIds: string[], dataId: string): Promise<string> {
+    return this.uprtcl.createCommit(serviceProvider, timestamp, message, parentsIds, dataId);
   }
-  cloneContext(context: import("../types").Context): Promise<string> {
-    return this.uprtcl.getContext(contextId);
+  cloneContext(serviceProvider: string, context: import("../types").Context): Promise<string> {
+    return this.uprtcl.cloneContext(serviceProvider, context);
   }
-  clonePerspective(perspective: import("../types").Perspective): Promise<string> {
-    return this.uprtcl.getContext(contextId);
+  clonePerspective(serviceProvider: string, perspective: import("../types").Perspective): Promise<string> {
+    return this.uprtcl.clonePerspective(serviceProvider, perspective);
   }
-  cloneCommit(commit: import("../types").Commit): Promise<string> {
-    return this.uprtcl.getContext(contextId);
+  cloneCommit(serviceProvider: string, commit: import("../types").Commit): Promise<string> {
+    return this.uprtcl.cloneCommit(serviceProvider, commit);
   }
   updateHead(perspectiveId: string, commitId: string): Promise<void> {
-    return this.uprtcl.getContext(contextId);
+    return this.uprtcl.updateHead(perspectiveId, commitId);
   }
   getData(dataId: string): Promise<any> {
-    throw new Error("Method not implemented.");
+    return this.data.getData(dataId);
   }
-  createData(data: any): Promise<string> {
-    throw new Error("Method not implemented.");
+  createData(serviceProvider: string, data: any): Promise<string> {
+    return this.data.createData(serviceProvider, data);
   }
 
   /** -----------------------------------------------------------------
@@ -172,12 +170,12 @@ export class UprtclData implements UprtclService, DataService {
 
     /** get perspective and include first level links */
     const perspective = await this.uprtcl.getPerspective(perspectiveId);
-    const head = await this.uprtcl.getCommit(perspective.headId);
-    const data = await this.data.getData(head.dataId);
+    const head = perspective.headId ? await this.uprtcl.getCommit(perspective.headId) : null;
+    const data = head ? await this.data.getData(head.dataId) : null;
 
     /** global perspectives are created bottom-up in the tree of 
      * perspectives */
-    const links = data.links;
+    const links = data ? data.links : [];
     let newLinks = JSON.parse(JSON.stringify(links));
 
     for (let i = 0; i < links.length; i++) {
