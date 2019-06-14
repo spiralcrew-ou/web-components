@@ -1,4 +1,4 @@
-import { uprtclMultiplatform, dataMultiplatform, c1LensService as lensService } from './index';
+import { uprtclMultiplatform, dataMultiplatform } from './index';
 import { PerspectiveFull, CommitFull, TextNodeFull, TextNode as ITextNode } from './../types';
 import { TextNode } from './../objects';
 

@@ -114,7 +114,7 @@ export class TextNode implements ITextNode {
   text: string;
   links: {
     position?: Position;
-    type?: Position;
+    type?: string;
     link: string;
   }[];
 
