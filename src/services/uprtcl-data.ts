@@ -1,12 +1,66 @@
 import { uprtclMultiplatform, dataMultiplatform } from './index';
 import { PerspectiveFull, CommitFull, TextNodeFull, TextNode as ITextNode } from './../types';
 import { TextNode } from './../objects';
+import { UprtclService } from './uprtcl.service';
+import { DataService } from './data.service';
 
-export class UprtclData {
-
+export class UprtclData implements UprtclService, DataService {
+  
   uprtcl = uprtclMultiplatform;
   data = dataMultiplatform;
 
+  /** -----------------------------------------------------------------
+   * DIRECT ACCESS TO ALL UPRTCL AND DATA SERVICES
+   * ------------------------------------------------------------------
+  */
+  getContext(contextId: string): Promise<import("../types").Context> {
+    return this.uprtcl.getContext(contextId);
+  }
+  getPerspective(perspectiveId: string): Promise<import("../types").Perspective> {
+    return this.uprtcl.getContext(contextId);
+  }
+  getCommit(commitId: string): Promise<import("../types").Commit> {
+    return this.uprtcl.getContext(contextId);
+  }
+  getRootContextId(): Promise<string> {
+    return this.uprtcl.getContext(contextId);
+  }
+  getContextPerspectives(contextId: string): Promise<import("../types").Perspective[]> {
+    return this.uprtcl.getContext(contextId);
+  }
+  createContext(timestamp: number, nonce: number): Promise<string> {
+    return this.uprtcl.getContext(contextId);
+  }
+  createPerspective(contextId: string, name: string, timestamp: number, headId: string): Promise<string> {
+    return this.uprtcl.getContext(contextId);
+  }
+  createCommit(timestamp: number, message: string, parentsIds: string[], dataId: string): Promise<string> {
+    return this.uprtcl.getContext(contextId);
+  }
+  cloneContext(context: import("../types").Context): Promise<string> {
+    return this.uprtcl.getContext(contextId);
+  }
+  clonePerspective(perspective: import("../types").Perspective): Promise<string> {
+    return this.uprtcl.getContext(contextId);
+  }
+  cloneCommit(commit: import("../types").Commit): Promise<string> {
+    return this.uprtcl.getContext(contextId);
+  }
+  updateHead(perspectiveId: string, commitId: string): Promise<void> {
+    return this.uprtcl.getContext(contextId);
+  }
+  getData(dataId: string): Promise<any> {
+    throw new Error("Method not implemented.");
+  }
+  createData(data: any): Promise<string> {
+    throw new Error("Method not implemented.");
+  }
+
+  /** -----------------------------------------------------------------
+   * ADDITIONAL HELPER FUNCTIONS THAT COMBINE UPRTCL AND DATA SERVICES
+   * ------------------------------------------------------------------
+  */
+  
   /** Gets a PerspectiveFull object with the head, context and draft objects nested. 
    * It may recurse if the head commit or the draft have a TextNode with links, getting 
    * their content as PerspectiveFull recursively.
