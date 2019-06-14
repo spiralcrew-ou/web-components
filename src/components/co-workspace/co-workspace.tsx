@@ -1,16 +1,12 @@
 import { Component, State, Prop } from '@stencil/core';
 import {
   uprtclMultiplatform,
-  dataMultiplatform,
   //c1ServiceProvider as serviceProvider,
   localServiceProvider as serviceProvider
 } from '../../services';
-// import { uprtclData } from '../../services/uprtcl-data';
-import { TextNode } from '../../types';
-
 import { Store } from '@stencil/redux';
 import {configureStore} from '../../store.js';
-
+import {UprtclData} from '../../services/uprtcl-data';
 
 @Component({
   tag: 'co-workspace',
@@ -19,20 +15,15 @@ import {configureStore} from '../../store.js';
 })
 export class COWorkspace {
   @State() rootPerspectiveId: string;
-  @State() perspectiveId: string;
-  @State() loading: boolean = true;
   @State() defaultService = serviceProvider;
   @Prop({ context: 'store' }) store: Store;
 
   // Multiplatform service is already instantiated, get a reference to it
   uprtcl = uprtclMultiplatform;
-  dataService = dataMultiplatform;
+  uprtclData = new UprtclData()
 
   async componentWillLoad() {
-    this.loading = true;
     this.store.setStore(configureStore());
-
-    /** MVP assumes one root perspective per user in platform */
     const rootContextId = await this.uprtcl.getRootContextId(
       this.defaultService
     );
@@ -41,80 +32,18 @@ export class COWorkspace {
     );
     this.rootPerspectiveId = rootPerspectives[0].id;
 
+    let fullPerspective = await this.uprtclData.getPerspectiveFull(rootPerspectives[0].id,-1)
+    // Asume that is first load
+    if (!fullPerspective.head && !fullPerspective.draft){
+      await this.uprtclData.initContextUnder(serviceProvider,rootPerspectives[0].id,-1,'First node')
+    } 
     
-    const draft = await this.dataService.getDraft(
-      this.defaultService,
-      this.rootPerspectiveId
-    );
-
-    if (draft && draft.links.length > 0) {
-      // MVP shows one document per user only
-      this.perspectiveId = draft.links[0].link;
-    } else {
-      this.perspectiveId = await this.createPerspectiveWithDraftUnder(
-        { text: '', links: [] },
-        this.rootPerspectiveId
-      );
-    }
-    this.loading = false;
-  }
-
-  async createPerspectiveWithDraft(
-    serviceProvider: string,
-    contextId: string,
-    data: TextNode
-  ): Promise<string> {
-    if (contextId == null) {
-      contextId = await this.uprtcl.createContext(
-        serviceProvider,
-        Date.now(),
-        0
-      );
-    }
-    const perspectiveId = await this.uprtcl.createPerspective(
-      serviceProvider,
-      contextId,
-      'default',
-      Date.now(),
-      null
-    );
-    // head commit is left as null, only draft data is created. head commit is created at first commit
-    await this.dataService.setDraft(serviceProvider, perspectiveId, data);
-    return perspectiveId;
-  }
-
-  async addLinkToPerspective(_link: string, perspectiveId: string) {
-    let newDraft = await this.dataService.getDraft(
-      this.defaultService,
-      perspectiveId
-    );
-    if (!newDraft) {
-      newDraft = { text: '', links: [] };
-    }
-    newDraft.links.push({ link: _link });
-    await this.dataService.setDraft(
-      this.defaultService,
-      perspectiveId,
-      newDraft
-    );
-  }
-
-  async createPerspectiveWithDraftUnder(
-    data: TextNode,
-    parentId: string
-  ): Promise<string> {
-    const perspectiveId = await this.createPerspectiveWithDraft(
-      this.defaultService,
-      null,
-      data
-    );
-    await this.addLinkToPerspective(perspectiveId, parentId);
-    return perspectiveId;
+    console.log(await this.uprtclData.getPerspectiveFull(rootPerspectives[0].id,-1))
   }
 
   render() {
     return (<div>
-      <co-workpad document-id={this.perspectiveId}></co-workpad>
+      <c1-workpad document-id={this.rootPerspectiveId}></c1-workpad>
     </div>)
     
   }

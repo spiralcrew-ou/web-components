@@ -23,7 +23,6 @@ export class UprtclData {
     const perspectiveFull = new PerspectiveFull()
 
     const draft = await this.data.getDraft(perspective.origin, perspectiveId);
-
     perspectiveFull.id = perspective.id
     perspectiveFull.origin = perspective.origin
     perspectiveFull.creatorId = perspective.creatorId
