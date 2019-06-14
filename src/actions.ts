@@ -1,6 +1,6 @@
 import Hashids from 'hashids'
 import { UprtclData } from './services/uprtcl-data';
-import { PerspectiveFull } from './types';
+import { PerspectiveFull, TextNodeFull } from './types';
 
 const uprtcData = new UprtclData()
 
@@ -32,13 +32,10 @@ blocksTree id -> {
 
 const readBlockRec = (perspective, getState.tree) => {
     block {
-        parent: ""
         children: perspective.head.data.links.map( link => {
             { 
-                link: link.link,
-                style: switch (link.type) 
-                    case 'leaf': 'paragraph' break; 
-                    case 'node': 'title' break;
+              link: link.link
+            }
         },         
         block: {
             content:  persecoive.head.data.text
@@ -60,35 +57,33 @@ const hasChanges = (_perspective: PerspectiveFull): boolean => {
   return _perspective.head ? false : true
 }
 
-const getTypeOfComponent = (type: string): string => {
-  switch (type) {
-    case 'leaf': return 'paragraph'
-    case 'node': return 'title'
-    default: return 'paragraph'
+const getPerspectiveData = (perspective: PerspectiveFull) : TextNodeFull => {
+  if (hasChanges(perspective)) {
+    return perspective.draft;
+  } else {
+    return perspective.head.data;
   }
 }
 
-const readBlockRec = (perspective, tree) => {
-  if (perspective.draft.links.length != 0) {
-    perspective.draft.links.map(p => readBlockRec(p.link, tree))
-    return tree
-  }
+const readBlockRec = (perspectiveFull: PerspectiveFull, tree) : void => {
 
+  let data = getPerspectiveData(perspectiveFull);
 
-  const dataFromDraftOrCommits = perspective.head ? perspective.head.data.links : perspective.draft.links
   const block = {
-    parent: '',
-    id: perspective.id,
-    children: dataFromDraftOrCommits.map(link => (
-      {
-        link: link.link,
-        style: getTypeOfComponent(link.type)
-      })),
-    status: hasChanges(perspective) ? 'DRAFT' : 'COMMITED',
-    content: perspective.head ? perspective.head.data.text : perspective.draft.text
+    id: perspectiveFull.id,
+    children: [],
+    status: hasChanges(perspectiveFull) ? 'DRAFT' : 'COMMITED',
+    content: data.text
   }
-  tree[perspective.id] = block
-  return block
+
+  data.links.map((link) => {
+    readBlockRec(link.link, tree);
+    block.children.push(link.link.id);
+  })
+
+  tree[perspectiveFull.id] = block
+  
+  return
 }
 
 

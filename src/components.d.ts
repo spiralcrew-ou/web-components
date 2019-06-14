@@ -28,9 +28,6 @@ export namespace Components {
   interface CoLogin {}
   interface CoLoginAttributes extends StencilHTMLAttributes {}
 
-  interface CoWorkpad {}
-  interface CoWorkpadAttributes extends StencilHTMLAttributes {}
-
   interface CoWorkspace {}
   interface CoWorkspaceAttributes extends StencilHTMLAttributes {}
 
@@ -79,7 +76,6 @@ declare global {
     'C1Workpad': Components.C1Workpad;
     'CoEditor': Components.CoEditor;
     'CoLogin': Components.CoLogin;
-    'CoWorkpad': Components.CoWorkpad;
     'CoWorkspace': Components.CoWorkspace;
     'TextBlock': Components.TextBlock;
     'TextNode': Components.TextNode;
@@ -90,7 +86,6 @@ declare global {
     'c1-workpad': Components.C1WorkpadAttributes;
     'co-editor': Components.CoEditorAttributes;
     'co-login': Components.CoLoginAttributes;
-    'co-workpad': Components.CoWorkpadAttributes;
     'co-workspace': Components.CoWorkspaceAttributes;
     'text-block': Components.TextBlockAttributes;
     'text-node': Components.TextNodeAttributes;
@@ -114,12 +109,6 @@ declare global {
   var HTMLCoLoginElement: {
     prototype: HTMLCoLoginElement;
     new (): HTMLCoLoginElement;
-  };
-
-  interface HTMLCoWorkpadElement extends Components.CoWorkpad, HTMLStencilElement {}
-  var HTMLCoWorkpadElement: {
-    prototype: HTMLCoWorkpadElement;
-    new (): HTMLCoWorkpadElement;
   };
 
   interface HTMLCoWorkspaceElement extends Components.CoWorkspace, HTMLStencilElement {}
@@ -150,7 +139,6 @@ declare global {
     'c1-workpad': HTMLC1WorkpadElement
     'co-editor': HTMLCoEditorElement
     'co-login': HTMLCoLoginElement
-    'co-workpad': HTMLCoWorkpadElement
     'co-workspace': HTMLCoWorkspaceElement
     'text-block': HTMLTextBlockElement
     'text-node': HTMLTextNodeElement
@@ -161,7 +149,6 @@ declare global {
     'c1-workpad': HTMLC1WorkpadElement;
     'co-editor': HTMLCoEditorElement;
     'co-login': HTMLCoLoginElement;
-    'co-workpad': HTMLCoWorkpadElement;
     'co-workspace': HTMLCoWorkspaceElement;
     'text-block': HTMLTextBlockElement;
     'text-node': HTMLTextNodeElement;
