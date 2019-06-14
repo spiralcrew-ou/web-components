@@ -114,6 +114,7 @@ export class UprtclData {
       if (links.length > 0) {
         let newNode = {
           text: data.text,
+          type: data.type,
           links: newLinks
         }
   
