@@ -1,6 +1,7 @@
 import { DataService } from '../data.service';
 import { TextNode as TextNodeIf } from '../../types';
-import { insertTextNode, getTextNode, TextNode } from '../local/dataservices';
+import { insertTextNode, getTextNode } from '../local/dataservices';
+import { TextNode } from '../../objects';
 
 import { c1Cid as cidConfig } from './cid.config';
 

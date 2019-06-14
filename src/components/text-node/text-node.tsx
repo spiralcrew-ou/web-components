@@ -208,7 +208,7 @@ export class TextNodeElement {
      * This way the logic of the draft maintainance dont need to be handled by its users. */
 
     if (this.draft == null) this.draft = { ...this.node };
-    this.draft.links.push({ link: newPerspectiveId });
+    this.draft.links.push({ link: newPerspectiveId, type: 'leaf' });
     this.draft = { ...this.draft };
     await this.dataService.setDraft(
       this.perspective.origin,

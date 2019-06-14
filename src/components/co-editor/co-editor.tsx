@@ -85,7 +85,7 @@ export class CoEditor {
     if (!newDraft) {
       newDraft = { text: '', links: [] };
     }
-    newDraft.links.push({ link: _link });
+    newDraft.links.push({ link: _link, type: 'node' });
     await this.dataService.setDraft(
       this.defaultService,
       perspectiveId,
