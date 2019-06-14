@@ -16,10 +16,10 @@ import {
 export namespace Components {
 
   interface C1Workpad {
-    'documentId': String;
+    'documentId': string;
   }
   interface C1WorkpadAttributes extends StencilHTMLAttributes {
-    'documentId'?: String;
+    'documentId'?: string;
   }
 
   interface CoEditor {}

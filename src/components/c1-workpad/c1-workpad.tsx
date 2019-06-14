@@ -2,11 +2,7 @@ import {
   Component, State, Prop, Element, Listen
 } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
-import { newBlock, updateTree } from '../../actions';
-import { configureStore } from '../../store.js';
-
-
-
+import { newBlock, initWorkPad,reloadTree, removeBlock, newDraft, commitAll  } from '../../actions';
 
 const commited = 'text-gray-800 p-2 mx-8 font-light bg-red-100 break-words'
 const unCommited = 'text-gray-800 p-2 mx-8 font-light break-words'
@@ -19,26 +15,33 @@ const unCommited = 'text-gray-800 p-2 mx-8 font-light break-words'
 })
 export class Workpad {
   @Element() _element: HTMLElement;
-  @State() blocks: Array<any>
+  @State() blocks
   @Prop({ context: 'store' }) store: Store;
-  @Prop() documentId: String
+  @Prop() documentId: string
 
+  initWorkPad: Action
   newBlock: Action
+  removeBlock: Action 
+  newDraft: Action
   updateTree: Action
+  reloadTree: Action
+  commitAll: Action
+  
 
   findBlock(_blockId: string) {
-    return this.blocks.filter(b => b.id === _blockId)[0]
+    return this.blocks[_blockId]
   }
 
 
   @Listen('keydown')
   onKeyDown(event: KeyboardEvent) {
-    //ParentId 
     const idBlockUpdated = event['path'][0].id
 
     if (this.findBlock(idBlockUpdated).content != event['path'][0].innerText && this.findBlock(idBlockUpdated).status === 'COMMITED') {
-      this.findBlock(idBlockUpdated).status = 'DRAFT'
-      this.updateTree(Object.assign([], this.blocks))
+      /** UI detects that this block have been change. For these reason need create a new draft for
+       * same perspective
+       */
+      this.newDraft(this.findBlock(idBlockUpdated))
     }
 
     if (event.key === 'Enter') {
@@ -51,28 +54,32 @@ export class Workpad {
 
     if (event.key === 'Backspace') {
       if (event['path'][0].innerText === '') {
-        const newTree = Object.assign([], this.blocks.filter(b => b.id != idBlockUpdated))
+        this.removeBlock(this.findBlock(idBlockUpdated))
+        /**TODO: What happend if document have only one element? That means, 
+         * we need to consireded if user try to remove all blocks from document. 
+         *  It make sense? 
+         * IMPORTANT TO SEE WITH PEPO. User delete only one word and then type the same word. 
+         * We need to create a new Draft in this case? 
+          */
 
-        if (newTree.length === 0) {
-          newTree.push({ status: 'DRAFT', content: '',lens: 'paragraph'},idBlockUpdated )
-        }
-
-        this.updateTree(newTree)
+        // this.updateTree(newTree)
       }
     }
 
   }
 
   componentWillLoad() {
-    this.store.setStore(configureStore());
     this.store.mapDispatchToProps(this, {
       newBlock,
-      // setRoot,
-      updateTree
+      removeBlock,
+      newDraft,
+      initWorkPad,
+      reloadTree,
+      commitAll
+      
     })
-    // this.setRoot()
-    // this.reloadTree()
-
+    this.initWorkPad(this.documentId)
+    this.reloadTree()
     this.store.mapStateToProps(this, state => {
       return {
         blocks: Object.assign([], state.workpad.tree)  //  When U work with [], this is the only way to force render
@@ -80,9 +87,6 @@ export class Workpad {
     })
   }
 
-  updateAllTree() { 
-
-  }
 
   componentDidUpdate() {
     console.log('Render')
@@ -93,26 +97,26 @@ export class Workpad {
     })
   }
 
-  commitAll() {
-
+  commit() {
+    this.commitAll()
+    this.reloadTree()
   }
 
 
   render() {
+    Object.keys(this.blocks).map(id => console.log(id))
     return (
       <div class='container'>
-        {this.blocks.map((b) => (
+        {Object.keys(this.blocks).map((id) => (
           <div
-            id={b.id}
+            id={this.blocks[id].id}
             contentEditable
             onBlur ={() => console.log('foco')}
-            class={b.status === 'DRAFT' ? commited : unCommited} data-placeholder='Enter text here'>{b.content}</div>
+            class={this.blocks[id].status === 'DRAFT' ? commited : unCommited} data-placeholder='Enter text here'>{this.blocks[id].content}</div>
         ))}
-
-        <button class='border-red-700 uppercase' onClick={() => this.commitAll()}> Commit </button>
+        <button class='border-red-700 uppercase' onClick={() => this.commit()}> Commit </button>
       </div>)
   }
 
-  // Helper functions
   
 }
