@@ -67,7 +67,7 @@ export class Commit implements ICommit {
       'creatorId': this.creatorId,
       'timestamp': this.timestamp,
       'message': this.message,
-      'parentsIds': this.parentsIds.toString(),
+      'parentsIds': this.parentsIds,
       'dataId': this.dataId
     };
 
