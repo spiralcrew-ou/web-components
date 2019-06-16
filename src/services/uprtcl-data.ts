@@ -1,5 +1,7 @@
 import { uprtclMultiplatform, dataMultiplatform } from './index';
-import { PerspectiveFull, CommitFull, TextNodeFull, TextNode as ITextNode } from './../types';
+import { 
+  PerspectiveFull, CommitFull, TextNodeFull, TextNode as ITextNode,
+  Perspective, Context, Commit } from './../types';
 import { TextNode } from './../objects';
 
 export class UprtclData {
@@ -11,19 +13,19 @@ export class UprtclData {
    * DIRECT ACCESS TO ALL UPRTCL AND DATA SERVICES
    * ------------------------------------------------------------------
   */
-  getContext(contextId: string): Promise<import("../types").Context> {
+  getContext(contextId: string): Promise<Context> {
     return this.uprtcl.getContext(contextId);
   }
-  getPerspective(perspectiveId: string): Promise<import("../types").Perspective> {
+  getPerspective(perspectiveId: string): Promise<Perspective> {
     return this.uprtcl.getPerspective(perspectiveId);
   }
-  getCommit(commitId: string): Promise<import("../types").Commit> {
+  getCommit(commitId: string): Promise<Commit> {
     return this.uprtcl.getCommit(commitId);
   }
   getRootContextId(serviceProvider: string): Promise<string> {
     return this.uprtcl.getRootContextId(serviceProvider);
   }
-  getContextPerspectives(contextId: string): Promise<import("../types").Perspective[]> {
+  getContextPerspectives(contextId: string): Promise<Perspective[]> {
     return this.uprtcl.getContextPerspectives(contextId);
   }
   createContext(serviceProvider: string, timestamp: number, nonce: number): Promise<string> {
@@ -35,13 +37,13 @@ export class UprtclData {
   createCommit(serviceProvider: string, timestamp: number, message: string, parentsIds: string[], dataId: string): Promise<string> {
     return this.uprtcl.createCommit(serviceProvider, timestamp, message, parentsIds, dataId);
   }
-  cloneContext(serviceProvider: string, context: import("../types").Context): Promise<string> {
+  cloneContext(serviceProvider: string, context: Context): Promise<string> {
     return this.uprtcl.cloneContext(serviceProvider, context);
   }
-  clonePerspective(serviceProvider: string, perspective: import("../types").Perspective): Promise<string> {
+  clonePerspective(serviceProvider: string, perspective: Perspective): Promise<string> {
     return this.uprtcl.clonePerspective(serviceProvider, perspective);
   }
-  cloneCommit(serviceProvider: string, commit: import("../types").Commit): Promise<string> {
+  cloneCommit(serviceProvider: string, commit: Commit): Promise<string> {
     return this.uprtcl.cloneCommit(serviceProvider, commit);
   }
   updateHead(perspectiveId: string, commitId: string): Promise<void> {
