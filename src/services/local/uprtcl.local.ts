@@ -6,42 +6,41 @@ import {
   Context as IContext
 } from '../../types';
 
-import {
-  Perspective,
-  Commit,
-  Context
-} from '../../objects';
+import { Perspective, Commit, Context } from '../../objects';
 
 import {
   insertPerspective,
   insertContext,
   insertCommit,
-  getContext, 
+  getContext,
   getPerpectives,
   getPerspective,
   getCommit,
-  updatePerspectiveHead,
+  updatePerspectiveHead
   // Draft
 } from './dataservices';
 
 const userId = 'anon';
-const origin = 'local';
 
 /** standard C1 settings */
 import { c1Cid as cidConfig } from './cid.config';
 //import { hcCid as cidConfig } from './cid.config';
 
 export class UprtclLocal implements UprtclService {
+  currentOrigin = 'local';
 
-  constructor() {
+  constructor() {}
+
+  public setCurrentOrigin(origin: string) {
+    this.currentOrigin = origin;
   }
 
   getContext(_contextId: string): Promise<IContext> {
-    return getContext(_contextId)
+    return getContext(_contextId);
   }
 
   getPerspective(_perspectiveId: string): Promise<IPerspective> {
-    return getPerspective(_perspectiveId)
+    return getPerspective(_perspectiveId);
   }
 
   getCommit(_commitId: string): Promise<ICommit> {
@@ -65,49 +64,93 @@ export class UprtclLocal implements UprtclService {
 
   async getRootContextId(): Promise<string> {
     let context = new Context(userId, 0, 0);
-    await context.setId(cidConfig.base, cidConfig.version, cidConfig.codec, cidConfig.type);
+    await context.setId(
+      cidConfig.base,
+      cidConfig.version,
+      cidConfig.codec,
+      cidConfig.type
+    );
     return Promise.resolve(context.id);
   }
 
   async getContextPerspectives(_contextId: string): Promise<IPerspective[]> {
-    return getPerpectives(_contextId) 
+    return getPerpectives(_contextId);
   }
 
   async createContext(_timestamp: number, _nonce: number): Promise<string> {
-    let context = new Context(userId, _timestamp, _nonce)
-    await context.setId(cidConfig.base, cidConfig.version, cidConfig.codec, cidConfig.type);
+    let context = new Context(userId, _timestamp, _nonce);
+    await context.setId(
+      cidConfig.base,
+      cidConfig.version,
+      cidConfig.codec,
+      cidConfig.type
+    );
     const exists = await this.existContext(context.id);
     return !exists ? insertContext(context) : Promise.resolve(context.id);
   }
 
-  async createPerspective(_contextId: string, _name: string, _timestamp: number, _headId: string): Promise<string> {
-    let perspective = new Perspective(origin, userId, _timestamp, _contextId, _name, _headId);
-    await perspective.setId(cidConfig.base, cidConfig.version, cidConfig.codec, cidConfig.type);
+  async createPerspective(
+    _contextId: string,
+    _name: string,
+    _timestamp: number,
+    _headId: string
+  ): Promise<string> {
+    let perspective = new Perspective(
+      this.currentOrigin,
+      userId,
+      _timestamp,
+      _contextId,
+      _name,
+      _headId
+    );
+    await perspective.setId(
+      cidConfig.base,
+      cidConfig.version,
+      cidConfig.codec,
+      cidConfig.type
+    );
     const exists = await this.existPerspective(perspective.id);
-    return !exists ? insertPerspective(perspective) : Promise.resolve(perspective.id);
+    return !exists
+      ? insertPerspective(perspective)
+      : Promise.resolve(perspective.id);
   }
 
-  async createCommit(_timestamp: number, _message: string, _parentsIds: string[], _dataId: string): Promise<string> { 
-    let commit = new Commit(userId, new Date().getDate(), _message, _parentsIds, _dataId);
-    await commit.setId(cidConfig.base, cidConfig.version, cidConfig.codec, cidConfig.type);
+  async createCommit(
+    _timestamp: number,
+    _message: string,
+    _parentsIds: string[],
+    _dataId: string
+  ): Promise<string> {
+    let commit = new Commit(
+      userId,
+      new Date().getDate(),
+      _message,
+      _parentsIds,
+      _dataId
+    );
+    await commit.setId(
+      cidConfig.base,
+      cidConfig.version,
+      cidConfig.codec,
+      cidConfig.type
+    );
     const exists = await this.existCommit(commit.id);
     return !exists ? insertCommit(commit) : Promise.resolve(commit.id);
   }
 
   async cloneContext(_context: IContext): Promise<string> {
-    throw new Error("Method not implemented.");
+    return insertContext(_context);
   }
 
   async clonePerspective(_perspective: IPerspective): Promise<string> {
-    throw new Error("Method not implemented.");
+    return insertPerspective(_perspective);
   }
 
   async cloneCommit(_commit: ICommit): Promise<string> {
-    throw new Error("Method not implemented.");
+    return insertCommit(_commit);
   }
 
   async updateHead(_perspectiveId: string, _commitId: string): Promise<void> {
-    return updatePerspectiveHead(_perspectiveId,_commitId)
+    return updatePerspectiveHead(_perspectiveId, _commitId);
   }
-
 }

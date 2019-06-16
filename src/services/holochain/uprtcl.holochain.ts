@@ -30,6 +30,20 @@ export class UprtclHolochain implements UprtclService {
     this.proxyZome = new HolochainConnection('test-instance', 'proxy');
   }
 
+  splitId(object: any) {
+    let id = null;
+    const result = {};
+    for (const key of Object.keys(object)) {
+      if (key === 'id') {
+        id = object[key];
+      } else {
+        result[key] = object[key];
+      }
+    }
+
+    return { object, id };
+  }
+
   getEntry(entryId: string): Promise<EntryResult> {
     return this.proxyZome
       .call('get_proxied_entry', { address: entryId })
@@ -141,20 +155,26 @@ export class UprtclHolochain implements UprtclService {
   }
 
   cloneContext(context: Context): Promise<string> {
+    const { object, id } = this.splitId(context);
     return this.uprtclZome.call('clone_context', {
-      context
+      previous_address: id,
+      context: this.formatter.formatUiToServer('context', object)
     });
   }
 
   clonePerspective(perspective: Perspective): Promise<string> {
+    const { object, id } = this.splitId(perspective);
     return this.uprtclZome.call('clone_perspective', {
-      perspective
+      previous_address: id,
+      perspective: this.formatter.formatUiToServer('perspective', object)
     });
   }
 
   cloneCommit(commit: Commit): Promise<string> {
+    const { object, id } = this.splitId(commit);
     return this.uprtclZome.call('clone_commit', {
-      commit
+      previous_address: id,
+      commit: this.formatter.formatUiToServer('commit', object)
     });
   }
 

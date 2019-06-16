@@ -46,7 +46,7 @@ export class TextNodeElement {
     this.perspective = await this.uprtclService.getPerspective(
       this.perspectiveId
     );
-
+    
     this.draft = await this.dataService.getDraft(
       this.perspective.origin,
       this.perspectiveId
