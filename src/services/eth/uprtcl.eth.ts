@@ -1,18 +1,21 @@
 import { UprtclService } from '../uprtcl.service';
 import { DataIpfs } from '../data.ipfs';
 import { Context, Commit, Perspective } from './../../objects';
+import Web3 from 'web3';
 
 const userId = 'asdasdsadas';
 
-export class UprtclCollectiveOne implements UprtclService {
+export class UprtclEthereum implements UprtclService {
 
   ADDRESS = '0xsdfjhsdfkjdfskjlslkjsdlkj'
-  ipfsClient = new DataIpfs('localhost://5000');
+  ipfsClient = null;
   web3Client = null;
   uprtclEthereum = null;
 
-  constructor() {
-    this.web3Client = window['web3'];
+  constructor(host: string) {
+    debugger
+    this.ipfsClient = new DataIpfs('localhost://5000');
+    this.web3Client = new Web3(host);
   }
 
   async connect() {

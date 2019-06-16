@@ -15,6 +15,8 @@ import { DraftCollectiveOne } from './c1/draft.c1';
 import { UprtclCollectiveOne } from './c1/uprtcl.c1';
 import { DiscoveryCollectiveOne } from './c1/discovery.c1';
 
+import { UprtclEthereum } from './eth/uprtcl.eth';
+
 import { DataIpfs } from './data.ipfs';
 
 export const holochainEnabled = false;
@@ -23,6 +25,9 @@ export const holochainServiceProvider =
 
 export const c1Enabled = false;
 export const c1ServiceProvider = 'https://www.collectiveone.org/uprtcl/1';
+
+export const ethEnabled = false;
+export const ethServiceProvider = 'eth://smartContract';
 
 export const localServiceProvider = 'local';
 
@@ -67,6 +72,18 @@ if (holochainEnabled) {
     service: new DataIpfs('ipfs.infura.io'),
     discovery: null,
     draft: null
+  };
+}
+
+if (ethEnabled) {
+  uprtclConfig[ethServiceProvider] = {
+    service: new UprtclEthereum('http://127.0.0.1:7545'),
+    discovery: null
+  };
+  dataConfig[ethServiceProvider] = {
+    service: new DataLocal(),
+    discovery: null,
+    draft: new DraftLocal()
   };
 }
 

@@ -3,7 +3,8 @@ import {
   uprtclMultiplatform,
   dataMultiplatform,
   // c1ServiceProvider as serviceProvider,
-  localServiceProvider as serviceProvider
+  ethServiceProvider as serviceProvider
+  //localServiceProvider as serviceProvider
 } from '../../services';
 import { uprtclData } from '../../services/uprtcl-data';
 import { TextNode } from '../../types';

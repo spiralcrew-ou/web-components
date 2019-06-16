@@ -1,5 +1,7 @@
 import { uprtclMultiplatform, dataMultiplatform } from './index';
-import { PerspectiveFull, CommitFull, TextNodeFull, TextNode as ITextNode } from './../types';
+import { 
+  PerspectiveFull, CommitFull, TextNodeFull, TextNode as ITextNode,
+  Perspective, Context, Commit } from './../types';
 import { TextNode } from './../objects';
 
 export class UprtclData {
@@ -11,19 +13,19 @@ export class UprtclData {
    * DIRECT ACCESS TO ALL UPRTCL AND DATA SERVICES
    * ------------------------------------------------------------------
   */
-  getContext(contextId: string): Promise<import("../types").Context> {
+  getContext(contextId: string): Promise<Context> {
     return this.uprtcl.getContext(contextId);
   }
-  getPerspective(perspectiveId: string): Promise<import("../types").Perspective> {
+  getPerspective(perspectiveId: string): Promise<Perspective> {
     return this.uprtcl.getPerspective(perspectiveId);
   }
-  getCommit(commitId: string): Promise<import("../types").Commit> {
+  getCommit(commitId: string): Promise<Commit> {
     return this.uprtcl.getCommit(commitId);
   }
   getRootContextId(serviceProvider: string): Promise<string> {
     return this.uprtcl.getRootContextId(serviceProvider);
   }
-  getContextPerspectives(contextId: string): Promise<import("../types").Perspective[]> {
+  getContextPerspectives(contextId: string): Promise<Perspective[]> {
     return this.uprtcl.getContextPerspectives(contextId);
   }
   createContext(serviceProvider: string, timestamp: number, nonce: number): Promise<string> {
@@ -35,13 +37,13 @@ export class UprtclData {
   createCommit(serviceProvider: string, timestamp: number, message: string, parentsIds: string[], dataId: string): Promise<string> {
     return this.uprtcl.createCommit(serviceProvider, timestamp, message, parentsIds, dataId);
   }
-  cloneContext(serviceProvider: string, context: import("../types").Context): Promise<string> {
+  cloneContext(serviceProvider: string, context: Context): Promise<string> {
     return this.uprtcl.cloneContext(serviceProvider, context);
   }
-  clonePerspective(serviceProvider: string, perspective: import("../types").Perspective): Promise<string> {
+  clonePerspective(serviceProvider: string, perspective: Perspective): Promise<string> {
     return this.uprtcl.clonePerspective(serviceProvider, perspective);
   }
-  cloneCommit(serviceProvider: string, commit: import("../types").Commit): Promise<string> {
+  cloneCommit(serviceProvider: string, commit: Commit): Promise<string> {
     return this.uprtcl.cloneCommit(serviceProvider, commit);
   }
   updateHead(perspectiveId: string, commitId: string): Promise<void> {
@@ -307,13 +309,13 @@ export class UprtclData {
    * @param serviceProvider The service provider storing the draft of the parent 
    * perspective. (The child perspective can come from another provider).
    * 
-   * @param perspectiveId The parent perspective id.
+   * @param onPerspectiveId The parent perspective id.
+   * 
+   * @param perspectiveId The child perspective id.
    * 
    * @param index The index in which the child perspective should be added. 
    * `index = -1` can be used to add it as the last children.
    * 
-   * @param content An optional string used to intialize the draft of the child
-   * perspective.
    * 
    * @returns The id of the new child **perspective**. 
   */
@@ -340,6 +342,36 @@ export class UprtclData {
 
     return;
   }
+
+  /** Remove one child perspective from its parent perspective.
+   * 
+   * @param serviceProvider The service provider storing the draft of the parent 
+   * perspective.
+   * 
+   * @param fromPerspectiveId The parent perspective id.
+   * 
+   * @param perspectiveId The child perspective id to be removed (must be a current child 
+   * of the parent).
+   *  
+   * @returns The id of the new child **perspective**. 
+  */
+  async removePerspective(
+    serviceProvider: string,
+    fromPerspectiveId: string,
+    perspectiveId: string): Promise<void> {
+
+    let draft = await this.data.getDraft(serviceProvider, fromPerspectiveId);
+    
+    let index = draft.links.findIndex(link => link.link === perspectiveId);
+    if (index == -1) throw new Error(`perspective ${perspectiveId} not found under ${fromPerspectiveId}`);
+
+    /** remove the link */
+    draft.links.splice(index, 1);
+
+    /* udpate draft without the link */
+    await this.data.setDraft(serviceProvider, fromPerspectiveId, draft);
+  }
+
 
 
   /** Getter function to get or create a draft of/on a given perspective.
