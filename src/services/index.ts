@@ -11,11 +11,11 @@ import { DraftCollectiveOne } from './c1/draft.c1';
 import { UprtclCollectiveOne } from './c1/uprtcl.c1';
 import { DiscoveryCollectiveOne } from './c1/discovery.c1';
 
-export const holochainEnabled = true;
+export const holochainEnabled = false;
 export const holochainServiceProvider =
-  'holochain://QmYCV6DCqn6trWAPGPriFLQfeXjosKSp9jFxFKDUbpwk5U';
+  'holochain://QmT7uU1BdyuKYdNwFzFv3dJmaJuWE1eZwJW4wm1n5gVSex';
 
-export const c1Enabled = false;
+export const c1Enabled = true;
 export const c1ServiceProvider = 'https://www.collectiveone.org/uprtcl/1';
 
 export const localServiceProvider = 'local';
