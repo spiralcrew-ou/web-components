@@ -1,25 +1,58 @@
 import { UprtclService } from '../uprtcl.service';
-import { DataIpfs } from '../data.ipfs';
 import { Context, Commit, Perspective } from './../../objects';
+
+import { IpfsStub } from './ipfs.data.stub';
+
+import CID from 'cids';
+import multihashing from 'multihashing-async';
+import Buffer from 'buffer/';
+
 import Web3 from 'web3';
+import * as UprtclContractArtifact from './Uprtcl.json';
+import contract from 'truffle-contract';
 
 const userId = 'asdasdsadas';
 
 export class UprtclEthereum implements UprtclService {
 
-  ADDRESS = '0xsdfjhsdfkjdfskjlslkjsdlkj'
   ipfsClient = null;
-  web3Client = null;
-  uprtclEthereum = null;
+  web3 = null;
+  UprtclContract = null;
+  uprtclInstance = null;
+  loggedAccount = null;
 
   constructor(host: string) {
-    debugger
-    this.ipfsClient = new DataIpfs('localhost://5000');
-    this.web3Client = new Web3(host);
+    this.ipfsClient = new IpfsStub();
+    this.web3 = new Web3.providers.HttpProvider(host);
+    this.UprtclContract = contract(UprtclContractArtifact);
+    this.UprtclContract.setProvider();
+    this.uprtclInstance = this.UprtclContract.deployed();
+    this.loggedAccount = this.web3.accounts[0];
   }
 
-  async connect() {
-    this.uprtclEthereum = await this.web3Client.contract(this.ADDRESS);
+  private async hash(data: string) : Promise<string> {
+    const encoded = await multihashing(
+      Buffer.Buffer.from(data), 'sha3-256');
+    return '0x' + encoded.toString('hex');
+  }
+
+  private cidToBytes32(cidEncoded: string) : string[] {
+    const cid = new CID(cidEncoded);
+
+    const cidEncoded16 = cid.toString('base16');
+    
+    let cidHex0 = null;
+    let cidHex1 = null;
+
+    if (cidEncoded16.length <= 64) {
+      cidHex0 = cidEncoded16.padStart(64, '0');
+      cidHex1 = new Array(64).fill('0').join('');
+    } else {
+      cidHex0 = cidEncoded16.slice(-64);
+      cidHex1 = cidEncoded16.slice(-cidEncoded16.length, -64).padStart(64,'0');
+    }
+
+    return [ cidHex1, cidHex0 ];
   }
 
   async getContext(contextId: string): Promise<Context> {
@@ -32,7 +65,7 @@ export class UprtclEthereum implements UprtclService {
     persp.id = perspectiveId;
 
     /** Head comes from ethereum */
-    const result = await this.uprtclEthereum.getPerspective(perspectiveId);
+    const result = await this.uprtclInstance.getPerspective(perspectiveId);
     persp.headId = result.head;
 
     return persp;
@@ -48,12 +81,14 @@ export class UprtclEthereum implements UprtclService {
    * a user and directly query for it using getContext(rootContextId)
    */
   async getRootContextId(): Promise<string> {
-    return null;
+    const context = new Context(
+      userId, 0, 0);
+    return this.ipfsClient.getObjectId(context);
   }
 
   async getContextPerspectives(contextId: string): Promise<Perspective[]> {
 
-    let events = await this.uprtclEthereum.PerspectiveAddedPromise(
+    let events = await this.uprtclInstance.PerspectiveAdded(
       {
         filter: {
           contextId: contextId
@@ -89,7 +124,7 @@ export class UprtclEthereum implements UprtclService {
     _contextId: string,
     _name: string,
     _timestamp: number,
-    _headId: string) {
+    _headCid: string) : Promise<string> {
 
     let perspective = {
       'origin': 'eth://XXXXX',
@@ -99,9 +134,23 @@ export class UprtclEthereum implements UprtclService {
       'name': _name
     }
 
+    /** Store the perspective data in the data layer */
     let perspectiveId = await this.ipfsClient.createData(perspective);
-    await this.uprtclEthereum.addPerspective(perspectiveId, _contextId);
-    return this.uprtclEthereum.updateHead(perspectiveId, _headId);
+    
+    let perspectiveIdHash = this.hash(perspectiveId);
+    let contextIdHash = this.hash(_contextId);
+    
+    await this.uprtclInstance
+      .methods['addPerspective(bytes32,bytes32,address)']
+      (perspectiveIdHash, contextIdHash, userId,
+      { from: this.loggedAccount });
+
+    let headParts = this.cidToBytes32(_headCid);
+
+    return this.uprtclInstance
+      .methods['updateHead(bytes32,bytes32,bytes32)']
+      (perspectiveIdHash, headParts[0], headParts[1],
+      { from: this.loggedAccount });
   }
 
   async createCommit(
@@ -136,7 +185,7 @@ export class UprtclEthereum implements UprtclService {
   }
 
   async updateHead(perspectiveId: string, commitId: string): Promise<void> {
-    return this.uprtclEthereum.updateHead(perspectiveId, commitId);
+    throw new Error(perspectiveId + commitId);
   }
 
 }

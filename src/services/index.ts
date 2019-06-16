@@ -26,7 +26,7 @@ export const holochainServiceProvider =
 export const c1Enabled = false;
 export const c1ServiceProvider = 'https://www.collectiveone.org/uprtcl/1';
 
-export const ethEnabled = false;
+export const ethEnabled = true;
 export const ethServiceProvider = 'eth://smartContract';
 
 export const localServiceProvider = 'local';

@@ -26,6 +26,7 @@ export class CoEditor {
 
   async componentWillLoad() {
     this.loading = true;
+    debugger
 
     /** MVP assumes one root perspective per user in platform */
     const rootContextId = await this.uprtcl.getRootContextId(
@@ -35,7 +36,6 @@ export class CoEditor {
       rootContextId
     );
     this.rootPerspectiveId = rootPerspectives[0].id;
-
     
     const draft = await this.dataService.getDraft(
       this.defaultService,
