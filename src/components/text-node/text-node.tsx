@@ -8,7 +8,7 @@ import {
   EventEmitter,
   Method
 } from '@stencil/core';
-import { TextNode, Perspective, Commit } from '../../types';
+import { TextNode, Perspective, Commit, Context } from '../../types';
 import { uprtclMultiplatform, dataMultiplatform } from '../../services';
 import { uprtclData } from '../../services/uprtcl-data';
 
@@ -24,6 +24,7 @@ export class TextNodeElement {
   @Prop() defaultService: string;
 
   @State() perspective: Perspective;
+  headId: string;
   @State() commit: Commit;
 
   @State() node: TextNode;
@@ -46,15 +47,16 @@ export class TextNodeElement {
     this.perspective = await this.uprtclService.getPerspective(
       this.perspectiveId
     );
-    
+    this.headId = await this.uprtclService.getHead(this.perspectiveId);
+
     this.draft = await this.dataService.getDraft(
       this.perspective.origin,
       this.perspectiveId
     );
 
     // Head can be null, only go get it if it exists
-    if (this.perspective.headId) {
-      this.commit = await this.uprtclService.getCommit(this.perspective.headId);
+    if (this.headId) {
+      this.commit = await this.uprtclService.getCommit(this.headId);
       this.node = await this.dataService.getData(this.commit.dataId);
     }
   }
@@ -100,43 +102,43 @@ export class TextNodeElement {
         {this.loading ? (
           <span>Loading...</span>
         ) : (
-            <div class='flex-column'>
-              {this.isRootNode ? (
-                <uprtcl-toolbar
-                  defaultService={this.defaultService}
-                  perspective={this.perspective}
-                  onCreateCommit={() => this.createCommit()}
-                  onCreatePerspective={e =>
-                    this.createPerspective(
-                      e.detail.serviceProvider,
-                      e.detail.name
-                    )
-                  }
-                  onSelectPerspective={e => this.selectPerspective(e.detail)}
-                />
-              ) : (
-                  ''
-                )}
+          <div class="flex-column">
+            {this.isRootNode ? (
+              <uprtcl-toolbar
+                defaultService={this.defaultService}
+                perspective={this.perspective}
+                onCreateCommit={() => this.createCommit()}
+                onCreatePerspective={e =>
+                  this.createPerspective(
+                    e.detail.serviceProvider,
+                    e.detail.name
+                  )
+                }
+                onSelectPerspective={e => this.selectPerspective(e.detail)}
+              />
+            ) : (
+              ''
+            )}
 
-              <div class='node'>
-                <text-block
+            <div class="node">
+              <text-block
+                id={this.perspectiveId}
+                text={this.getRenderingData().text}
+              />
+              {this.hasChanges() ? <div class="indicator" /> : ''}
+
+              {this.getRenderingData().links.map(link => (
+                <text-node
                   id={this.perspectiveId}
-                  text={this.getRenderingData().text}
+                  class="child-node"
+                  isRootNode={false}
+                  perspectiveId={link.link}
+                  onCreateSibling={() => this.createNewChild()}
                 />
-                {this.hasChanges() ? <div class='indicator' /> : ''}
-
-                {this.getRenderingData().links.map(link => (
-                  <text-node
-                    id={this.perspectiveId}
-                    class='child-node'
-                    isRootNode={false}
-                    perspectiveId={link.link}
-                    onCreateSibling={() => this.createNewChild()}
-                  />
-                ))}
-              </div>
+              ))}
             </div>
-          )}
+          </div>
+        )}
       </div>
     );
   }
@@ -249,20 +251,24 @@ export class TextNodeElement {
 
   private async commitContent() {
     if (!this.hasChanges()) {
-      return
+      return;
     }
-    
+
     const dataId = await this.dataService.createData(
       this.perspective.origin,
       this.draft
     );
-    const parentsIds = this.perspective.headId ? [this.perspective.headId] : [];
+    const parentsIds = this.headId ? [this.headId] : [];
+    const commit: Commit = {
+      timestamp: Date.now(),
+      message: 'Commit at ' + Date.now(),
+      parentsIds: parentsIds,
+      creatorId: 'anon',
+      dataId: dataId
+    };
     const commitId = await this.uprtclService.createCommit(
       this.perspective.origin,
-      Date.now(),
-      'Commit at ' + Date.now(),
-      parentsIds,
-      dataId
+      commit
     );
 
     await this.uprtclService.updateHead(this.perspectiveId, commitId);
@@ -276,18 +282,23 @@ export class TextNodeElement {
     name: string = 'master'
   ): Promise<string> {
     if (!contextId) {
+      const context: Context = {
+        creatorId: 'anon',
+        timestamp: Date.now(),
+        nonce: 0
+      };
       contextId = await this.uprtclService.createContext(
         serviceProvider,
-        Date.now(),
-        0
+        context
       );
     }
-    return this.uprtclService.createPerspective(
-      serviceProvider,
-      contextId,
-      name,
-      Date.now(),
-      null
-    );
+    const perspective: Perspective = {
+      creatorId: 'anon',
+      contextId: contextId,
+      name: name,
+      timestamp: Date.now(),
+      origin: serviceProvider
+    };
+    return this.uprtclService.createPerspective(serviceProvider, perspective);
   }
 }

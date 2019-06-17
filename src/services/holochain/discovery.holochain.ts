@@ -13,9 +13,6 @@ export class DiscoveryHolochain implements DiscoveryService {
   }
 
   getKnownSources(hash: string): Promise<string[]> {
-    if (typeof hash !== 'string') {
-      debugger;
-    }
     return this.discoveryZome.call('get_known_sources', { address: hash });
   }
   addKnownSources(hash: string, sources: string[]): Promise<void> {

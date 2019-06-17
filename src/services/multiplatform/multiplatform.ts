@@ -29,11 +29,11 @@ export class Multiplatform<T> {
    * Discover the sources of the given link from the discover service of the originSource
    * and store them locally for future operations
    */
-  private async discoverLinkSource(
-    link: string,
-    originSource: string
+  private async discoverLinkSources(
+    serviceProvider: string,
+    link: string
   ): Promise<void> {
-    const discoverService = this.serviceProviders[originSource].discovery;
+    const discoverService = this.serviceProviders[serviceProvider].discovery;
 
     let knownSources = await this.knownSources.getKnownSources(link);
     if (!knownSources || knownSources.length === 0) {
@@ -51,17 +51,17 @@ export class Multiplatform<T> {
    * and store them locally for future operations
    */
   protected async discoverLinksSources(
-    links: string[],
-    originSource: string
+    serviceProvider: string,
+    links: string[]
   ): Promise<void> {
-    const discoverService = this.serviceProviders[originSource].discovery;
+    const discoverService = this.serviceProviders[serviceProvider].discovery;
 
     if (discoverService) {
       // Discover known sources of link from the discover service
       await Promise.all(
         links
           .filter(link => link != null)
-          .map(link => this.discoverLinkSource(link, originSource))
+          .map(link => this.discoverLinkSources(serviceProvider, link))
       );
     }
   }
@@ -76,29 +76,39 @@ export class Multiplatform<T> {
     }
   }
 
+  protected async getFromSource<O>(
+    source: string,
+    getter: (service: T) => Promise<O>,
+    linksSelector: (object: O) => string[] = () => []
+  ): Promise<O> {
+    // Try to retrieve the object
+    const object = await getter(this.serviceProviders[source].service);
+
+    if (object) {
+      // Object retrieved successfully, discover the known sources of the links the object points to
+      const links = linksSelector(object);
+      await this.discoverLinksSources(source, links);
+    }
+    return object;
+  }
+
   /**
    * Gets the object identified with the given hash from the given source
    */
-  private async getFromSource<O>(
+  private async tryGetFromSource<O>(
     source: string,
     hash: string,
     getter: (service: T) => Promise<O>,
     linksSelector: (object: O) => string[] = () => []
   ): Promise<O> {
     try {
-      // Try to retrieve the object
-      const object = await getter(this.serviceProviders[source].service);
+      const object = await this.getFromSource(source, getter, linksSelector);
 
-      if (object) {
-        // Object retrieved successfully, discover the known sources of the links the object points to
-        const links = linksSelector(object);
-        await this.discoverLinksSources(links, source);
-
-        return object;
-      } else {
+      if (!object) {
         // The get call succeeded but didn't return the object, remove the source from the known sources
-        this.removeKnownSource(source, hash);
+        await this.removeKnownSource(source, hash);
       }
+      return object;
     } catch (e) {
       // The get call failed, don't remove the known source as it could be a network error
       console.error(e);
@@ -114,7 +124,7 @@ export class Multiplatform<T> {
    * @param linksSelector: function that gets the links from the retrieved object to ask for their sources
    * @returns the object retrieved
    */
-  protected async discoverObject<O>(
+  protected async discover<O>(
     hash: string,
     getter: (service: T) => Promise<O>,
     linksSelector: (object: O) => string[] = () => []
@@ -128,7 +138,7 @@ export class Multiplatform<T> {
 
     // Iterate through the known sources until a source successfully returns the object
     for (const source of knownSources) {
-      const object = await this.getFromSource(
+      const object = await this.tryGetFromSource(
         source,
         hash,
         getter,
@@ -165,7 +175,7 @@ export class Multiplatform<T> {
 
     // Iterate through the known sources until a source successfully returns the array of objects
     for (const source of this.getServiceProviders()) {
-      const object = await this.getFromSource(
+      const object = await this.tryGetFromSource(
         source,
         hash,
         getter,
@@ -213,7 +223,7 @@ export class Multiplatform<T> {
           const knownLinkSources = await this.knownSources.getKnownSources(
             link
           );
-          
+
           await discoveryService.addKnownSources(link, knownLinkSources);
         })
       );
@@ -232,7 +242,7 @@ export class Multiplatform<T> {
    * @param linksToObjects
    * @returns the newly created hash of the object
    */
-  public async createWithLinks(
+  protected async create(
     serviceProvider: string,
     creator: (service: T) => Promise<string>,
     linksToObjects: string[]
@@ -257,7 +267,7 @@ export class Multiplatform<T> {
    * @param updater
    * @param linksToObjects
    */
-  public async updateWithLinks(
+  public async update(
     serviceProvider: string,
     updater: (service: T) => Promise<void>,
     linksToObjects: string[]

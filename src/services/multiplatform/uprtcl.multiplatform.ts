@@ -6,7 +6,7 @@ import { UprtclLocal } from '../local/uprtcl.local';
 
 export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
   linksFromPerspective(perspective: Perspective) {
-    return [perspective.contextId, perspective.headId];
+    return [perspective.contextId];
   }
 
   linksFromCommit(commit: Commit) {
@@ -23,55 +23,33 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
   }
 
   async getContext(contextId: string): Promise<Context> {
-    return await this.cachedDiscoverObject(
+    return await this.cachedDiscover(
       contextId,
       service => service.getContext(contextId),
-      (service, context) => service.cloneContext(context)
+      (service, context) => service.createContext(context)
     );
   }
 
   async getPerspective(perspectiveId: string): Promise<Perspective> {
-    return await this.discoverObject(
+    return await this.cachedDiscover(
       perspectiveId,
       service => service.getPerspective(perspectiveId),
+      (service, perspective) => service.createPerspective(perspective),
       this.linksFromPerspective
     );
   }
 
   async getCommit(commitId: string): Promise<Commit> {
-    return await this.cachedDiscoverObject(
+    return await this.cachedDiscover(
       commitId,
       service => service.getCommit(commitId),
-      (service, commit) => service.cloneCommit(commit),
+      (service, commit) => service.createCommit(commit),
       this.linksFromCommit
     );
   }
 
   async getRootContextId(serviceProvider: string): Promise<string> {
-    const provider = this.getServiceProvider(serviceProvider);
-    let rootContextId = await provider.getRootContextId();
-    const rootContext = await provider.getContext(rootContextId);
-
-    const defaultDiscovery = this.serviceProviders[serviceProvider].discovery;
-    let defaultSource = serviceProvider;
-    if (defaultDiscovery) {
-      defaultSource = await defaultDiscovery.getOwnSource();
-    }
-
-    if (!rootContext) {
-      rootContextId = await this.createContext(serviceProvider, 0, 0);
-      // Create an empty perspective
-      const perspectiveId = await this.createPerspective(
-        serviceProvider,
-        rootContextId,
-        'User Context',
-        new Date().getTime(),
-        null
-      );
-      await this.knownSources.addKnownSources(perspectiveId, [defaultSource]);
-    }
-    await this.knownSources.addKnownSources(rootContextId, [defaultSource]);
-    return rootContextId;
+    return this.getServiceProvider(serviceProvider).getRootContextId();
   }
 
   async getContextPerspectives(contextId: string): Promise<Perspective[]> {
@@ -89,82 +67,59 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
     return perspectives.reduce((a, e) => a.concat(...e), []);
   }
 
-  createContext(
-    serviceProvider: string,
-    timestamp: number,
-    nonce: number
-  ): Promise<string> {
-    return this.cachedCreateWithLinks(
+  createContext(serviceProvider: string, context: Context): Promise<string> {
+    return this.optimisticCreate(
       serviceProvider,
-      (service, hash) => service.getContext(hash),
-      service => service.createContext(timestamp, nonce),
-      (service, context) => service.cloneContext(context),
+      context,
+      (service, context) => service.createContext(context),
       []
     );
   }
 
   async createPerspective(
     serviceProvider: string,
-    contextId: string,
-    name: string,
-    timestamp: number,
-    headId: string
-  ): Promise<string> {
-    (<UprtclLocal>this.cacheService).setCurrentOrigin(serviceProvider);
-
-    const links = [contextId];
-    if (headId) {
-      links.push(headId);
-    }
-    return this.cachedCreateWithLinks(
-      serviceProvider,
-      (service, hash) => service.getPerspective(hash),
-      service => service.createPerspective(contextId, name, timestamp, headId),
-      (service, perspective) => service.clonePerspective(perspective),
-      links
-    );
-  }
-
-  createCommit(
-    serviceProvider: string,
-    timestamp: number,
-    message: string,
-    parentsIds: string[],
-    dataId: string
-  ): Promise<string> {
-    debugger
-    return this.cachedCreateWithLinks(
-      serviceProvider,
-      (service, hash) => service.getCommit(hash),
-      service => service.createCommit(timestamp, message, parentsIds, dataId),
-      (service, commit) => service.cloneCommit(commit),
-      [...parentsIds, dataId]
-    );
-  }
-
-  cloneContext(serviceProvider: string, context: Context): Promise<string> {
-    return this.getServiceProvider(serviceProvider).cloneContext(context);
-  }
-
-  clonePerspective(
-    serviceProvider: string,
     perspective: Perspective
   ): Promise<string> {
-    return this.getServiceProvider(serviceProvider).clonePerspective(
-      perspective
+    return this.optimisticCreate(
+      serviceProvider,
+      perspective,
+      (service, perspective) => service.createPerspective(perspective),
+      this.linksFromPerspective(perspective)
     );
   }
 
-  cloneCommit(serviceProvider: string, commit: Commit): Promise<string> {
-    return this.getServiceProvider(serviceProvider).cloneCommit(commit);
+  createCommit(serviceProvider: string, commit: Commit): Promise<string> {
+    return this.optimisticCreate(
+      serviceProvider,
+      commit,
+      (service, commit) => service.createCommit(commit),
+      this.linksFromCommit(commit)
+    );
+  }
+
+  async getHead(perspectiveId: string): Promise<string> {
+    const perspective = await this.getPerspective(perspectiveId);
+
+    if (perspective == null) {
+      return null;
+    }
+
+    const origin = perspective.origin;
+    return this.fallbackGet(
+      origin,
+      service => service.getHead(perspectiveId),
+      headId => [headId]
+    );
   }
 
   async updateHead(perspectiveId: string, headId: string): Promise<void> {
-    const sources = await this.knownSources.getKnownSources(perspectiveId);
-    if (sources.length !== 1) {
-      throw new Error('Perspective has more than one known source');
-    }
+    const perspective = await this.getPerspective(perspectiveId);
+    const origin = perspective.origin;
 
-    return this.cachedUpdateWithLinks(sources[0], service => service.updateHead(perspectiveId, headId), [headId]);
+    return this.optimisticUpdate(
+      origin,
+      service => service.updateHead(perspectiveId, headId),
+      [headId]
+    );
   }
 }

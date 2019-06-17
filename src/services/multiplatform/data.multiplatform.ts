@@ -17,7 +17,7 @@ export class DataMultiplatform extends CachedMultiplatform<DataProvider> {
   }
 
   getData(dataId: string): Promise<TextNode> {
-    return this.cachedDiscoverObject(
+    return this.cachedDiscover(
       dataId,
       service => service.data.getData(dataId),
       (service, data) => service.data.createData(data),
@@ -26,27 +26,20 @@ export class DataMultiplatform extends CachedMultiplatform<DataProvider> {
   }
 
   createData(serviceProvider: string, data: TextNode): Promise<string> {
-    debugger
-    return this.cachedCreateWithLinks(
+    return this.optimisticCreate(
       serviceProvider,
-      (service, dataId) => service.data.getData(dataId),
-      service => service.data.createData(data),
+      data,
       (service, object) => service.data.createData(object),
       data.links.map(link => link.link)
     );
   }
 
   async getDraft(serviceProvider: string, objectId: string): Promise<TextNode> {
-    const draft = await this.getServiceProvider(serviceProvider).draft.getDraft(
-      objectId
+    return this.getFromSource(
+      serviceProvider,
+      service => service.draft.getDraft(objectId),
+      draft => draft.links.map(link => link.link)
     );
-    if (draft) {
-      await this.discoverLinksSources(
-        draft.links.map(link => link.link),
-        serviceProvider
-      );
-    }
-    return draft;
   }
 
   setDraft(

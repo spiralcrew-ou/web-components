@@ -16,25 +16,23 @@ export class Perspective implements IPerspective {
   timestamp: number;
   contextId: string;
   name: string;
-  headId: string;
 
-  constructor(_origin, _creatorId, _timestamp, _contextId, _name, _headId) {
+  constructor(_origin, _creatorId, _timestamp, _contextId, _name) {
     this.id = null;
-    this.origin = _origin
-    this.creatorId = _creatorId
-    this.timestamp = _timestamp
-    this.contextId = _contextId
-    this.name = _name
-    this.headId = _headId
+    this.origin = _origin;
+    this.creatorId = _creatorId;
+    this.timestamp = _timestamp;
+    this.contextId = _contextId;
+    this.name = _name;
   }
 
   async setId(base: string, version: number, codec: string, type: string) {
     const plain = {
-      'origin': this.origin,
-      'creatorId': this.creatorId,
-      'timestamp': this.timestamp,
-      'contextId': this.contextId,
-      'name': this.name
+      origin: this.origin,
+      creatorId: this.creatorId,
+      timestamp: this.timestamp,
+      contextId: this.contextId,
+      name: this.name
     };
 
     this.id = await ipldService.generateCid(
@@ -42,12 +40,14 @@ export class Perspective implements IPerspective {
       base,
       version,
       codec,
-      type);
+      type
+    );
   }
 }
 
 export class Commit implements ICommit {
-  id?: string; creatorId: string;
+  id?: string;
+  creatorId: string;
   timestamp: number;
   message: string;
   parentsIds: string[];
@@ -55,20 +55,20 @@ export class Commit implements ICommit {
 
   constructor(_creatorId, _timestamp, _message, _parentsIds, _dataId) {
     this.id = null;
-    this.creatorId = _creatorId
-    this.timestamp = _timestamp
-    this.message = _message
-    this.parentsIds = _parentsIds
-    this.dataId = _dataId
+    this.creatorId = _creatorId;
+    this.timestamp = _timestamp;
+    this.message = _message;
+    this.parentsIds = _parentsIds;
+    this.dataId = _dataId;
   }
 
   async setId(base: string, version: number, codec: string, type: string) {
     const plain = {
-      'creatorId': this.creatorId,
-      'timestamp': this.timestamp,
-      'message': this.message,
-      'parentsIds': this.parentsIds,
-      'dataId': this.dataId
+      creatorId: this.creatorId,
+      timestamp: this.timestamp,
+      message: this.message,
+      parentsIds: this.parentsIds,
+      dataId: this.dataId
     };
 
     this.id = await ipldService.generateCid(
@@ -76,7 +76,8 @@ export class Commit implements ICommit {
       base,
       version,
       codec,
-      type);
+      type
+    );
   }
 }
 
@@ -88,16 +89,16 @@ export class Context implements IContext {
 
   constructor(_creatorId, _timestamp, _nonce) {
     this.id = null;
-    this.creatorId = _creatorId
-    this.timestamp = _timestamp
-    this.nonce = _nonce
+    this.creatorId = _creatorId;
+    this.timestamp = _timestamp;
+    this.nonce = _nonce;
   }
 
   async setId(base: string, version: number, codec: string, type: string) {
     const plain = {
-      'creatorId': this.creatorId,
-      'timestamp': this.timestamp,
-      'nonce': this.nonce
+      creatorId: this.creatorId,
+      timestamp: this.timestamp,
+      nonce: this.nonce
     };
 
     this.id = await ipldService.generateCid(
@@ -105,7 +106,8 @@ export class Context implements IContext {
       base,
       version,
       codec,
-      type);
+      type
+    );
   }
 }
 
@@ -120,16 +122,16 @@ export class TextNode implements ITextNode {
 
   constructor(_text: string, _type: string, _links: any) {
     this.id = null;
-    this.text = _text
-    this.type = _type
-    this.links = _links
+    this.text = _text;
+    this.type = _type;
+    this.links = _links;
   }
 
   async setId(base: string, version: number, codec: string, type: string) {
     const plain = {
-      'text': this.text,
-      'type': this.type,
-      'links': this.links,
+      text: this.text,
+      type: this.type,
+      links: this.links
     };
 
     this.id = await ipldService.generateCid(
@@ -137,27 +139,28 @@ export class TextNode implements ITextNode {
       base,
       version,
       codec,
-      type);
+      type
+    );
   }
 }
 
 export class Draft implements IDraft {
   perspectiveId: string;
   dataId: string;
-  id: string
+  id: string;
 
   constructor(_id: string, _perspectiveId: string, _dataId: string) {
-    this.id = _id
-    this.perspectiveId = _perspectiveId
-    this.dataId = _dataId
+    this.id = _id;
+    this.perspectiveId = _perspectiveId;
+    this.dataId = _dataId;
   }
 }
 
 export class KnownSources {
-  hash: string
-  sources: string[]
+  hash: string;
+  sources: string[];
   constructor(_hash, _sources) {
-    this.hash = _hash
-    this.sources = _sources
+    this.hash = _hash;
+    this.sources = _sources;
   }
 }
