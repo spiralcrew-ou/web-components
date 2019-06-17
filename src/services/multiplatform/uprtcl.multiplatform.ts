@@ -1,16 +1,17 @@
 import { UprtclService } from '../uprtcl.service';
 import { Context, Perspective, Commit, Dictionary } from '../../types';
-import { Multiplatform } from './multiplatform';
 import { DiscoveryService } from '../discovery.service';
+import { CachedMultiplatform } from './cached.multiplatform';
+import { UprtclLocal } from '../local/uprtcl.local';
 
-export class UprtclMultiplatform extends Multiplatform<UprtclService> {
+export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
   linksFromPerspective(perspective: Perspective) {
-    return [ perspective.contextId, perspective.headId ]
-  };
+    return [perspective.contextId, perspective.headId];
+  }
 
   linksFromCommit(commit: Commit) {
-    return [ commit.dataId, ...commit.parentsIds ]
-  };
+    return [commit.dataId, ...commit.parentsIds];
+  }
 
   constructor(
     serviceProviders: Dictionary<{
@@ -18,27 +19,30 @@ export class UprtclMultiplatform extends Multiplatform<UprtclService> {
       discovery: DiscoveryService;
     }>
   ) {
-    super(serviceProviders);
+    super(serviceProviders, new UprtclLocal());
   }
 
   async getContext(contextId: string): Promise<Context> {
-    return await this.discoverObject(contextId, (service, hash) =>
-      service.getContext(hash)
+    return await this.cachedDiscoverObject(
+      contextId,
+      service => service.getContext(contextId),
+      (service, context) => service.cloneContext(context)
     );
   }
 
   async getPerspective(perspectiveId: string): Promise<Perspective> {
     return await this.discoverObject(
       perspectiveId,
-      (service, hash) => service.getPerspective(hash),
-      perspective => [perspective.headId, perspective.contextId]
+      service => service.getPerspective(perspectiveId),
+      this.linksFromPerspective
     );
   }
 
   async getCommit(commitId: string): Promise<Commit> {
-    return await this.discoverObject(
+    return await this.cachedDiscoverObject(
       commitId,
-      (service, hash) => service.getCommit(hash),
+      service => service.getCommit(commitId),
+      (service, commit) => service.cloneCommit(commit),
       this.linksFromCommit
     );
   }
@@ -73,7 +77,7 @@ export class UprtclMultiplatform extends Multiplatform<UprtclService> {
   async getContextPerspectives(contextId: string): Promise<Perspective[]> {
     const perspectives = await this.getFromAllSources(
       contextId,
-      (service, hash) => service.getContextPerspectives(hash),
+      service => service.getContextPerspectives(contextId),
       (perspectives: Perspective[]) =>
         perspectives.reduce(
           (links, p) => [...links, ...this.linksFromPerspective(p)],
@@ -90,9 +94,11 @@ export class UprtclMultiplatform extends Multiplatform<UprtclService> {
     timestamp: number,
     nonce: number
   ): Promise<string> {
-    return this.createWithLinks(
+    return this.cachedCreateWithLinks(
       serviceProvider,
+      (service, hash) => service.getContext(hash),
       service => service.createContext(timestamp, nonce),
+      (service, context) => service.cloneContext(context),
       []
     );
   }
@@ -104,13 +110,17 @@ export class UprtclMultiplatform extends Multiplatform<UprtclService> {
     timestamp: number,
     headId: string
   ): Promise<string> {
+    (<UprtclLocal>this.cacheService).setCurrentOrigin(serviceProvider);
+
     const links = [contextId];
     if (headId) {
       links.push(headId);
     }
-    return this.createWithLinks(
+    return this.cachedCreateWithLinks(
       serviceProvider,
+      (service, hash) => service.getPerspective(hash),
       service => service.createPerspective(contextId, name, timestamp, headId),
+      (service, perspective) => service.clonePerspective(perspective),
       links
     );
   }
@@ -122,9 +132,12 @@ export class UprtclMultiplatform extends Multiplatform<UprtclService> {
     parentsIds: string[],
     dataId: string
   ): Promise<string> {
-    return this.createWithLinks(
+    debugger
+    return this.cachedCreateWithLinks(
       serviceProvider,
+      (service, hash) => service.getCommit(hash),
       service => service.createCommit(timestamp, message, parentsIds, dataId),
+      (service, commit) => service.cloneCommit(commit),
       [...parentsIds, dataId]
     );
   }
@@ -151,9 +164,7 @@ export class UprtclMultiplatform extends Multiplatform<UprtclService> {
     if (sources.length !== 1) {
       throw new Error('Perspective has more than one known source');
     }
-    return this.serviceProviders[sources[0]].service.updateHead(
-      perspectiveId,
-      headId
-    );
+
+    return this.cachedUpdateWithLinks(sources[0], service => service.updateHead(perspectiveId, headId), [headId]);
   }
 }

@@ -270,7 +270,7 @@ export class UprtclData {
     await this.data.setDraft(
       serviceProvider,
       perspectiveId,
-      new TextNode(content, [])
+      new TextNode(content, 'paragraph', [])
     );
 
     return perspectiveId;
@@ -393,7 +393,7 @@ export class UprtclData {
     }
 
     await this.data.setDraft(
-      serviceProvider, perspectiveId, new TextNode('', []));
+      serviceProvider, perspectiveId, new TextNode('', 'paragraph', []));
 
     return this.data.getDraft(serviceProvider, perspectiveId);
   }

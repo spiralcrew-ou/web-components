@@ -40,10 +40,12 @@ let uprtclConfig = {
 
 let dataConfig = {
   local: {
-    service: new DataLocal(),
     discovery: null,
-    draft: new DraftLocal()
-  }  
+    service: {
+      data: new DataLocal(),
+      draft: new DraftLocal()
+    }
+  }
 };
 
 if (c1Enabled) {
@@ -52,9 +54,11 @@ if (c1Enabled) {
     discovery: new DiscoveryCollectiveOne()
   };
   dataConfig[c1ServiceProvider] = {
-    service: new DataCollectiveOne(),
     discovery: new DiscoveryCollectiveOne(),
-    draft: new DraftCollectiveOne()
+    service: {
+      data: new DataCollectiveOne(),
+      draft: new DraftCollectiveOne()
+    }
   };
 }
 
@@ -64,14 +68,18 @@ if (holochainEnabled) {
     discovery: new DiscoveryHolochain()
   };
   dataConfig[holochainServiceProvider] = {
-    service: new DataHolochain(),
     discovery: new DiscoveryHolochain(),
-    draft: new DraftHolochain()
+    service: {
+      data: new DataHolochain(),
+      draft: new DraftHolochain()
+    }
   };
   dataConfig['ipfs'] = {
-    service: new DataIpfs('ipfs.infura.io'),
     discovery: null,
-    draft: null
+    service: {
+      data: new DataIpfs('ipfs.infura.io'),
+      draft: null
+    }
   };
 }
 
@@ -84,9 +92,11 @@ if (ethEnabled) {
     discovery: null
   };
   dataConfig[ethServiceProvider] = {
-    service: new DataLocal(),
     discovery: null,
-    draft: new DraftLocal()
+    service: {
+      data: new DataLocal(),
+      draft: new DraftLocal()
+    }
   };
 }
 

@@ -26,7 +26,7 @@ export class CoEditor {
 
   async componentWillLoad() {
     this.loading = true;
-    
+
     var currentTime = new Date().getTime();
 
     while (currentTime + 3000 >= new Date().getTime()) {
@@ -35,7 +35,7 @@ export class CoEditor {
     console.log('TODO: remove artificial delay to wait for eth contract instance... ')
 
     debugger
-    
+
     /** MVP assumes one root perspective per user in platform */
     const rootContextId = await this.uprtcl.getRootContextId(
       this.defaultService
@@ -44,7 +44,7 @@ export class CoEditor {
       rootContextId
     );
     this.rootPerspectiveId = rootPerspectives[0].id;
-    
+
     const draft = await this.dataService.getDraft(
       this.defaultService,
       this.rootPerspectiveId
@@ -115,28 +115,28 @@ export class CoEditor {
     return perspectiveId;
   }
 
-  async logUprtcl () {
+  async logUprtcl() {
     const perspectiveFull = await uprtclData.getPerspectiveFull(this.rootPerspectiveId, 10);
     console.log(perspectiveFull);
   }
 
   render() {
-    
+
     return (
       <div>
         {this.loading ? (
           <span>Loading...</span>
         ) : (
-          <div>
-            <button onClick={() => this.logUprtcl()}>Log</button>
-            <text-node 
-            id={this.perspectiveId} 
-            perspectiveId={this.perspectiveId} 
-            defaultService={this.defaultService}/>
-          </div>
-        )}
+            <div>
+              <button onClick={() => this.logUprtcl()}>Log</button>
+              <text-node
+                id={this.perspectiveId}
+                perspectiveId={this.perspectiveId}
+                defaultService={this.defaultService} />
+            </div>
+          )}
       </div>
     );
-    
+
   }
 }

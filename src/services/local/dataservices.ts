@@ -43,7 +43,7 @@ export const fetchPerspective = (_id: string) => {
 }
 
 export const insertPerspective = (perspective): Promise<any> => {
-  return db.perspectives.add(perspective)
+  return db.perspectives.put(perspective)
 }
 
 export const updatePerspectiveHead = (perspectiveId, commitId): Promise<any> => {
@@ -51,11 +51,11 @@ export const updatePerspectiveHead = (perspectiveId, commitId): Promise<any> => 
 }
 
 export const insertContext = (context): Promise<any> => {
-  return db.contexts.add(context)
+  return db.contexts.put(context)
 }
 
 export const insertCommit = (commit): Promise<any> => {
-  return db.commits.add(commit)
+  return db.commits.put(commit)
 }
 
 export const getContext = (contextId): Promise<any> => {
@@ -75,7 +75,7 @@ export const getCommit = (commitId: string): Promise<ICommit> => {
 }
 
 export const insertDraft = (draft: Draft): Promise<any> => {
-  return db.drafts.add(draft)
+  return db.drafts.put(draft)
 }
 
 export const getDraft = (id: string): Promise<any> => {
@@ -100,7 +100,7 @@ export const insertKnownSources = (knownSources: KnownSources): Promise<any> => 
 }
 
 export const insertTextNode = async (object: TextNode): Promise<any> => {
-  return db.textNode.add(object)
+  return db.textNode.put(object)
 }
 
 export const getTextNode = (id: string): Promise<TextNode> => {

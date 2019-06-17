@@ -2,22 +2,22 @@ import { Dictionary } from '../../types';
 import { DiscoveryService } from '../discovery.service';
 import { DiscoveryLocal } from '../local/discovery.local';
 
+export interface DiscoveryProvider<T> {
+  discovery: DiscoveryService;
+  service: T;
+}
+
 export class Multiplatform<T> {
   /**
    * Dictionary of service providers
    * Its key should be the identification of the source by other sources
    */
-  serviceProviders: Dictionary<{ service: T; discovery: DiscoveryService }>;
+  serviceProviders: Dictionary<DiscoveryProvider<T>>;
 
   // Stores the known sources locally
   knownSources: DiscoveryService = new DiscoveryLocal();
 
-  constructor(
-    serviceProviders: Dictionary<{
-      service: T;
-      discovery: DiscoveryService;
-    }>
-  ) {
+  constructor(serviceProviders: Dictionary<DiscoveryProvider<T>>) {
     this.serviceProviders = serviceProviders;
   }
 
@@ -82,12 +82,12 @@ export class Multiplatform<T> {
   private async getFromSource<O>(
     source: string,
     hash: string,
-    getter: (service: T, hash: string) => Promise<O>,
+    getter: (service: T) => Promise<O>,
     linksSelector: (object: O) => string[] = () => []
   ): Promise<O> {
     try {
       // Try to retrieve the object
-      const object = await getter(this.serviceProviders[source].service, hash);
+      const object = await getter(this.serviceProviders[source].service);
 
       if (object) {
         // Object retrieved successfully, discover the known sources of the links the object points to
@@ -116,7 +116,7 @@ export class Multiplatform<T> {
    */
   protected async discoverObject<O>(
     hash: string,
-    getter: (service: T, hash: string) => Promise<O>,
+    getter: (service: T) => Promise<O>,
     linksSelector: (object: O) => string[] = () => []
   ): Promise<O> {
     if (typeof hash !== 'string') {
@@ -138,7 +138,9 @@ export class Multiplatform<T> {
     }
 
     // All known sources failed, throw error
-    throw new Error(`Object with hash ${hash} not found in any of the known sources`);
+    throw new Error(
+      `Object with hash ${hash} not found in any of the known sources`
+    );
   }
 
   /**
@@ -151,14 +153,14 @@ export class Multiplatform<T> {
    */
   protected async getFromAllSources<O>(
     hash: string,
-    getter: (service: T, hash: string) => Promise<O>,
+    getter: (service: T) => Promise<O>,
     linksSelector: (object: O) => string[] = () => [],
     idSelector: (object: O) => string = o => o['id']
   ): Promise<Array<O>> {
     if (typeof hash !== 'string') {
       return null;
     }
-    
+
     let results = [];
 
     // Iterate through the known sources until a source successfully returns the array of objects
@@ -188,6 +190,39 @@ export class Multiplatform<T> {
   }
 
   /**
+   * Executes the given modify function in the given service provider,
+   * and stores the known sources of the given links on that service provider's discovery module
+   */
+  private async modifyWithLinks<S>(
+    serviceProvider: string,
+    modifier: (service: T) => Promise<S>,
+    linksToObjects: string[]
+  ): Promise<S> {
+    // Execute the given modifier function in the service provider
+    const newHash = await modifier(this.getServiceProvider(serviceProvider));
+
+    // Get the discovery service for the given service provider
+    const discoveryService = this.serviceProviders[serviceProvider].discovery;
+    // TODO: check if this known source should be source or serviceProvider
+    // const source = await discoveryService.getOwnSource();
+
+    if (discoveryService) {
+      // Stores the links contained in the object in the discovery service of the given service provider
+      await Promise.all(
+        linksToObjects.map(async link => {
+          const knownLinkSources = await this.knownSources.getKnownSources(
+            link
+          );
+          
+          await discoveryService.addKnownSources(link, knownLinkSources);
+        })
+      );
+    }
+
+    return newHash;
+  }
+
+  /**
    * Creates the object in the given service provider,
    * stores it in the local known sources
    * and stores the known sources of its links in the discovery service of the given service provider
@@ -203,31 +238,31 @@ export class Multiplatform<T> {
     linksToObjects: string[]
   ): Promise<string> {
     // Create the object in the service provider
-    const newHash = await creator(
-      this.serviceProviders[serviceProvider].service
+    const newHash = await this.modifyWithLinks(
+      serviceProvider,
+      creator,
+      linksToObjects
     );
-
-    // Get the discovery service for the given service provider
-    const discoveryService = this.serviceProviders[serviceProvider].discovery;
-    // TODO: check if this known source should be source or serviceProvider
-    // const source = await discoveryService.getOwnSource();
 
     // Add the newly created object to the local known sources
     await this.knownSources.addKnownSources(newHash, [serviceProvider]);
 
-    if (discoveryService) {
-      // Stores the links contained in the object in the discovery service of the given service provider
-      await Promise.all(
-        linksToObjects.map(async link => {
-          const knownLinkSources = await this.knownSources.getKnownSources(
-            link
-          );
-          await discoveryService.addKnownSources(link, knownLinkSources);
-        })
-      );
-    }
-
     return newHash;
+  }
+
+  /**
+   * Executes the given update function on the given service provider
+   *
+   * @param serviceProvider
+   * @param updater
+   * @param linksToObjects
+   */
+  public async updateWithLinks(
+    serviceProvider: string,
+    updater: (service: T) => Promise<void>,
+    linksToObjects: string[]
+  ): Promise<void> {
+    return this.modifyWithLinks(serviceProvider, updater, linksToObjects);
   }
 
   /**

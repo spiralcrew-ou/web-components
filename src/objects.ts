@@ -53,12 +53,12 @@ export class Commit implements ICommit {
   parentsIds: string[];
   dataId: string;
 
-  constructor(_creatorId, _timestamp, _message, _parentsId, _dataId) {
+  constructor(_creatorId, _timestamp, _message, _parentsIds, _dataId) {
     this.id = null;
     this.creatorId = _creatorId
     this.timestamp = _timestamp
     this.message = _message
-    this.parentsIds = _parentsId
+    this.parentsIds = _parentsIds
     this.dataId = _dataId
   }
 
@@ -118,15 +118,17 @@ export class TextNode implements ITextNode {
     link: string;
   }[];
 
-  constructor(_text: string, _links: any) {
+  constructor(_text: string, _type: string, _links: any) {
     this.id = null;
     this.text = _text
+    this.type = _type
     this.links = _links
   }
 
   async setId(base: string, version: number, codec: string, type: string) {
     const plain = {
       'text': this.text,
+      'type': this.type,
       'links': this.links,
     };
 

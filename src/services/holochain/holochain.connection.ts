@@ -7,7 +7,7 @@ export interface EntryResult<T = any> {
 }
 
 const host = 'ws://3.130.73.99:80';
-// const host = 'ws://localhost:8888';
+//const host = 'ws://localhost:8888';
 
 export class HolochainConnection {
   connection: (funcName: string, params: any) => Promise<any>;
