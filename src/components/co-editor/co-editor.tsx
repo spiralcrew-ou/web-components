@@ -26,8 +26,16 @@ export class CoEditor {
 
   async componentWillLoad() {
     this.loading = true;
-    debugger
+    
+    var currentTime = new Date().getTime();
 
+    while (currentTime + 3000 >= new Date().getTime()) {
+    }
+
+    console.log('TODO: remove artificial delay to wait for eth contract instance... ')
+
+    debugger
+    
     /** MVP assumes one root perspective per user in platform */
     const rootContextId = await this.uprtcl.getRootContextId(
       this.defaultService

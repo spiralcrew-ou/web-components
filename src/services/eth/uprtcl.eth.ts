@@ -11,7 +11,32 @@ import Web3 from 'web3';
 import * as UprtclContractArtifact from './Uprtcl.json';
 import contract from 'truffle-contract';
 
-const userId = 'asdasdsadas';
+const userId = 'did:sec256k1:mykey';
+const web3 = window['web3'];
+const ethereum = window['ethereum'];
+
+const getProvider = (host: string) => {
+  let web3Provider = null;
+  if (ethereum) {
+    web3Provider = ethereum;
+    try {
+      // Request account access
+      ethereum.enable();
+    } catch (error) {
+      // User denied account access...
+      console.error("User denied account access")
+    }
+  }
+  // Legacy dapp browsers...
+  else if (web3) {
+    web3Provider = new Web3(web3.currentProvider);
+  }
+  // If no injected web3 instance is detected, fall back to Ganache
+  else {
+    web3Provider = new Web3(new Web3.providers.HttpProvider(host));
+  }
+  return web3Provider;
+}
 
 export class UprtclEthereum implements UprtclService {
 
@@ -20,14 +45,26 @@ export class UprtclEthereum implements UprtclService {
   UprtclContract = null;
   uprtclInstance = null;
   loggedAccount = null;
+  accounts = []
 
   constructor(host: string) {
     this.ipfsClient = new IpfsStub();
-    this.web3 = new Web3.providers.HttpProvider(host);
+    this.web3 = getProvider(host);
     this.UprtclContract = contract(UprtclContractArtifact);
-    this.UprtclContract.setProvider();
-    this.uprtclInstance = this.UprtclContract.deployed();
-    this.loggedAccount = this.web3.accounts[0];
+    this.UprtclContract.setProvider(this.web3);
+    this.accounts = this.web3.eth.accounts;
+    console.log(this.accounts);
+  }
+
+  async setInstance() : Promise<void> {
+    new Promise((resolve, reject) => {
+      this.UprtclContract.deployed((instance) => {
+        this.uprtclInstance = instance;
+        resolve()
+      }).catch(error => {
+        reject(error);
+      });
+    })
   }
 
   private async hash(data: string) : Promise<string> {
@@ -143,14 +180,14 @@ export class UprtclEthereum implements UprtclService {
     await this.uprtclInstance
       .methods['addPerspective(bytes32,bytes32,address)']
       (perspectiveIdHash, contextIdHash, userId,
-      { from: this.loggedAccount });
+      { from: this.accounts[0] });
 
     let headParts = this.cidToBytes32(_headCid);
 
     return this.uprtclInstance
       .methods['updateHead(bytes32,bytes32,bytes32)']
       (perspectiveIdHash, headParts[0], headParts[1],
-      { from: this.loggedAccount });
+      { from: this.accounts[0] });
   }
 
   async createCommit(
