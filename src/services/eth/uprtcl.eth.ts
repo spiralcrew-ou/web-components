@@ -1,70 +1,23 @@
 import { UprtclService } from '../uprtcl.service';
 import { Context, Commit, Perspective } from './../../objects';
 
+import { EthereumConnection } from './eth.connection';
 import { IpfsStub } from './ipfs.data.stub';
 
 import CID from 'cids';
 import multihashing from 'multihashing-async';
 import Buffer from 'buffer/';
 
-import Web3 from 'web3';
-import * as UprtclContractArtifact from './Uprtcl.json';
-import contract from 'truffle-contract';
-
 const userId = 'did:sec256k1:mykey';
-const web3 = window['web3'];
-const ethereum = window['ethereum'];
-
-const getProvider = (host: string) => {
-  let web3Provider = null;
-  if (ethereum) {
-    web3Provider = ethereum;
-    try {
-      // Request account access
-      ethereum.enable();
-    } catch (error) {
-      // User denied account access...
-      console.error("User denied account access")
-    }
-  }
-  // Legacy dapp browsers...
-  else if (web3) {
-    web3Provider = new Web3(web3.currentProvider);
-  }
-  // If no injected web3 instance is detected, fall back to Ganache
-  else {
-    web3Provider = new Web3(new Web3.providers.HttpProvider(host));
-  }
-  return web3Provider;
-}
 
 export class UprtclEthereum implements UprtclService {
 
   ipfsClient = null;
-  web3 = null;
-  UprtclContract = null;
-  uprtclInstance = null;
-  loggedAccount = null;
-  accounts = []
+  ethereum = null;
 
   constructor(host: string) {
     this.ipfsClient = new IpfsStub();
-    this.web3 = getProvider(host);
-    this.UprtclContract = contract(UprtclContractArtifact);
-    this.UprtclContract.setProvider(this.web3);
-    this.accounts = this.web3.eth.accounts;
-    console.log(this.accounts);
-  }
-
-  async setInstance() : Promise<void> {
-    new Promise((resolve, reject) => {
-      this.UprtclContract.deployed((instance) => {
-        this.uprtclInstance = instance;
-        resolve()
-      }).catch(error => {
-        reject(error);
-      });
-    })
+    this.ethereum = new EthereumConnection(host);
   }
 
   private async hash(data: string) : Promise<string> {
@@ -102,7 +55,7 @@ export class UprtclEthereum implements UprtclService {
     persp.id = perspectiveId;
 
     /** Head comes from ethereum */
-    const result = await this.uprtclInstance.getPerspective(perspectiveId);
+    const result = await this.ethereum.uprtclInstance.getPerspective(perspectiveId);
     persp.headId = result.head;
 
     return persp;
@@ -124,16 +77,21 @@ export class UprtclEthereum implements UprtclService {
   }
 
   async getContextPerspectives(contextId: string): Promise<Perspective[]> {
+    debugger
+    const contextIdHash = await this.hash(contextId);
+    let event = this.ethereum.uprtclInstance.PerspectiveAdded(
+      { contextId: contextIdHash },
+      { fromBlock: 0 });
 
-    let events = await this.uprtclInstance.PerspectiveAdded(
-      {
-        filter: {
-          contextId: contextId
-        },
-        fromBlock: 0
-      }).getPromise();
+    event.get((error, events) => {
+      console.log(events);
+      console.log(events);
+    });
+
+    /** 
 
     let perspectiveIds = events.map(e => e.perspectiveId);
+
 
     // TODO: paralelize calls with Promise.all
     let perspectives = [];
@@ -143,6 +101,9 @@ export class UprtclEthereum implements UprtclService {
     } 
 
     return perspectives;
+    */
+
+    return [];
   }
 
   async createContext(
@@ -177,17 +138,17 @@ export class UprtclEthereum implements UprtclService {
     let perspectiveIdHash = this.hash(perspectiveId);
     let contextIdHash = this.hash(_contextId);
     
-    await this.uprtclInstance
+    await this.ethereum.uprtclInstance
       .methods['addPerspective(bytes32,bytes32,address)']
       (perspectiveIdHash, contextIdHash, userId,
-      { from: this.accounts[0] });
+      { from: this.ethereum.web3.accounts[0] });
 
     let headParts = this.cidToBytes32(_headCid);
 
-    return this.uprtclInstance
+    return this.ethereum.uprtclInstance
       .methods['updateHead(bytes32,bytes32,bytes32)']
       (perspectiveIdHash, headParts[0], headParts[1],
-      { from: this.accounts[0] });
+      { from: this.ethereum.uprtclInstance[0] });
   }
 
   async createCommit(
@@ -209,16 +170,13 @@ export class UprtclEthereum implements UprtclService {
   }
 
   cloneContext(context: Context): Promise<string> {
-    console.log(context);
-    throw new Error('ethereum cannot clone contexts');
+    return this.ipfsClient.createData(context);
   }
   clonePerspective(perspective: Perspective): Promise<string> {
-    console.log(perspective);
-    throw new Error('ethereum cannot clone perspectives');
+    return this.ipfsClient.createData(perspective);
   }
   cloneCommit(commit: Commit): Promise<string> {
-    console.log(commit);
-    throw new Error('ethereum cannot clone commits');
+    return this.ipfsClient.createData(commit);
   }
 
   async updateHead(perspectiveId: string, commitId: string): Promise<void> {

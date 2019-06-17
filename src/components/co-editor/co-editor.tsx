@@ -4,7 +4,7 @@ import {
   dataMultiplatform,
   // c1ServiceProvider as serviceProvider,
   ethServiceProvider as serviceProvider
-  //localServiceProvider as serviceProvider
+  // localServiceProvider as serviceProvider
 } from '../../services';
 import { uprtclData } from '../../services/uprtcl-data';
 import { TextNode } from '../../types';
@@ -26,14 +26,7 @@ export class CoEditor {
 
   async componentWillLoad() {
     this.loading = true;
-
-    var currentTime = new Date().getTime();
-
-    while (currentTime + 3000 >= new Date().getTime()) {
-    }
-
-    console.log('TODO: remove artificial delay to wait for eth contract instance... ')
-
+    
     debugger
 
     /** MVP assumes one root perspective per user in platform */
