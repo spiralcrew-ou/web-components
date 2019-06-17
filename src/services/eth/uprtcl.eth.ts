@@ -77,21 +77,17 @@ export class UprtclEthereum implements UprtclService {
   }
 
   async getContextPerspectives(contextId: string): Promise<Perspective[]> {
-    debugger
+    debugger;
+    await this.ethereum.ready();
     const contextIdHash = await this.hash(contextId);
-    let event = this.ethereum.uprtclInstance.PerspectiveAdded(
-      { contextId: contextIdHash },
-      { fromBlock: 0 });
-
-    event.get((error, events) => {
-      console.log(events);
-      console.log(events);
-    });
-
-    /** 
-
-    let perspectiveIds = events.map(e => e.perspectiveId);
-
+    let events = await this.ethereum.uprtclInstance.getPastEvents(
+      'PerspectiveAdded', {
+        filter: { contextId: contextIdHash },
+        fromBlock: 0
+      }
+    )
+    
+    let perspectiveIds = events.map(e => e.args.perspectiveId);
 
     // TODO: paralelize calls with Promise.all
     let perspectives = [];
@@ -101,9 +97,6 @@ export class UprtclEthereum implements UprtclService {
     } 
 
     return perspectives;
-    */
-
-    return [];
   }
 
   async createContext(
@@ -123,6 +116,9 @@ export class UprtclEthereum implements UprtclService {
     _name: string,
     _timestamp: number,
     _headCid: string) : Promise<string> {
+
+    debugger;
+    await this.ethereum.ready();
 
     let perspective = {
       'origin': 'eth://XXXXX',
@@ -157,6 +153,8 @@ export class UprtclEthereum implements UprtclService {
     _parentsIds: string[],
     _dataId: string
   ) {
+    debugger;
+    await this.ethereum.ready();
 
     let commit: Commit = new Commit(
       userId,

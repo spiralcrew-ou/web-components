@@ -6226,10 +6226,16 @@
       "links": {},
       "address": "0x6fcE1eD1b0C9b9892491fFbE9f2EeD53A52E8512",
       "transactionHash": "0x9fc1e833b5c20fb1bac99fc2cceceef98b80e90b6651147c25260c14872583bb"
+    },
+    "1560781481653": {
+      "events": {},
+      "links": {},
+      "address": "0x7880713E8d5122c0f46660a7E2C4F62267dED1D5",
+      "transactionHash": "0x18d2736d39670741d4dcb92d104b116ebe676e3da0d20c2487e1457eb5092dfc"
     }
   },
   "schemaVersion": "3.0.9",
-  "updatedAt": "2019-06-17T08:04:21.420Z",
+  "updatedAt": "2019-06-17T14:29:30.987Z",
   "devdoc": {
     "methods": {}
   },

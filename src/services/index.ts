@@ -85,7 +85,7 @@ if (holochainEnabled) {
 
 if (ethEnabled) {
   uprtclConfig[ethServiceProvider] = {
-    service: new UprtclEthereum('http://127.0.0.1:7545'),
+    service: new UprtclEthereum('ws://127.0.0.1:8545'),
     discovery: null
   };
   dataConfig[ethServiceProvider] = {
