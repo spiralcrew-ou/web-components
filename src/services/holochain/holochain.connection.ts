@@ -6,17 +6,47 @@ export interface EntryResult<T = any> {
   type: string;
 }
 
-const host = 'ws://3.130.73.99:80';
-//const host = 'ws://localhost:8888';
+//const host = 'ws://3.130.73.99:80';
+const host = 'ws://localhost:8888';
 
 export class HolochainConnection {
+  instanceId: string;
+  zome: string;
   connection: (funcName: string, params: any) => Promise<any>;
   connectionReady: Promise<any>;
 
   constructor(instanceId: string, zome: string) {
-    this.connectionReady = connect(host).then(({ callZome }) => {
-      this.connection = async (funcName: string, params: any) =>
-        await callZome(instanceId, zome, funcName)(params);
+    this.instanceId = instanceId;
+    this.zome = zome;
+    this.connect();
+  }
+
+  onSocketClose() {
+    console.log('connection with websocket closed, retrying');
+    this.connection = null;
+    this.connectionReady = Promise.reject();
+    const retryInterval = setInterval(() => {
+      this.connect();
+      if (this.connection) {
+        console.log('connection with websocket reestablished');
+        clearInterval(retryInterval);
+      }
+    }, 5000);
+  }
+
+  connect() {
+    this.connectionReady = new Promise((resolve, reject) => {
+      connect(host).then(({ callZome, ws }) => {
+        ws.socket.socket.onclose = () => this.onSocketClose();
+        this.connection = async (funcName: string, params: any) =>
+          await callZome(this.instanceId, this.zome, funcName)(params);
+        resolve();
+      });
+      setTimeout(() => {
+        if (!this.connection) {
+          reject();
+        }
+      }, 3000);
     });
   }
 

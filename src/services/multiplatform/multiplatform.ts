@@ -76,24 +76,47 @@ export class Multiplatform<T> {
     }
   }
 
+  /**
+   * Gets the object identified with the given hash from the given source
+   */
   protected async getFromSource<O>(
     source: string,
     getter: (service: T) => Promise<O>,
-    linksSelector: (object: O) => string[] = () => []
+    linksSelector: (object: O) => string[] = () => [],
+    idSelector: (object: O) => string = o => o['id']
   ): Promise<O> {
     // Try to retrieve the object
     const object = await getter(this.serviceProviders[source].service);
 
     if (object) {
-      // Object retrieved successfully, discover the known sources of the links the object points to
-      const links = linksSelector(object);
-      await this.discoverLinksSources(source, links);
+      const discoveryPromises = [];
+      if (!(object instanceof Array)) {
+
+        // Object retrieved successfully, discover the known sources of the links the object points to
+        const links = linksSelector(object);
+        await this.discoverLinksSources(source, links);
+
+      } else {
+        // If object is an array, we should add to the known sources each element of the array
+        discoveryPromises.concat(
+          object.map(element =>
+            this.knownSources.addKnownSources(idSelector(element), [source])
+          )
+        );
+        discoveryPromises.concat(
+          object.map(element =>
+            this.discoverLinksSources(source, linksSelector(element))
+          )
+        );
+        await Promise.all(discoveryPromises);
+      }
     }
     return object;
   }
 
   /**
-   * Gets the object identified with the given hash from the given source
+   * Gets the object identified with the given hash from the given source,
+   * removing it from known sources if the source does not have the object
    */
   private async tryGetFromSource<O>(
     source: string,
@@ -164,39 +187,26 @@ export class Multiplatform<T> {
   protected async getFromAllSources<O>(
     hash: string,
     getter: (service: T) => Promise<O>,
-    linksSelector: (object: O) => string[] = () => [],
-    idSelector: (object: O) => string = o => o['id']
+    linksSelector: (object: O) => string[] = () => []
   ): Promise<Array<O>> {
     if (typeof hash !== 'string') {
       return null;
     }
 
-    let results = [];
-
-    // Iterate through the known sources until a source successfully returns the array of objects
-    for (const source of this.getServiceProviders()) {
+    const promises = this.getServiceProviders().map(async serviceProvider => {
       const object = await this.tryGetFromSource(
-        source,
+        serviceProvider,
         hash,
         getter,
         linksSelector
       );
-      if (object) {
-        // If object is an array, we should add to the known sources each element of the array
-        if (object instanceof Array) {
-          const addToKnownSources = object.map(element =>
-            this.knownSources.addKnownSources(idSelector(element), [source])
-          );
-          await Promise.all(addToKnownSources);
-        } else {
-          await this.knownSources.addKnownSources(hash, [source]);
-        }
-
-        results.push(object);
+      if (object && !(object instanceof Array)) {
+        await this.knownSources.addKnownSources(hash, [serviceProvider]);
       }
-    }
+      return object;
+    });
 
-    return results;
+    return Promise.all(promises);
   }
 
   /**

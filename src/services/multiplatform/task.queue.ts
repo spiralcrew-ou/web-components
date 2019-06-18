@@ -1,7 +1,7 @@
-export type Task = () => any;
+export type Task = () => Promise<any>;
 
 export class TaskQueue {
-  retryInterval = null; 
+  retryInterval = null;
   intervalTime = 3000; // Milliseconds
 
   queue: Task[] = [];
@@ -14,22 +14,32 @@ export class TaskQueue {
     // Clear queue
     const queue = this.queue;
     this.queue = [];
-    
-    this.retryInterval = null; 
+
+    // Clear interval
+    clearInterval(this.retryInterval);
+    this.retryInterval = null;
 
     for (const task of queue) {
       this.runTask(task);
     }
   }
 
-  private runTask(task: Task) {
+  private async runTask(task: Task) {
     try {
-      task();
+      // Try to execute task
+      await task();
     } catch (e) {
+      console.log(
+        `Task failed, retrying in ${this.intervalTime / 1000}s`,
+        task
+      );
       this.queue.push(task);
 
       if (this.retryInterval == null) {
-        this.retryInterval = setInterval(this.runTasks, this.intervalTime);
+        this.retryInterval = setInterval(
+          () => this.runTasks(),
+          this.intervalTime
+        );
       }
     }
   }

@@ -1,7 +1,6 @@
 import { UprtclMultiplatform } from './multiplatform/uprtcl.multiplatform';
 import { DataMultiplatform } from './multiplatform/data.multiplatform';
 
-import { UprtclLocal } from './local/uprtcl.local';
 import { DataLocal } from './local/data.local';
 import { DraftLocal } from './local/draft.local';
 
@@ -21,32 +20,17 @@ import { DataIpfs } from './data.ipfs';
 
 export const holochainEnabled = false;
 export const holochainServiceProvider =
-  'holochain://QmQzVGkmPJN2jX2Jsdc9Rg7oCayc3QKLeVPyWh9Bpd1hdk';
+  'holochain://Qmag7yGbYSMhkzDZLnSJkc4pzNWpHLtfP5o2jL8jGF4W5w';
 
 export const c1Enabled = false;
 export const c1ServiceProvider = 'https://www.collectiveone.org/uprtcl/1';
 
-export const ethEnabled = true;
+export const ethEnabled = false;
 export const ethServiceProvider = 'eth://smartContract';
 
-export const localServiceProvider = 'local';
+let uprtclConfig = {};
 
-let uprtclConfig = {
-  local: {
-    service: new UprtclLocal(),
-    discovery: null
-  }
-};
-
-let dataConfig = {
-  local: {
-    discovery: null,
-    service: {
-      data: new DataLocal(),
-      draft: new DraftLocal()
-    }
-  }
-};
+let dataConfig = {};
 
 if (c1Enabled) {
   uprtclConfig[c1ServiceProvider] = {
@@ -74,6 +58,7 @@ if (holochainEnabled) {
       draft: new DraftHolochain()
     }
   };
+
   dataConfig['ipfs'] = {
     discovery: null,
     service: {

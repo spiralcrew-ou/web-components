@@ -26,7 +26,8 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
     return await this.cachedDiscover(
       contextId,
       service => service.getContext(contextId),
-      (service, context) => service.createContext(context)
+      (service, context) => service.createContext(context),
+      () => []
     );
   }
 
@@ -49,22 +50,34 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
   }
 
   async getRootContextId(serviceProvider: string): Promise<string> {
-    return this.getServiceProvider(serviceProvider).getRootContextId();
+    try {
+      const rootContextId = await this.getServiceProvider(serviceProvider).getRootContextId();
+      await (<UprtclLocal>this.cacheService).setProviderRootContextId(serviceProvider, rootContextId);
+      return rootContextId;
+    } catch(e) {
+      return (<UprtclLocal>this.cacheService).getProviderRootContextId(serviceProvider);
+    }
   }
 
   async getContextPerspectives(contextId: string): Promise<Perspective[]> {
-    const perspectives = await this.getFromAllSources(
-      contextId,
-      service => service.getContextPerspectives(contextId),
-      (perspectives: Perspective[]) =>
-        perspectives.reduce(
-          (links, p) => [...links, ...this.linksFromPerspective(p)],
-          []
-        )
-    );
+    const getter = service => service.getContextPerspectives(contextId);
 
-    // Flatten the perspective array
-    return perspectives.reduce((a, e) => a.concat(...e), []);
+    const sourcesGetter = () =>
+      this.getFromAllSources(
+        contextId,
+        getter,
+        (perspectives: Perspective[]) => {
+          const flat = Array.prototype.concat.apply([], perspectives);
+          return flat.map(p => this.linksFromPerspective(p));
+        }
+      ).then(perspectives => Array.prototype.concat.apply([], perspectives));
+
+    const clonePerspectives = (service, perspectives: Perspective[]) =>
+      Promise.all(perspectives.map(p => service.createPerspective(p)));
+
+    return this.fallback(sourcesGetter, clonePerspectives, service =>
+      service.getContextPerspectives(contextId)
+    );
   }
 
   createContext(serviceProvider: string, context: Context): Promise<string> {
@@ -105,10 +118,15 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
     }
 
     const origin = perspective.origin;
-    return this.fallbackGet(
-      origin,
-      service => service.getHead(perspectiveId),
-      headId => [headId]
+    return this.fallback(
+      () =>
+        this.getFromSource(
+          origin,
+          s => s.getHead(perspectiveId),
+          headId => [headId]
+        ),
+      (service, headId) => service.updateHead(perspectiveId, headId),
+      service => service.getHead(perspectiveId)
     );
   }
 

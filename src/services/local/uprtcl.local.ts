@@ -15,6 +15,7 @@ import { ipldService } from '../ipld';
 //import { hcCid as cidConfig } from './cid.config';
 
 export class UprtclLocal extends Dexie implements UprtclService {
+  rootContexts: Dexie.Table<string, string>;
   contexts: Dexie.Table<Context, string>;
   perspectives: Dexie.Table<Perspective, string>;
   heads: Dexie.Table<string, string>;
@@ -23,15 +24,17 @@ export class UprtclLocal extends Dexie implements UprtclService {
   constructor() {
     super('_prtcl');
     this.version(0.1).stores({
+      rootContexts: '',
       perspectives: 'id,contextId',
       heads: '',
       commits: 'id',
       contexts: 'id'
     });
+    this.rootContexts = this.table('rootContexts');
     this.contexts.mapToClass(Context);
     this.perspectives.mapToClass(Perspective);
-    this.commits.mapToClass(Commit);
     this.heads = this.table('heads');
+    this.commits.mapToClass(Commit);
   }
 
   generateCid(object: any, propertyOrder: string[]) {
@@ -64,6 +67,14 @@ export class UprtclLocal extends Dexie implements UprtclService {
 
   async getRootContextId(): Promise<string> {
     throw new Error('not implemented');
+  }
+
+  getProviderRootContextId(serviceProvider: string): Promise<string> {
+    return this.rootContexts.get(serviceProvider);  
+  }
+
+  async setProviderRootContextId(serviceProvider: string, rootContextId: string): Promise<void> {
+    await this.rootContexts.put(rootContextId, serviceProvider);
   }
 
   async getContextPerspectives(contextId: string): Promise<IPerspective[]> {

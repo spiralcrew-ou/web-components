@@ -12,6 +12,8 @@ export interface DataProvider {
 }
 
 export class DataMultiplatform extends CachedMultiplatform<DataProvider> {
+  linksFromTextNode = node => node.links.map(link => link.link);
+
   constructor(serviceProviders: Dictionary<DiscoveryProvider<DataProvider>>) {
     super(serviceProviders, { data: new DataLocal(), draft: new DraftLocal() });
   }
@@ -21,7 +23,7 @@ export class DataMultiplatform extends CachedMultiplatform<DataProvider> {
       dataId,
       service => service.data.getData(dataId),
       (service, data) => service.data.createData(data),
-      data => data.links.map(link => link.link)
+      this.linksFromTextNode
     );
   }
 
@@ -30,15 +32,22 @@ export class DataMultiplatform extends CachedMultiplatform<DataProvider> {
       serviceProvider,
       data,
       (service, object) => service.data.createData(object),
-      data.links.map(link => link.link)
+      this.linksFromTextNode(data)
     );
   }
 
   async getDraft(serviceProvider: string, objectId: string): Promise<TextNode> {
-    return this.getFromSource(
-      serviceProvider,
-      service => service.draft.getDraft(objectId),
-      draft => draft.links.map(link => link.link)
+    const sourceGetter = () =>
+      this.getFromSource(
+        serviceProvider,
+        service => service.draft.getDraft(objectId),
+        this.linksFromTextNode
+      );
+
+    return this.fallback(
+      sourceGetter,
+      (service, draft) => service.draft.setDraft(objectId, draft),
+      service => service.draft.getDraft(objectId)
     );
   }
 
@@ -47,9 +56,10 @@ export class DataMultiplatform extends CachedMultiplatform<DataProvider> {
     objectId: string,
     draft: any
   ): Promise<any> {
-    return this.getServiceProvider(serviceProvider).draft.setDraft(
-      objectId,
-      draft
+    return this.optimisticUpdate(
+      serviceProvider,
+      service => service.draft.setDraft(objectId, draft),
+      this.linksFromTextNode(draft)
     );
   }
 }
