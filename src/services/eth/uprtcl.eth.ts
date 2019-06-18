@@ -1,14 +1,13 @@
 import { UprtclService } from '../uprtcl.service';
 import { Context, Commit, Perspective } from './../../objects';
 
-import { IpfsStub } from './ipfs.data.stub';
-
 import multihashing from 'multihashing-async';
 import Buffer from 'buffer/';
 
 import Web3 from 'web3';
 import * as UprtclContractArtifact from './Uprtcl.json';
 import contract from 'truffle-contract';
+import { IpfsClient } from './ipfs.client';
 
 const userId = 'did:sec256k1:mykey';
 const web3 = window['web3'];
@@ -38,7 +37,7 @@ const getProvider = (host: string) => {
 };
 
 export class UprtclEthereum implements UprtclService {
-  ipfsClient = null;
+  ipfsClient: IpfsClient = null;
   web3 = null;
   UprtclContract = null;
   uprtclInstance = null;
@@ -46,7 +45,7 @@ export class UprtclEthereum implements UprtclService {
   accounts = [];
 
   constructor(host: string) {
-    this.ipfsClient = new IpfsStub();
+    this.ipfsClient = new IpfsClient();
     this.web3 = getProvider(host);
     this.UprtclContract = contract(UprtclContractArtifact);
     this.UprtclContract.setProvider(this.web3);
@@ -70,13 +69,25 @@ export class UprtclEthereum implements UprtclService {
     return '0x' + encoded.toString('hex');
   }
 
+  /* 
+  Maybe this will be useful?
+  Needs dependency bs58, but maybe we can use multihash
+  // Return base58 encoded ipfs hash from bytes32 hex string,
+  getIpfsHashFromBytes32(bytes32Hex) {
+    const hashHex = '1220' + bytes32Hex.slice(2);
+    const hashBytes = Buffer.from(hashHex, 'hex');
+    const hashStr = bs58.encode(hashBytes);
+    return hashStr;
+  }
+ */
+
   async getContext(contextId: string): Promise<Context> {
-    return this.ipfsClient.getData(contextId);
+    return this.ipfsClient.get(contextId);
   }
 
   async getPerspective(perspectiveId: string): Promise<Perspective> {
     /** Content addressable part comes from IPFS */
-    const persp = await this.ipfsClient.getData(perspectiveId);
+    const persp = await this.ipfsClient.get(perspectiveId);
     persp.id = perspectiveId;
 
     /** Head comes from ethereum */
@@ -87,7 +98,7 @@ export class UprtclEthereum implements UprtclService {
   }
 
   async getCommit(commitId: string): Promise<Commit> {
-    return this.ipfsClient.getData(commitId);
+    return this.ipfsClient.get(commitId);
   }
 
   /**
@@ -97,7 +108,7 @@ export class UprtclEthereum implements UprtclService {
    */
   async getRootContextId(): Promise<string> {
     const context = new Context(userId, 0, 0);
-    return this.ipfsClient.getObjectId(context);
+    return this.ipfsClient.addObject(context, { onlyHash: true });
   }
 
   async getContextPerspectives(contextId: string): Promise<Perspective[]> {
@@ -123,12 +134,12 @@ export class UprtclEthereum implements UprtclService {
   }
 
   async createContext(context: Context): Promise<string> {
-    return this.ipfsClient.createData(context);
+    return this.ipfsClient.addObject(context);
   }
 
   async createPerspective(perspective: Perspective): Promise<string> {
     /** Store the perspective data in the data layer */
-    let perspectiveId = await this.ipfsClient.createData(perspective);
+    let perspectiveId = await this.ipfsClient.addObject(perspective);
 
     let perspectiveIdHash = this.hash(perspectiveId);
     let contextIdHash = this.hash(perspective.contextId);
@@ -141,7 +152,7 @@ export class UprtclEthereum implements UprtclService {
   }
 
   async createCommit(commit: Commit) {
-    return this.ipfsClient.createData(commit);
+    return this.ipfsClient.addObject(commit);
   }
 
   async updateHead(perspectiveId: string, commitId: string): Promise<void> {
