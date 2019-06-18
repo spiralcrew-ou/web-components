@@ -6,13 +6,12 @@ export interface Context {
 }
 
 export interface Perspective {
-  id: string;
+  id?: string;
   origin: string;
   creatorId: string;
   timestamp: number;
   contextId: string;
   name: string;
-  headId: string;
 }
 
 export interface Commit {
