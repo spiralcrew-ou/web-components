@@ -4,14 +4,14 @@ import { Context, Commit, Perspective } from './../../objects';
 import { EthereumConnection } from './eth.connection';
 import { IpfsStub } from './ipfs.data.stub';
 
-import CID from 'cids';
-import multihashing from 'multihashing-async';
-import Buffer from 'buffer/';
+import { hash, cidToHeadData, headDataToCid, HeadData } from './eth.support';
 
 const userId = 'did:sec256k1:mykey';
 
-export class UprtclEthereum implements UprtclService {
 
+
+export class UprtclEthereum implements UprtclService {
+  
   ipfsClient = null;
   ethereum = null;
 
@@ -20,29 +20,8 @@ export class UprtclEthereum implements UprtclService {
     this.ethereum = new EthereumConnection(host);
   }
 
-  private async hash(data: string) : Promise<string> {
-    const encoded = await multihashing(
-      Buffer.Buffer.from(data), 'sha3-256');
-    return '0x' + encoded.toString('hex');
-  }
-
-  private cidToBytes32(cidEncoded: string) : string[] {
-    const cid = new CID(cidEncoded);
-
-    const cidEncoded16 = cid.toString('base16');
-    
-    let cidHex0 = null;
-    let cidHex1 = null;
-
-    if (cidEncoded16.length <= 64) {
-      cidHex0 = cidEncoded16.padStart(64, '0');
-      cidHex1 = new Array(64).fill('0').join('');
-    } else {
-      cidHex0 = cidEncoded16.slice(-64);
-      cidHex1 = cidEncoded16.slice(-cidEncoded16.length, -64).padStart(64,'0');
-    }
-
-    return [ cidHex1, cidHex0 ];
+  async hash(data: string): Promise<string> {
+    return hash(data);
   }
 
   async getContext(contextId: string): Promise<Context> {
@@ -50,6 +29,7 @@ export class UprtclEthereum implements UprtclService {
   }
 
   async getPerspective(perspectiveId: string): Promise<Perspective> {
+    await this.ethereum.ready();
     /** Content addressable part comes from IPFS */
     const persp = await this.ipfsClient.getData(perspectiveId);
     persp.id = perspectiveId;
@@ -65,6 +45,24 @@ export class UprtclEthereum implements UprtclService {
     return this.ipfsClient.getData(commitId);
   }
 
+  async getHead(perspectiveId: string): Promise<string> {
+    await this.ethereum.ready();
+    /** Head comes from ethereum */
+    let perspectiveIdHash = this.hash(perspectiveId);
+    
+    let perspData = await this.ethereum.uprtclInstance.methods
+      .getPerspective(perspectiveIdHash)
+      .call();
+
+    let headData: HeadData = {
+      base: perspData.base,
+      head1: perspData.head1,
+      head0: perspData.head0
+    }
+
+    return headDataToCid(headData);
+  }
+
   /** 
    * Ethereum dont know of root contexts. The consumer app can decide
    * the logic (multihash) used to derive the id of the root context of
@@ -77,7 +75,6 @@ export class UprtclEthereum implements UprtclService {
   }
 
   async getContextPerspectives(contextId: string): Promise<Perspective[]> {
-    debugger;
     await this.ethereum.ready();
     const contextIdHash = await this.hash(contextId);
     let events = await this.ethereum.uprtclInstance.getPastEvents(
@@ -99,86 +96,103 @@ export class UprtclEthereum implements UprtclService {
     return perspectives;
   }
 
-  async createContext(
-    _timestamp: number,
-    _nonce: number): Promise<string> {
+  async createContext(context: Context): Promise<string> {
+    await this.ethereum.ready();
+    
+    let contextIdOrg = context.id;
 
-    let context: Context = new Context(
-      userId,
-      _timestamp,
-      _nonce);
+    let contextPlain = {
+      'creatorId': context.creatorId,
+      'timestamp': context.timestamp,
+      'nonce': context.nonce,
+    }
 
-    return this.ipfsClient.createData(context);
+    let contextId = this.ipfsClient.createData(contextPlain);
+
+    if (contextIdOrg) {
+      if (contextIdOrg != contextId) {
+        throw new Error('context ID computed by IPFS is not the same as the input one.')
+      }
+    }
+
+    return contextId;
   }
 
-  async createPerspective(
-    _contextId: string,
-    _name: string,
-    _timestamp: number,
-    _headCid: string) : Promise<string> {
-
-    debugger;
+  async createPerspective(perspective: Perspective) : Promise<string> {
     await this.ethereum.ready();
 
-    let perspective = {
-      'origin': 'eth://XXXXX',
-      'creatorId': userId,
-      'timestamp': _timestamp,
-      'contextId': _contextId,
-      'name': _name
+    /** validate */
+    if (!perspective.origin) throw new Error('origin cannot be empty');
+    if (!perspective.contextId) throw new Error('context cannot be empty');
+
+    let perspectiveIdOrg = perspective.id;
+
+    /** force fields order */
+    let perspectivePlain = {
+      'origin': perspective.origin,
+      'creatorId': perspective.creatorId,
+      'timestamp': perspective.timestamp,
+      'contextId': perspective.contextId,
+      'name': perspective.name
     }
 
     /** Store the perspective data in the data layer */
-    let perspectiveId = await this.ipfsClient.createData(perspective);
+    let perspectiveId = await this.ipfsClient.createData(perspectivePlain);
+
+    if (perspectiveIdOrg) {
+      if (perspectiveIdOrg != perspectiveId) {
+        throw new Error('perspective ID computed by IPFS is not the same as the input one.')
+      }
+    }
     
     let perspectiveIdHash = this.hash(perspectiveId);
-    let contextIdHash = this.hash(_contextId);
+    let contextIdHash = this.hash(perspective.contextId);
     
-    await this.ethereum.uprtclInstance
-      .methods['addPerspective(bytes32,bytes32,address)']
-      (perspectiveIdHash, contextIdHash, userId,
-      { from: this.ethereum.web3.accounts[0] });
+    /** perspective is added but the head is set to null 
+     * updateHead() should be to set the head */
+    await this.ethereum.uprtclInstance.methods
+      .addPerspective(perspectiveIdHash, contextIdHash, userId)
+      .send({ from: this.ethereum.accounts[0] });
 
-    let headParts = this.cidToBytes32(_headCid);
-
-    return this.ethereum.uprtclInstance
-      .methods['updateHead(bytes32,bytes32,bytes32)']
-      (perspectiveIdHash, headParts[0], headParts[1],
-      { from: this.ethereum.uprtclInstance[0] });
+    return perspectiveId;
   }
 
-  async createCommit(
-    _timestamp: number,
-    _message: string,
-    _parentsIds: string[],
-    _dataId: string
-  ) {
-    debugger;
+  async updateHead(perspectiveId: string, headId: string): Promise<void> {
+    
+    let perspectiveIdHash = this.hash(perspectiveId);
+
+    let headParts = cidToHeadData(headId);
+
+    await this.ethereum.uprtclInstance.methods
+      .updateHead(perspectiveIdHash, headParts.base, headParts.head1, headParts.head0)
+      .send({ from: this.ethereum.account })
+  }
+
+  async createCommit(commit: Commit) {
+    
     await this.ethereum.ready();
 
-    let commit: Commit = new Commit(
-      userId,
-      _timestamp,
-      _message,
-      _parentsIds,
-      _dataId
-    );
+    let commitIdOrg = commit.id;
+
+    /** force fields order */
+    let commitPlain = {
+      'creatorId': commit.creatorId,
+      'timestamp': commit.timestamp,
+      'message': commit.message,
+      'parentsIds': commit.parentsIds,
+      'dataId': commit.dataId
+    }
+
+    /** Store the perspective data in the data layer */
+    let commitId = await this.ipfsClient.createData(commitPlain);
+
+    if (commitIdOrg) {
+      if (commitIdOrg != commitId) {
+        throw new Error('commit ID computed by IPFS is not the same as the input one.')
+      }
+    }    
 
     return this.ipfsClient.createData(commit);
-  }
-
-  cloneContext(context: Context): Promise<string> {
-    return this.ipfsClient.createData(context);
-  }
-  clonePerspective(perspective: Perspective): Promise<string> {
-    return this.ipfsClient.createData(perspective);
-  }
-  cloneCommit(commit: Commit): Promise<string> {
-    return this.ipfsClient.createData(commit);
-  }
-
-  async updateHead(perspectiveId: string, commitId: string): Promise<void> {
-    throw new Error(perspectiveId + commitId);
   }
 
 }

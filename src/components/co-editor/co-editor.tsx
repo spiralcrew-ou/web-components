@@ -7,7 +7,7 @@ import {
   // localServiceProvider as serviceProvider
 } from '../../services';
 import { uprtclData } from '../../services/uprtcl-data';
-import { TextNode } from '../../types';
+import { TextNode, Context, Perspective } from '../../types';
 
 @Component({
   tag: 'co-editor',
@@ -61,18 +61,23 @@ export class CoEditor {
     data: TextNode
   ): Promise<string> {
     if (contextId == null) {
-      contextId = await this.uprtcl.createContext(
-        serviceProvider,
-        Date.now(),
-        0
-      );
+      const context: Context = {
+        creatorId: 'anon',
+        timestamp: Date.now(),
+        nonce: 0
+      };
+      contextId = await this.uprtcl.createContext(serviceProvider, context);
     }
+    const perspective: Perspective = {
+      creatorId: 'anon',
+      contextId: contextId,
+      name: 'default',
+      origin: serviceProvider,
+      timestamp: Date.now()
+    };
     const perspectiveId = await this.uprtcl.createPerspective(
       serviceProvider,
-      contextId,
-      'default',
-      Date.now(),
-      null
+      perspective
     );
     // head commit is left as null, only draft data is created. head commit is created at first commit
     await this.dataService.setDraft(serviceProvider, perspectiveId, data);
@@ -109,27 +114,29 @@ export class CoEditor {
   }
 
   async logUprtcl() {
-    const perspectiveFull = await uprtclData.getPerspectiveFull(this.rootPerspectiveId, 10);
+    const perspectiveFull = await uprtclData.getPerspectiveFull(
+      this.rootPerspectiveId,
+      10
+    );
     console.log(perspectiveFull);
   }
 
   render() {
-
     return (
       <div>
         {this.loading ? (
           <span>Loading...</span>
         ) : (
-            <div>
-              <button onClick={() => this.logUprtcl()}>Log</button>
-              <text-node
-                id={this.perspectiveId}
-                perspectiveId={this.perspectiveId}
-                defaultService={this.defaultService} />
-            </div>
-          )}
+          <div>
+            <button onClick={() => this.logUprtcl()}>Log</button>
+            <text-node
+              id={this.perspectiveId}
+              perspectiveId={this.perspectiveId}
+              defaultService={this.defaultService}
+            />
+          </div>
+        )}
       </div>
     );
-
   }
 }
