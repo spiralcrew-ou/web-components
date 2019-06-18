@@ -39,8 +39,8 @@ export class COWorkspace {
     
     // Asume that is first load
     if (!fullPerspective.head && !fullPerspective.draft){
-      this.documentPerspectiveId = await this.uprtclData.initContextUnder(serviceProvider,rootPerspectives[0].id, -1, '');
-      await this.uprtclData.initContextUnder(serviceProvider, this.documentPerspectiveId, -1, 'first node');
+      this.documentPerspectiveId = await this.uprtclData.initContextUnder(serviceProvider,rootPerspectives[0].id, -1, 'Untitled Document');
+      await this.uprtclData.initContextUnder(serviceProvider, this.documentPerspectiveId, -1, '');
     } else {
       this.documentPerspectiveId = fullPerspective.draft.links[0].link.id;
     }

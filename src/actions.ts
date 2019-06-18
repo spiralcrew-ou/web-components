@@ -1,179 +1,142 @@
-import Hashids from 'hashids'
-import { UprtclData } from './services/uprtcl-data';
-import { PerspectiveFull, TextNodeFull } from './types';
+import { UprtclData } from "./services/uprtcl-data";
+import { PerspectiveFull, TextNodeFull } from "./types";
 
-const uprtcData = new UprtclData()
-
-const getRandomId = () => {
-  const id = new Hashids(new Date().getTime().toString())
-  return id.encode(1, 2, 3)
-}
+const uprtcData = new UprtclData();
 
 /**
- * 
- * @param _block WIP 
+ *
+ * @param _block WIP
  */
-export const saveDraft = (_block) => {
+export const saveDraft = _block => {
   return dispatch => {
-    dispatch({type:'SAVE DRAFT'})
-  }
-}
-/*
+    dispatch({ type: "SAVE DRAFT" });
+  };
+};
 
-blocksTree id -> {
-    id: "id"
-    parent: "parent id"
-    children: [],
-    block: {
-        content: 
-        status: DRAFT
-    }
-}
-
-const readBlockRec = (perspective, getState.tree) => {
-    block {
-        children: perspective.head.data.links.map( link => {
-            { 
-              link: link.link
-            }
-        },         
-        block: {
-            content:  persecoive.head.data.text
-            status: hasChanges(persecoive)
-        }
-    }
 
 /** This method create initial context 
  * 
  * @param rootId 
  */
-export const initWorkPad = (rootId) => {
+export const initWorkPad = rootId => {
   return dispatch => {
-    dispatch({ type: 'INIT WORKPAD', rootId, tree: {} })
-  }
-}
+    dispatch({ type: "INIT WORKPAD", rootId, tree: {} });
+  };
+};
 
 const hasChanges = (_perspective: PerspectiveFull): boolean => {
-  return _perspective.head ? false : true
-}
+  return _perspective.head ? false : true;
+};
 
-const getPerspectiveData = (perspective: PerspectiveFull) : TextNodeFull => {
+const getPerspectiveData = (perspective: PerspectiveFull): TextNodeFull => {
   if (hasChanges(perspective)) {
     return perspective.draft;
   } else {
     return perspective.head.data;
   }
-}
+};
 
-const readBlockRec = (perspectiveFull: PerspectiveFull, tree) : void => {
-
+const readBlockRec = (
+  perspectiveFull: PerspectiveFull,
+  tree,
+  parentId: string
+): void => {
   let data = getPerspectiveData(perspectiveFull);
 
   const block = {
     id: perspectiveFull.id,
     children: [],
-    status: hasChanges(perspectiveFull) ? 'DRAFT' : 'COMMITED',
-    content: data.text
-  }
+    status: hasChanges(perspectiveFull) ? "DRAFT" : "COMMITED",
+    content: data.text,
+    style: "paragraph",
+    parentPerspectiveID: parentId,
+    serviceProvider: perspectiveFull.origin
+  };
 
-  data.links.map((link) => {
-    readBlockRec(link.link, tree);
+  data.links.map(link => {
+    readBlockRec(link.link, tree, parentId);
     block.children.push(link.link.id);
-  })
+  });
 
-  tree[perspectiveFull.id] = block
-  
-  return
-}
+  tree[perspectiveFull.id] = block;
 
+  return;
+};
 
 export const reloadTree = () => {
   return async (dispatch, getState) => {
-    const perspectiveFull = await uprtcData.getPerspectiveFull(getState().workpad.rootId, -1);
-    const t = getState().workpad.tree
-    readBlockRec(perspectiveFull, t)
-    dispatch({ type: 'RELOAD TREE', tree: readBlockRec(perspectiveFull, t) })
-  }
-}
+    const perspectiveFull = await uprtcData.getPerspectiveFull(
+      getState().workpad.rootId,
+      -1
+    );
+    const t = getState().workpad.tree;
+    dispatch({
+      type: "RELOAD TREE",
+      tree: readBlockRec(perspectiveFull, t, getState().workpad.rootId)
+    });
+  };
+};
 
-/** This method (WIP) create a new draft for a perspective. This method force to reload 
- * 
- * @param block 
- * 
+/** This method (WIP) create a new draft for a perspective. This method force to reload
+ *
+ * @param block
+ *
  */
 export const newDraft = block => {
-  return (dispatch) => {
-    dispatch({type: 'NEW DRAFT', block})
-  }
-}
+  return dispatch => {
+    dispatch({ type: "NEW DRAFT", block });
+  };
+};
 
-export const newBlock = (block, parentId) => {
-  return (dispatch, getState) => {
+export const newBlock = (block, initiatorId) => {
+  return async (dispatch, getState) => {
+    const tree = getState().workpad.tree;
+    const initNode = tree[initiatorId];
 
-    /*
-    Documento 
-        Parrafo
-        Titulo 1 (Documento)
-            Parrafo
-            Parrafo
-            parrafo
-        Titulo 2 ()
-            Parrafo
-    */
+    switch (initNode.style) {
+      case "title":
+        this.uprtcData.initContextUnder(
+          initNode.serviceProvider,
+          initNode.id,
+          0,
+          block.content
+        );
+        break;
 
-    block = getRandomId() // Replace with Perspective    upcrtldata.initContext(parentId, block.content )
-    const tree = getState().workpad.tree
-    const parentIdx = tree.findIndex(e => e.id === parentId)
-
-    // Last Element only push
-    if ((!parentId) || (parentIdx === tree.length - 1))
-      tree.push(block)
-    else {
-      tree.splice(parentIdx + 1, 0, block)
-    }
-    dispatch({ type: 'NEW_BLOCK', block, tree })
-
-    /*--------
-
-    return (dispatch, getState) => {
-    
-        // perspective tree in indexedDB 
-        // blocks tree in redux as flat map
- 
-        const initNode = blocks[initiatorId];
- 
-        switch (initNode.block.style) {
-            case 'title':
-                this.uprtcData.initContextUnder(
-                    initNode.serviceProvider,
-                    initNode.id,
-                    0,
-                    block.content)
-            break;
- 
-            case 'paragraph':
-                parentnode = blocks[initNode.parentPerspectiveID]
-                index = parentnode.children.indexOf(initiatorId)
-                newId = this.uprtcData.initContextUnder(
-                    parentnode.serviceProvider,
-                    parentnode.id,
-                    index + 1,
-                    block.content)
-                
-                // perspective tree to block tree synchronization 
-                // Optimistic fast approach 
-                parentnode.children.splice(index + 1, newId)
-                
-            break;
+      default:
+        const parentnode = tree[initNode.parentPerspectiveID];
+        const index = tree[initNode.parentPerspectiveID].children.findIndex(pId => pId === initiatorId)
+        const newId = await uprtcData.initContextUnder(
+          parentnode.serviceProvider,
+          parentnode.id,
+          index + 1,
+          block.content
+        );
+        const newTree = Object.assign({}, tree);
+        newTree[newId] = {
+          id: newId,
+          children:[],
+          status: 'DRAFT',
+          content:'',
+          style: 'paragraph',
+          parentPerspectiveID:initNode.parentPerspectiveID,
+          serviceProvider: parentnode.serviceProvider
         }
- 
-        // perspective tree to block tree synchronization 
-        // Brute Force
-        blocks = dispatch('reloadTree')
-    }*/
+        newTree[initNode.parentPerspectiveID].children.splice(index+1, 0, newId);
+        dispatch({ type: "NEW BLOCK", tree: newTree });
+        break;
+    }
+  };
+};
+
+export const setView = (block,newView) => {
+  //TODO: Change view from perspective and re-calculate node if apply
+  return (dispatch,getState) => {
+    const tree = Object.assign({},getState().workpad.tree)
+    tree[block.id].style=newView
+    dispatch({type:'SET VIEW', tree})
   }
 }
-
 
 /*
 setView = (blockId, newView) =>  {
@@ -190,47 +153,69 @@ setView = (blockId, newView) =>  {
 
 }
 
-deleteBlock (blockId) {
-    Changing the type of a paragraph to a title will move all the next sibling contexts of the paragraph as subcontexts of the new title.
-    Changing the type of a title to a paragraph will move all its subcontexts as next-siblings of the new typed paragraph
-}*/
-
-
-
 /**
- * 
- * This method remove a block (perspective indeed) from tree. 
- * @param {*} block 
+ *
+ * This method remove a block (perspective indeed) from tree.
+ * @param {*} block
  * @returns dispatch a reloadTree event
  */
 export const removeBlock = block => {
-  /** TODO: This version only remove block from tree. This method will be improved doing: 
-   * Remove perspective  (service and re-index all perspective and context)
-   * Call a reload dispatch event to force render component. 
-   * TO CHECK With Pepo. 
-   */
-  return (dispatch,getState) => {
-    const tree = Object.assign({},getState().workpad.tree)
-    delete tree[block.id]
-    dispatch({type: 'REMOVE BLOCK', tree })
-  }
-}
+  return (dispatch, getState) => {
+    uprtcData.removePerspective(block.serviceProvider,block.parentPerspectiveID,block.id)
+    const tree = Object.assign({}, getState().workpad.tree);
+    delete tree[block.id];
+    tree[block.parentPerspectiveID].children= tree[block.parentPerspectiveID].children.filter(id => id!= block.id)
+    dispatch({ type: "REMOVE BLOCK", tree });
+  };
+};
 
-
-/** 
+/**
  * WIP
  */
 export const commitAll = () => {
-
   // Update Tree, transform DRAFT to COMMITED
-  // Send only status=DRAFT 
-  return (dispatch) => {
-    dispatch({ type: 'COMMIT ALL' })
+  // Send only status=DRAFT
+
+  return (dispatch,getState) => {
+    const tree = getState().workpad.tree
+
+    const toCommit = Object.keys(tree).
+                        map(k => tree[k]).
+                        filter(block => block.contentUser)
+    
+    console.log(toCommit)
+    dispatch({ type: "COMMIT ALL" });
+  };
+};
+
+/**This function update content data from user (only for UI)
+ * 
+ * @param block The block was updated
+ * @param newContent  new Content input from user (UI)
+ */
+export const updateContentFromUser = (block, newContent) => {
+  return (dispatch,getState) => {
+    const tree = getState().workpad.tree
+    tree[block.id].contentUser = newContent
+    dispatch({type: 'UPDATE CONTENT FROM USER', tree})
   }
 }
 
-export const updateTree = (tree: []) => {
-  return dispatch => {
-    dispatch({ type: 'UPDATE TREE', tree })
+/**
+ * This function open the contextual menu
+ */
+export const openMenu = (blockId) => {
+  return (dispatch) => {
+    dispatch({type: 'OPEN MENU', isClose:false,blockId})
   }
+}
+
+/**
+ * This function close the contextual menu
+ */
+export const closeMenu = () => {
+  return (dispatch) => {
+    dispatch({type: 'OPEN MENU', isClose:true})
+  }
+
 }

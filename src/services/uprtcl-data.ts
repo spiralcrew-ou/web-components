@@ -384,7 +384,8 @@ export class UprtclData {
   */
   async getOrCreateDraft(
     serviceProvider: string,
-    perspectiveId: string): Promise<ITextNode> {
+    perspectiveId: string,
+    content: string = ''): Promise<ITextNode> {
 
     let draft = await this.data.getDraft(serviceProvider, perspectiveId);
 
@@ -393,7 +394,7 @@ export class UprtclData {
     }
 
     await this.data.setDraft(
-      serviceProvider, perspectiveId, new TextNode('', []));
+      serviceProvider, perspectiveId, new TextNode(content, []));
 
     return this.data.getDraft(serviceProvider, perspectiveId);
   }
@@ -434,7 +435,6 @@ export class UprtclData {
 
     await this.uprtcl.updateHead(perspectiveId, commitId);
   }
-
 }
 
 export const uprtclData = new UprtclData();

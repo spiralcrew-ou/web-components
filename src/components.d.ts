@@ -18,17 +18,27 @@ export namespace Components {
   interface CoEditor {}
   interface CoEditorAttributes extends StencilHTMLAttributes {}
 
+  interface CoLoading {}
+  interface CoLoadingAttributes extends StencilHTMLAttributes {}
+
   interface CoLogin {}
   interface CoLoginAttributes extends StencilHTMLAttributes {}
 
+  interface CoMenu {
+    'nodeId': string;
+  }
+  interface CoMenuAttributes extends StencilHTMLAttributes {
+    'nodeId'?: string;
+  }
+
   interface CoNode {
-    'id': string;
     'index': string;
+    'nodeId': string;
     'parentId': string;
   }
   interface CoNodeAttributes extends StencilHTMLAttributes {
-    'id'?: string;
     'index'?: string;
+    'nodeId'?: string;
     'parentId'?: string;
   }
 
@@ -85,7 +95,9 @@ export namespace Components {
 declare global {
   interface StencilElementInterfaces {
     'CoEditor': Components.CoEditor;
+    'CoLoading': Components.CoLoading;
     'CoLogin': Components.CoLogin;
+    'CoMenu': Components.CoMenu;
     'CoNode': Components.CoNode;
     'CoWorkpad': Components.CoWorkpad;
     'CoWorkspace': Components.CoWorkspace;
@@ -96,7 +108,9 @@ declare global {
 
   interface StencilIntrinsicElements {
     'co-editor': Components.CoEditorAttributes;
+    'co-loading': Components.CoLoadingAttributes;
     'co-login': Components.CoLoginAttributes;
+    'co-menu': Components.CoMenuAttributes;
     'co-node': Components.CoNodeAttributes;
     'co-workpad': Components.CoWorkpadAttributes;
     'co-workspace': Components.CoWorkspaceAttributes;
@@ -112,10 +126,22 @@ declare global {
     new (): HTMLCoEditorElement;
   };
 
+  interface HTMLCoLoadingElement extends Components.CoLoading, HTMLStencilElement {}
+  var HTMLCoLoadingElement: {
+    prototype: HTMLCoLoadingElement;
+    new (): HTMLCoLoadingElement;
+  };
+
   interface HTMLCoLoginElement extends Components.CoLogin, HTMLStencilElement {}
   var HTMLCoLoginElement: {
     prototype: HTMLCoLoginElement;
     new (): HTMLCoLoginElement;
+  };
+
+  interface HTMLCoMenuElement extends Components.CoMenu, HTMLStencilElement {}
+  var HTMLCoMenuElement: {
+    prototype: HTMLCoMenuElement;
+    new (): HTMLCoMenuElement;
   };
 
   interface HTMLCoNodeElement extends Components.CoNode, HTMLStencilElement {}
@@ -156,7 +182,9 @@ declare global {
 
   interface HTMLElementTagNameMap {
     'co-editor': HTMLCoEditorElement
+    'co-loading': HTMLCoLoadingElement
     'co-login': HTMLCoLoginElement
+    'co-menu': HTMLCoMenuElement
     'co-node': HTMLCoNodeElement
     'co-workpad': HTMLCoWorkpadElement
     'co-workspace': HTMLCoWorkspaceElement
@@ -167,7 +195,9 @@ declare global {
 
   interface ElementTagNameMap {
     'co-editor': HTMLCoEditorElement;
+    'co-loading': HTMLCoLoadingElement;
     'co-login': HTMLCoLoginElement;
+    'co-menu': HTMLCoMenuElement;
     'co-node': HTMLCoNodeElement;
     'co-workpad': HTMLCoWorkpadElement;
     'co-workspace': HTMLCoWorkspaceElement;

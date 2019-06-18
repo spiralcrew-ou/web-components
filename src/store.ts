@@ -11,6 +11,9 @@ const initialState = {
     // tree: {id -> {}},
     rootId: '',
     tree: {}
+  },
+  menu: {
+    isClose: true
   }
 }
 
@@ -23,19 +26,34 @@ export const workpadReducer = (state = { ...initialState.workpad }, action) => {
     case 'NEW DRAFT':
       return { ...state, ...action }
     case 'SAVE DRAFT':
-        return { ...state, ...action }    
+      return { ...state, ...action }    
     case 'INIT WORKPAD':
       return { ...state, ...action }
     case 'COMMIT ALL':
-        return { ...state, ...action }
+      return { ...state, ...action }
+    case 'UPDATE CONTENT FROM USER':
+        return {...state,...action}
+    case 'SET VIEW':
+        return {...state,...action}
     default:
       return state
   }
 }
 
+export const menuReducer = (state ={...initialState.menu},action) => {
+  switch (action.type) {
+    case 'OPEN MENU':
+      return {...state,...action}
+    case 'CLOSE MENU':
+        return {...state,...action}
+    default:
+      return state 
+  }
+}
 
 const reducers = combineReducers({
-  workpad: workpadReducer
+  workpad: workpadReducer,
+  menu: menuReducer
 })
 
 

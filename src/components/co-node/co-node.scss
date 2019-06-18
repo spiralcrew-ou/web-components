@@ -1,0 +1,15 @@
+@import '../../globals/style.css';
+@import '../../globals/_variables.scss';
+
+[contenteditable=true]:empty:before {
+    content: attr(data-placeholder);
+    opacity: 0.3;
+  }
+  
+  [contenteditable=true]:focus {
+    outline: 0px solid transparent;
+  }
+  
+* {
+    font-family: 'Open Sans', sans-serif;
+}
