@@ -2,9 +2,8 @@ import { Component, State } from '@stencil/core';
 import {
   uprtclMultiplatform,
   dataMultiplatform,
-  // c1ServiceProvider as serviceProvider,
-  ethServiceProvider as serviceProvider
-  // localServiceProvider as serviceProvider
+  c1ServiceProvider as serviceProvider,
+  // ethServiceProvider as serviceProvider
 } from '../../services';
 import { uprtclData } from '../../services/uprtcl-data';
 import { TextNode, Context, Perspective } from '../../types';
