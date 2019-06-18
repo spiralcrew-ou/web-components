@@ -15,54 +15,79 @@ export class CachedMultiplatform<T> extends Multiplatform<T> {
     this.cacheService = cacheService;
   }
 
-  protected async cachedDiscover<O>(
-    hash: string,
+  /**
+   * Try to get the object from the cache, otherwise discover the object and store in cache
+   * @param getter
+   * @param discover
+   * @param cloner
+   */
+  protected async cached<O>(
     getter: (service: T) => Promise<O>,
-    cloner: (service: T, object: O) => Promise<any>,
-    linksSelector: (object: O) => string[] = () => []
+    discover: () => Promise<O>,
+    cloner: (service: T, object: O) => Promise<any>
   ): Promise<O> {
-    if (typeof hash !== 'string' || hash == null) {
-      return null;
-    }
-
     // If we have the object already cached, return it
     const cachedObject = await getter(this.cacheService);
     if (cachedObject) {
       return cachedObject;
     }
 
-    // If not, discover the object...
-    const object = await this.discover(hash, getter, linksSelector);
+    // If not on cache, discover it
+    const object = await discover();
 
-    // ... and store it in the cache service
+    // And store it in cache
     await cloner(this.cacheService, object);
-
-    // Return the object
     return object;
   }
 
   /**
-   * Fallback getter, executes the get function first in the server,
-   * and if it fails, executes it in the cache service
+   * Discover object from cache or from the known sources, discovering its links sources
    */
-  protected async fallbackGet<O>(
-    serviceProvider: string,
+  protected async cachedDiscover<O>(
+    hash: string,
     getter: (service: T) => Promise<O>,
+    cloner: (service: T, object: O) => Promise<any>,
     linksSelector: (object: O) => string[]
   ): Promise<O> {
-    try {
-      const object = await this.getFromSource(
-        serviceProvider,
-        getter,
-        linksSelector
-      );
+    if (typeof hash !== 'string' || hash == null) {
+      return null;
+    }
 
+    return this.cached(
+      getter,
+      () => this.discover(hash, getter, linksSelector),
+      cloner
+    );
+  }
+
+  /**
+   * Try to get the object from the server and cache the result,
+   * else return the object from cache
+   */
+  protected async fallback<O>(
+    sourceGetter: () => Promise<O>,
+    cloner: (service: T, object: O) => Promise<any>,
+    cacheGetter: (service: T) => Promise<O>
+  ) {
+    try {
+      // Try to get object from source
+      const object = await sourceGetter();
+
+      // Clone the object into the cache
+      await cloner(this.cacheService, object);
+
+      // And return it
       return object;
     } catch (e) {
-      return getter(this.cacheService);
+      // Otherwise, return object from cache
+      return cacheGetter(this.cacheService);
     }
   }
 
+  /**
+   * Creates the object in cache synchronously and
+   * schedules its creation in the service provider
+   */
   protected async optimisticCreate<O>(
     serviceProvider: string,
     object: O,
@@ -87,6 +112,10 @@ export class CachedMultiplatform<T> extends Multiplatform<T> {
     return objectId;
   }
 
+  /**
+   * Executes the update in cache synchronously and
+   * schedules the same update in the service provider
+   */
   protected async optimisticUpdate(
     serviceProvider: string,
     updater: (service: T) => Promise<void>,
