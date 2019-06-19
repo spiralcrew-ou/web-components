@@ -1,20 +1,21 @@
-import { Draft, TextNode, KnownSources } from '../../objects';
+import { TextNode, KnownSources } from '../../objects';
+import { TextNode as ITextNode } from '../../types';
 
 import Dexie from 'dexie';
 
 class LocalDatabase extends Dexie {
-  drafts: Dexie.Table<Draft, string>;
+  drafts: Dexie.Table<TextNode, string>;
   textNode: Dexie.Table<TextNode, string>;
   knowSources: Dexie.Table<KnownSources, string>;
 
   constructor() {
     super('CollectiveOne');
     this.version(0.1).stores({
-      drafts: 'id',
+      drafts: '',
       knowSources: 'hash',
       textNode: 'id'
     });
-    this.drafts.mapToClass(Draft);
+    this.drafts.mapToClass(TextNode);
     this.knowSources.mapToClass(KnownSources);
     this.textNode.mapToClass(TextNode);
   }
@@ -24,19 +25,13 @@ export const db = new LocalDatabase();
 
 window['db'] = db;
 
-export const insertDraft = (draft: Draft): Promise<any> => {
-  return db.drafts.put(draft);
+export const insertDraft = (objectId: string, draft: ITextNode): Promise<any> => {
+  const node = new TextNode(draft.text, draft.type, draft.links)
+  return db.drafts.put(node, objectId);
 };
 
 export const getDraft = (id: string): Promise<any> => {
   return db.drafts.get(id);
-};
-
-export const modifyDraft = (draft: Draft): void => {
-  db.drafts
-    .where('id')
-    .equals(draft.id)
-    .modify(draft);
 };
 
 export const getKnownSources = (hash: string): Promise<string[]> => {

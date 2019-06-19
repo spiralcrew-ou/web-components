@@ -2,7 +2,6 @@ import {
   Perspective as IPerspective,
   Commit as ICommit,
   Context as IContext,
-  Draft as IDraft,
   TextNode as ITextNode,
   Position
 } from './types';
@@ -141,18 +140,6 @@ export class TextNode implements ITextNode {
       codec,
       type
     );
-  }
-}
-
-export class Draft implements IDraft {
-  perspectiveId: string;
-  dataId: string;
-  id: string;
-
-  constructor(_id: string, _perspectiveId: string, _dataId: string) {
-    this.id = _id;
-    this.perspectiveId = _perspectiveId;
-    this.dataId = _dataId;
   }
 }
 
