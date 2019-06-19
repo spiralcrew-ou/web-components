@@ -28,12 +28,10 @@ export class CachedMultiplatform<T> extends Multiplatform<T> {
   ): Promise<O> {
     // If we have the object already cached, return it
     const cachedObject = await getter(this.cacheService);
-    console.log('cached', cachedObject);
     if (cachedObject) {
       return cachedObject;
     }
     
-    console.log('cached 2');
     // If not on cache, discover it
     const object = await discover();
 

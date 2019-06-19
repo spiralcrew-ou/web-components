@@ -24,7 +24,6 @@ export class DiscoveryLocal implements DiscoveryService {
       Array.from(newSources).filter(d => d),
       hash
     );
-    console.log(`known sources added`, hash, sources);
   }
 
   async removeKnownSource(hash: string, source: string): Promise<void> {
