@@ -4,7 +4,7 @@ import { Context, Commit, Perspective } from './../../objects';
 import { EthereumConnection } from './eth.connection';
 import { IpfsStub } from './ipfs.data.stub';
 
-import { hash, cidToHeadData, headDataToCid, HeadData } from './eth.support';
+import { hash, cidToHeadParts, headPartsToCid } from './eth.support';
 
 const userId = 'did:sec256k1:mykey';
 
@@ -16,10 +16,6 @@ export class UprtclEthereum implements UprtclService {
   constructor(host: string) {
     this.ipfsClient = new IpfsStub();
     this.ethereum = new EthereumConnection(host);
-  }
-
-  async hash(data: string): Promise<string> {
-    return hash(data);
   }
 
   async getContext(contextId: string): Promise<Context> {
@@ -46,19 +42,13 @@ export class UprtclEthereum implements UprtclService {
   async getHead(perspectiveId: string): Promise<string> {
     await this.ethereum.ready();
     /** Head comes from ethereum */
-    let perspectiveIdHash = await this.hash(perspectiveId);
+    let perspectiveIdHash = await hash(perspectiveId);
     
     let perspData = await this.ethereum.uprtclInstance.methods
       .getPerspective(perspectiveIdHash)
       .call();
 
-    let headData: HeadData = {
-      base: perspData.base,
-      head1: perspData.head1,
-      head0: perspData.head0
-    }
-
-    return headDataToCid(headData);
+    return headPartsToCid([perspData.head1, perspData.head0]);
   }
 
   /** 
@@ -74,7 +64,7 @@ export class UprtclEthereum implements UprtclService {
 
   async getContextPerspectives(contextId: string): Promise<Perspective[]> {
     await this.ethereum.ready();
-    const contextIdHash = await this.hash(contextId);
+    const contextIdHash = await hash(contextId);
     let events = await this.ethereum.uprtclInstance.getPastEvents(
       'PerspectiveAdded', {
         filter: { contextId: contextIdHash },
@@ -82,12 +72,12 @@ export class UprtclEthereum implements UprtclService {
       }
     )
     
-    let perspectiveIds = events.map(e => e.args.perspectiveId);
+    let perspectiveIdHashes = events.map(e => e.returnValues.perspectiveIdHash);
 
     // TODO: paralelize calls with Promise.all
     let perspectives = [];
-    for (let i=0; i<perspectiveIds.length; i++) {
-      let perspective = await this.getPerspective(perspectiveIds[i]);
+    for (let i=0; i<perspectiveIdHashes.length; i++) {
+      let perspective = await this.getPerspective(perspectiveIdHashes[i]);
       perspectives.push(perspective);
     } 
 
@@ -143,8 +133,8 @@ export class UprtclEthereum implements UprtclService {
       }
     }
     
-    let perspectiveIdHash = await this.hash(perspectiveId);
-    let contextIdHash = await this.hash(perspective.contextId);
+    let perspectiveIdHash = await hash(perspectiveId);
+    let contextIdHash = await hash(perspective.contextId);
     
     /** perspective is added but the head is set to null 
      * updateHead() should be to set the head */
@@ -157,12 +147,12 @@ export class UprtclEthereum implements UprtclService {
 
   async updateHead(perspectiveId: string, headId: string): Promise<void> {
     debugger
-    let perspectiveIdHash = await this.hash(perspectiveId);
+    let perspectiveIdHash = await hash(perspectiveId);
 
-    let headParts = cidToHeadData(headId);
+    let headParts = cidToHeadParts(headId);
 
     await this.ethereum.uprtclInstance.methods
-      .updateHead(perspectiveIdHash, headParts.base, headParts.head1, headParts.head0)
+      .updateHead(perspectiveIdHash, headParts[0], headParts[1])
       .send({ from: this.ethereum.account })
   }
 
