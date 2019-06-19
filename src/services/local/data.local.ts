@@ -1,12 +1,16 @@
 import { DataService } from '../data.service';
-
-import { c1Cid as cidConfig } from './cid.config';
+import { CidConfig } from './cid.config';
 import { ipldService } from '../ipld';
 import { ExtensionsLocal } from './extensions.local';
 
 export class DataLocal<T> implements DataService<T> {
 
+  currentConfig: CidConfig;
   uprtclExtensions = new ExtensionsLocal<T>();
+
+  constructor(config: CidConfig) {
+    this.currentConfig = config
+  }
 
   generateCid(object: any, propertyOrder: string[]) {
     const plain = {};
@@ -17,10 +21,7 @@ export class DataLocal<T> implements DataService<T> {
 
     return ipldService.generateCid(
       JSON.stringify(plain),
-      cidConfig.base,
-      cidConfig.version,
-      cidConfig.codec,
-      cidConfig.type
+      this.currentConfig
     );
   }
 

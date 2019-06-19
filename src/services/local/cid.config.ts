@@ -1,4 +1,4 @@
-export class Cid {
+export class CidConfig {
   base: string;
   version: number;
   codec: string;
@@ -11,6 +11,3 @@ export class Cid {
     this.type = _type;
   }
 }
-
-export const c1Cid = new Cid('base58btc', 1, 'raw', 'sha3-256');
-export const hcCid = new Cid('base58btc', 0, 'dag-pb', 'sha2-256');

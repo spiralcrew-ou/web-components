@@ -8,11 +8,9 @@ import {
 
 import { Perspective, Commit, Context } from '../../objects';
 
-/** standard C1 settings */
-import { c1Cid as cidConfig } from './cid.config';
 import Dexie from 'dexie';
 import { ipldService } from '../ipld';
-//import { hcCid as cidConfig } from './cid.config';
+import { CidConfig } from './cid.config';
 
 export class UprtclLocal extends Dexie implements UprtclService {
   rootContexts: Dexie.Table<string, string>;
@@ -20,8 +18,9 @@ export class UprtclLocal extends Dexie implements UprtclService {
   perspectives: Dexie.Table<Perspective, string>;
   heads: Dexie.Table<string, string>;
   commits: Dexie.Table<Commit, string>;
+  currentConfig: CidConfig;
 
-  constructor() {
+  constructor(config: CidConfig) {
     super('_prtcl');
     this.version(0.1).stores({
       rootContexts: '',
@@ -35,6 +34,11 @@ export class UprtclLocal extends Dexie implements UprtclService {
     this.perspectives.mapToClass(Perspective);
     this.heads = this.table('heads');
     this.commits.mapToClass(Commit);
+    this.currentConfig = config;
+  }
+
+  updateConfig(config: CidConfig) {
+    this.currentConfig = config;
   }
 
   generateCid(object: any, propertyOrder: string[]) {
@@ -46,10 +50,7 @@ export class UprtclLocal extends Dexie implements UprtclService {
 
     return ipldService.generateCid(
       JSON.stringify(plain),
-      cidConfig.base,
-      cidConfig.version,
-      cidConfig.codec,
-      cidConfig.type
+      this.currentConfig
     );
   }
 

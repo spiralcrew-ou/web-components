@@ -6,8 +6,6 @@ import {
   Position
 } from './types';
 
-import { ipldService } from './services/ipld';
-
 export class Perspective implements IPerspective {
   id: string;
   origin: string;
@@ -23,24 +21,6 @@ export class Perspective implements IPerspective {
     this.timestamp = _timestamp;
     this.contextId = _contextId;
     this.name = _name;
-  }
-
-  async setId(base: string, version: number, codec: string, type: string) {
-    const plain = {
-      origin: this.origin,
-      creatorId: this.creatorId,
-      timestamp: this.timestamp,
-      contextId: this.contextId,
-      name: this.name
-    };
-
-    this.id = await ipldService.generateCid(
-      JSON.stringify(plain),
-      base,
-      version,
-      codec,
-      type
-    );
   }
 }
 
@@ -60,24 +40,6 @@ export class Commit implements ICommit {
     this.parentsIds = _parentsIds;
     this.dataId = _dataId;
   }
-
-  async setId(base: string, version: number, codec: string, type: string) {
-    const plain = {
-      creatorId: this.creatorId,
-      timestamp: this.timestamp,
-      message: this.message,
-      parentsIds: this.parentsIds,
-      dataId: this.dataId
-    };
-
-    this.id = await ipldService.generateCid(
-      JSON.stringify(plain),
-      base,
-      version,
-      codec,
-      type
-    );
-  }
 }
 
 export class Context implements IContext {
@@ -91,22 +53,6 @@ export class Context implements IContext {
     this.creatorId = _creatorId;
     this.timestamp = _timestamp;
     this.nonce = _nonce;
-  }
-
-  async setId(base: string, version: number, codec: string, type: string) {
-    const plain = {
-      creatorId: this.creatorId,
-      timestamp: this.timestamp,
-      nonce: this.nonce
-    };
-
-    this.id = await ipldService.generateCid(
-      JSON.stringify(plain),
-      base,
-      version,
-      codec,
-      type
-    );
   }
 }
 
@@ -124,21 +70,5 @@ export class TextNode implements ITextNode {
     this.text = _text;
     this.type = _type;
     this.links = _links;
-  }
-
-  async setId(base: string, version: number, codec: string, type: string) {
-    const plain = {
-      text: this.text,
-      type: this.type,
-      links: this.links
-    };
-
-    this.id = await ipldService.generateCid(
-      JSON.stringify(plain),
-      base,
-      version,
-      codec,
-      type
-    );
   }
 }

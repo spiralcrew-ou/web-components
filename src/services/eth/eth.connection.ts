@@ -8,7 +8,6 @@ export class EthereumConnection {
   account: string;
 
   constructor(host: string) {
-    debugger
     this.connectionReady = new Promise((resolve) => {
       w3w.initializeWeb3({
         localProvider: host,
@@ -18,7 +17,7 @@ export class EthereumConnection {
             this.account = w3w.getAccount();
             this.uprtclInstance = new this.web3.eth.Contract(
               UprtclContractArtifact.abi,
-              UprtclContractArtifact.networks['1560781481653'].address);
+              UprtclContractArtifact.networks[w3w.getNetworkId()].address);
             resolve()
           }
         }

@@ -1,8 +1,5 @@
-import Buffer from 'buffer/';
-
-const buf2hex = (buffer) => { // buffer is an ArrayBuffer
-    return Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');
-}
+import { ipldService } from '../ipld';
+import { ipfsCid } from '..';
 
 export class IpfsStub {
     store = new Object();
@@ -18,9 +15,8 @@ export class IpfsStub {
     }
 
     async getObjectId(data: any) {
-        const dataString = JSON.stringify(data);
-        const id = await window.crypto.subtle.digest('SHA-256', Buffer.Buffer.from(dataString));
-        return buf2hex(id);
+        const id = await ipldService.generateCid(JSON.stringify(data), ipfsCid);
+        return id.toString();
     }
 }
 

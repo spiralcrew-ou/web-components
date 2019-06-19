@@ -19435,7 +19435,13 @@ var initializeWeb3 = function initializeWeb3(passedConfig) {
     }
   }
 
-  state.web3js = new Web3(Web3.givenProvider || localProvider);
+  /** local provider overwrites metamask or anything else */
+  if (localProvider) {
+    state.web3js = new Web3(localProvider);
+  } else {
+    state.web3js = new Web3(Web3.givenProvider);
+  }
+
   web3Poll(true);
 };
 
