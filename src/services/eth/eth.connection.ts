@@ -8,7 +8,6 @@ export class EthereumConnection {
   account: string;
 
   constructor(host: string) {
-    debugger
     this.connectionReady = new Promise((resolve) => {
       w3w.initializeWeb3({
         localProvider: host,

@@ -3,7 +3,7 @@ export type Task = () => Promise<any>;
 export class TaskQueue {
   retryInterval = null;
   intervalTime = 3000; // Milliseconds
-  retryEnabled = true;
+  retryEnabled = false;
 
   queue: Task[] = [];
 

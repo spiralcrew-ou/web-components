@@ -8,8 +8,6 @@ import { hash, cidToHeadData, headDataToCid, HeadData } from './eth.support';
 
 const userId = 'did:sec256k1:mykey';
 
-
-
 export class UprtclEthereum implements UprtclService {
   
   ipfsClient = null;
@@ -48,7 +46,7 @@ export class UprtclEthereum implements UprtclService {
   async getHead(perspectiveId: string): Promise<string> {
     await this.ethereum.ready();
     /** Head comes from ethereum */
-    let perspectiveIdHash = this.hash(perspectiveId);
+    let perspectiveIdHash = await this.hash(perspectiveId);
     
     let perspData = await this.ethereum.uprtclInstance.methods
       .getPerspective(perspectiveIdHash)
@@ -107,7 +105,7 @@ export class UprtclEthereum implements UprtclService {
       'nonce': context.nonce,
     }
 
-    let contextId = this.ipfsClient.createData(contextPlain);
+    let contextId = await this.ipfsClient.createData(contextPlain);
 
     if (contextIdOrg) {
       if (contextIdOrg != contextId) {
@@ -145,21 +143,21 @@ export class UprtclEthereum implements UprtclService {
       }
     }
     
-    let perspectiveIdHash = this.hash(perspectiveId);
-    let contextIdHash = this.hash(perspective.contextId);
+    let perspectiveIdHash = await this.hash(perspectiveId);
+    let contextIdHash = await this.hash(perspective.contextId);
     
     /** perspective is added but the head is set to null 
      * updateHead() should be to set the head */
     await this.ethereum.uprtclInstance.methods
-      .addPerspective(perspectiveIdHash, contextIdHash, userId)
-      .send({ from: this.ethereum.accounts[0] });
+      .addPerspective(perspectiveIdHash, contextIdHash, this.ethereum.account)
+      .send({ from: this.ethereum.account });
 
     return perspectiveId;
   }
 
   async updateHead(perspectiveId: string, headId: string): Promise<void> {
-    
-    let perspectiveIdHash = this.hash(perspectiveId);
+    debugger
+    let perspectiveIdHash = await this.hash(perspectiveId);
 
     let headParts = cidToHeadData(headId);
 

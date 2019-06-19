@@ -17,19 +17,27 @@ import { DiscoveryCollectiveOne } from './c1/discovery.c1';
 import { UprtclEthereum } from './eth/uprtcl.eth';
 
 import { DataIpfs } from './data.ipfs';
+import { CidConfig } from './local/cid.config';
 
 export const holochainEnabled = false;
+export const c1Enabled = false;
+export const ethEnabled = true;
+
 export const holochainServiceProvider =
   'holochain://Qmag7yGbYSMhkzDZLnSJkc4pzNWpHLtfP5o2jL8jGF4W5w';
 
-export const c1Enabled = true;
-export const c1ServiceProvider = 'https://www.collectiveone.org/uprtcl/1';
+export const c1ServiceProvider = 
+  'https://www.collectiveone.org/uprtcl/1';
 
-export const ethEnabled = false;
-export const ethServiceProvider = 'eth://smartContract';
+export const ethServiceProvider = 
+  'eth://smartContract';
 
+/** standard C1 settings */
+export const c1Cid   = new CidConfig('base58btc', 1, 'raw',    'sha3-256');
+export const hcCid   = new CidConfig('base58btc', 0, 'dag-pb', 'sha2-256');
+export const ipfsCid = new CidConfig('base58btc', 0, 'dag-pb', 'sha2-256');
+ 
 let uprtclConfig = {};
-
 let dataConfig = {};
 
 if (c1Enabled) {
@@ -76,12 +84,12 @@ if (ethEnabled) {
   dataConfig[ethServiceProvider] = {
     discovery: null,
     service: {
-      data: new DataLocal(),
+      data: new DataLocal(ipfsCid),
       draft: new DraftLocal()
     }
   };
 }
 
-export const uprtclMultiplatform = new UprtclMultiplatform(uprtclConfig);
+export const uprtclMultiplatform = new UprtclMultiplatform(uprtclConfig, ipfsCid);
 
-export const dataMultiplatform = new DataMultiplatform(dataConfig);
+export const dataMultiplatform = new DataMultiplatform(dataConfig, ipfsCid);

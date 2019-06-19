@@ -3,6 +3,7 @@ import { Context, Perspective, Commit, Dictionary } from '../../types';
 import { DiscoveryService } from '../discovery.service';
 import { CachedMultiplatform } from './cached.multiplatform';
 import { UprtclLocal } from '../local/uprtcl.local';
+import { CidConfig } from '../local/cid.config';
 
 export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
   linksFromPerspective(perspective: Perspective) {
@@ -17,9 +18,9 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
     serviceProviders: Dictionary<{
       service: UprtclService;
       discovery: DiscoveryService;
-    }>
+    }>, cidConfig: CidConfig
   ) {
-    super(serviceProviders, new UprtclLocal());
+    super(serviceProviders, new UprtclLocal(cidConfig));
   }
 
   async getContext(contextId: string): Promise<Context> {
