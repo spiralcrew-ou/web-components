@@ -1,32 +1,31 @@
 import { DiscoveryService } from '../discovery.service';
-import {
-  insertKnownSources,
-  getKnownSources
-} from './dataservices';
-
-import {
-  KnownSources
-} from './../../objects';
+import { ExtensionsLocal } from './extensions.local';
 
 export class DiscoveryLocal implements DiscoveryService {
-  constructor() {}
-
+  uprtclExtensions = new ExtensionsLocal();
+  
   getOwnSource(): Promise<string> {
     return Promise.resolve('local');
   }
 
   getKnownSources(hash: string): Promise<string[]> {
-    return getKnownSources(hash);
+    return this.uprtclExtensions.knownSources.get(hash);
   }
 
   async addKnownSources(hash: string, sources: string[]): Promise<void> {
-    await insertKnownSources(new KnownSources(hash, sources));
+    const knownSources = await this.getKnownSources(hash);
+    const newSources = new Set([].concat(knownSources).concat(sources));
+
+    await this.uprtclExtensions.knownSources.put(
+      Array.from(newSources).filter(d => d),
+      hash
+    );
   }
 
   async removeKnownSource(hash: string, source: string): Promise<void> {
     let knownSources = await this.getKnownSources(hash);
     knownSources = knownSources.filter(s => s !== source);
 
-    await insertKnownSources(new KnownSources(hash, knownSources));
+    await this.uprtclExtensions.knownSources.put(knownSources, hash);
   }
 }

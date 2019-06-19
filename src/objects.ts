@@ -142,12 +142,3 @@ export class TextNode implements ITextNode {
     );
   }
 }
-
-export class KnownSources {
-  hash: string;
-  sources: string[];
-  constructor(_hash, _sources) {
-    this.hash = _hash;
-    this.sources = _sources;
-  }
-}

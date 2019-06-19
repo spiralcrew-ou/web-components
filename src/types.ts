@@ -69,6 +69,7 @@ export class CommitFull {
 export class TextNodeFull {
   id?: string;
   text: string;
+  type: string;
   links: Array<{
     position?: Position;
     link: PerspectiveFull;

@@ -1,15 +1,16 @@
 import { DraftService } from '../draft.service';
-import { insertDraft, getDraft } from './dataservices';
-import { TextNode } from '../../types';
-
+import { ExtensionsLocal } from './extensions.local';
 
 export class DraftLocal<T> implements DraftService<T> {
+
+  uprtclExtensions = new ExtensionsLocal<T>();
+
   getDraft(objectId: string): Promise<T> {
-    return getDraft(objectId);
+    return this.uprtclExtensions.drafts.get(objectId);
   }
 
   async setDraft(objectId: string, draft: T): Promise<void> {
-    return insertDraft(objectId, <TextNode>(<unknown>draft));
+    delete draft['id'];
+    await this.uprtclExtensions.drafts.put(draft, objectId);
   }
-
 }

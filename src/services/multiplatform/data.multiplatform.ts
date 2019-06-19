@@ -15,7 +15,7 @@ export class DataMultiplatform extends CachedMultiplatform<DataProvider> {
   linksFromTextNode = node => node.links.map(link => link.link);
 
   constructor(serviceProviders: Dictionary<DiscoveryProvider<DataProvider>>) {
-    super(serviceProviders, { data: new DataLocal(), draft: new DraftLocal() });
+    super(serviceProviders, { data: new DataLocal(), draft: new DraftLocal<TextNode>() });
   }
 
   getData(dataId: string): Promise<TextNode> {
@@ -59,7 +59,8 @@ export class DataMultiplatform extends CachedMultiplatform<DataProvider> {
     return this.optimisticUpdate(
       serviceProvider,
       service => service.draft.setDraft(objectId, draft),
-      this.linksFromTextNode(draft)
+      this.linksFromTextNode(draft),
+      `Draft of ${objectId}`
     );
   }
 }

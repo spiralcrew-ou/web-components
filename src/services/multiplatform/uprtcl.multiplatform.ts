@@ -137,7 +137,8 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
     return this.optimisticUpdate(
       origin,
       service => service.updateHead(perspectiveId, headId),
-      [headId]
+      [headId],
+      `Update head of ${perspectiveId}`
     );
   }
 }

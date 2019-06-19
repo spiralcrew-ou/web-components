@@ -107,7 +107,7 @@ export class CachedMultiplatform<T> extends Multiplatform<T> {
         this.knownSources.addKnownSources(objectId, [serviceProvider])
       );
 
-    this.taskQueue.queueTask(task);
+    this.taskQueue.queueTask({ id: objectId, task });
 
     return objectId;
   }
@@ -119,11 +119,13 @@ export class CachedMultiplatform<T> extends Multiplatform<T> {
   protected async optimisticUpdate(
     serviceProvider: string,
     updater: (service: T) => Promise<void>,
-    linksToObjects: string[]
+    linksToObjects: string[],
+    taskId: string = null
   ): Promise<void> {
     await updater(this.cacheService);
 
     const task = () => this.update(serviceProvider, updater, linksToObjects);
-    this.taskQueue.queueTask(task);
+
+    this.taskQueue.queueTask({ task, id: taskId });
   }
 }
