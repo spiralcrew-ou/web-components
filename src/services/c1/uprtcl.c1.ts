@@ -37,8 +37,9 @@ export class UprtclCollectiveOne implements UprtclService {
     return await http.post('/commit', [commit]);
   }
 
-  async getHead(_perspectiveId: string): Promise<string> {
-    throw new Error('PEPO PLIS HELP');
+  async getHead(perspectiveId: string): Promise<string> {
+    const perspective = await http.get(`/persp/${perspectiveId}`);
+    return perspective['headId'];
   }
 
   async updateHead(perspectiveId: string, commitId: string): Promise<void> {

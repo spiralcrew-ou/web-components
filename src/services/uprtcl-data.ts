@@ -101,6 +101,7 @@ export class UprtclData {
 
     textNodeFull.id = textNode.id;
     textNodeFull.text = textNode.text;
+    textNodeFull.type = textNode.type;
 
     if (levels == 0) {
       /** stop recursion */
