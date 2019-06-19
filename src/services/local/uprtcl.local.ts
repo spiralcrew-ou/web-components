@@ -58,6 +58,10 @@ export class UprtclLocal extends Dexie implements UprtclService {
   }
 
   getPerspective(perspectiveId: string): Promise<IPerspective> {
+    console.log('local getPerspective', perspectiveId);
+    this.perspectives
+      .get(perspectiveId)
+      .then(perspective => console.log('local getPerspective', perspective));
     return this.perspectives.get(perspectiveId);
   }
 
@@ -70,10 +74,13 @@ export class UprtclLocal extends Dexie implements UprtclService {
   }
 
   getProviderRootContextId(serviceProvider: string): Promise<string> {
-    return this.rootContexts.get(serviceProvider);  
+    return this.rootContexts.get(serviceProvider);
   }
 
-  async setProviderRootContextId(serviceProvider: string, rootContextId: string): Promise<void> {
+  async setProviderRootContextId(
+    serviceProvider: string,
+    rootContextId: string
+  ): Promise<void> {
     await this.rootContexts.put(rootContextId, serviceProvider);
   }
 
@@ -95,6 +102,7 @@ export class UprtclLocal extends Dexie implements UprtclService {
   }
 
   async createPerspective(perspective: Perspective): Promise<string> {
+    console.log('local createPerspective', perspective);
     const perspectiveId = await this.generateCid(perspective, [
       'origin',
       'creatorId',

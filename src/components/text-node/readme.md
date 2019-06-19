@@ -7,17 +7,48 @@
 
 ## Properties
 
-| Property   | Attribute  | Description | Type     | Default     |
-| ---------- | ---------- | ----------- | -------- | ----------- |
-| `block_id` | `block_id` |             | `string` | `undefined` |
-| `content`  | `content`  |             | `string` | `undefined` |
+| Property         | Attribute         | Description | Type      | Default     |
+| ---------------- | ----------------- | ----------- | --------- | ----------- |
+| `defaultService` | `default-service` |             | `string`  | `undefined` |
+| `isRootNode`     | `is-root-node`    |             | `boolean` | `true`      |
+| `perspectiveId`  | `perspective-id`  |             | `string`  | `undefined` |
 
 
 ## Events
 
-| Event         | Description | Type                |
-| ------------- | ----------- | ------------------- |
-| `activeBlock` |             | `CustomEvent<void>` |
+| Event           | Description | Type                |
+| --------------- | ----------- | ------------------- |
+| `createSibling` |             | `CustomEvent<void>` |
+
+
+## Methods
+
+### `createCommit() => Promise<any[]>`
+
+
+
+#### Returns
+
+Type: `Promise<any[]>`
+
+
+
+### `createPerspective(serviceProvider: string, name: string) => Promise<void>`
+
+
+
+#### Parameters
+
+| Name              | Type     | Description |
+| ----------------- | -------- | ----------- |
+| `serviceProvider` | `string` |             |
+| `name`            | `string` |             |
+
+#### Returns
+
+Type: `Promise<void>`
+
+
 
 
 ----------------------------------------------

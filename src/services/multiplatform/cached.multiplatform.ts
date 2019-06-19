@@ -28,10 +28,12 @@ export class CachedMultiplatform<T> extends Multiplatform<T> {
   ): Promise<O> {
     // If we have the object already cached, return it
     const cachedObject = await getter(this.cacheService);
+    console.log('cached', cachedObject);
     if (cachedObject) {
       return cachedObject;
     }
-
+    
+    console.log('cached 2');
     // If not on cache, discover it
     const object = await discover();
 
@@ -98,14 +100,23 @@ export class CachedMultiplatform<T> extends Multiplatform<T> {
 
     object['id'] = objectId;
 
-    const task = () =>
-      this.create(
-        serviceProvider,
-        service => creator(service, object),
-        linksToObjects
-      ).then(() =>
-        this.knownSources.addKnownSources(objectId, [serviceProvider])
-      );
+    const task = async () => {
+      // First, optimistically add the service provider to the known sources
+      // to create the links correctly
+      await this.knownSources.addKnownSources(objectId, [serviceProvider]);
+
+      try {
+        // Execute the creator
+        await this.create(
+          serviceProvider,
+          service => creator(service, object),
+          linksToObjects
+        );
+      } catch (e) {
+        // If failed, remove the source from the known sources
+        await this.knownSources.removeKnownSource(objectId, serviceProvider);
+      }
+    };
 
     this.taskQueue.queueTask({ id: objectId, task });
 

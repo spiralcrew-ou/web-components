@@ -1,6 +1,5 @@
 import Dexie from 'dexie';
 
-
 export class ExtensionsLocal<T> extends Dexie {
   knownSources: Dexie.Table<string[], string>;
   drafts: Dexie.Table<T, string>;
@@ -15,7 +14,7 @@ export class ExtensionsLocal<T> extends Dexie {
     });
     this.knownSources = this.table('knownSources');
     this.drafts = this.table('drafts');
-    this.data = this.table('drafts');
+    this.data = this.table('data');
   }
 
 }

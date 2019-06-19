@@ -7,17 +7,17 @@
 
 ## Properties
 
-| Property   | Attribute  | Description | Type     | Default     |
-| ---------- | ---------- | ----------- | -------- | ----------- |
-| `block_id` | `block_id` |             | `string` | `undefined` |
-| `content`  | `content`  |             | `string` | `undefined` |
+| Property | Attribute | Description | Type     | Default     |
+| -------- | --------- | ----------- | -------- | ----------- |
+| `id`     | `id`      |             | `string` | `undefined` |
+| `text`   | `text`    |             | `string` | `undefined` |
 
 
 ## Events
 
-| Event         | Description | Type                |
-| ------------- | ----------- | ------------------- |
-| `activeBlock` |             | `CustomEvent<void>` |
+| Event             | Description | Type                |
+| ----------------- | ----------- | ------------------- |
+| `content-changed` |             | `CustomEvent<void>` |
 
 
 ----------------------------------------------

@@ -7,17 +7,19 @@
 
 ## Properties
 
-| Property   | Attribute  | Description | Type     | Default     |
-| ---------- | ---------- | ----------- | -------- | ----------- |
-| `block_id` | `block_id` |             | `string` | `undefined` |
-| `content`  | `content`  |             | `string` | `undefined` |
+| Property         | Attribute         | Description | Type          | Default     |
+| ---------------- | ----------------- | ----------- | ------------- | ----------- |
+| `defaultService` | `default-service` |             | `string`      | `undefined` |
+| `perspective`    | --                |             | `Perspective` | `undefined` |
 
 
 ## Events
 
-| Event         | Description | Type                |
-| ------------- | ----------- | ------------------- |
-| `activeBlock` |             | `CustomEvent<void>` |
+| Event               | Description | Type                                                                |
+| ------------------- | ----------- | ------------------------------------------------------------------- |
+| `createCommit`      |             | `CustomEvent<void>`                                                 |
+| `createPerspective` |             | `CustomEvent<{     name: string;     serviceProvider: string;   }>` |
+| `selectPerspective` |             | `CustomEvent<string>`                                               |
 
 
 ----------------------------------------------

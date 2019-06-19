@@ -3,7 +3,7 @@ import { ExtensionsLocal } from './extensions.local';
 
 export class DiscoveryLocal implements DiscoveryService {
   uprtclExtensions = new ExtensionsLocal();
-  
+
   getOwnSource(): Promise<string> {
     return Promise.resolve('local');
   }
@@ -13,19 +13,27 @@ export class DiscoveryLocal implements DiscoveryService {
   }
 
   async addKnownSources(hash: string, sources: string[]): Promise<void> {
+    if (!sources || sources.length === 0) {
+      return;
+    }
+
     const knownSources = await this.getKnownSources(hash);
-    const newSources = new Set([].concat(knownSources).concat(sources));
+    const newSources = new Set([].concat(sources).concat(knownSources));
 
     await this.uprtclExtensions.knownSources.put(
       Array.from(newSources).filter(d => d),
       hash
     );
+    console.log(`known sources added`, hash, sources);
   }
 
   async removeKnownSource(hash: string, source: string): Promise<void> {
     let knownSources = await this.getKnownSources(hash);
     knownSources = knownSources.filter(s => s !== source);
-
-    await this.uprtclExtensions.knownSources.put(knownSources, hash);
+    if (knownSources.length === 0){
+      await this.uprtclExtensions.knownSources.delete(hash);
+    } else {
+      await this.uprtclExtensions.knownSources.put(knownSources, hash);
+    }
   }
 }

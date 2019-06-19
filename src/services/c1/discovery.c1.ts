@@ -2,9 +2,7 @@ import { DiscoveryService } from '../discovery.service';
 import { http } from './http';
 
 export class DiscoveryCollectiveOne implements DiscoveryService {
-
-  constructor() {
-  }
+  constructor() {}
 
   getOwnSource(): Promise<string> {
     return http.get('/discovery/you');
@@ -13,12 +11,8 @@ export class DiscoveryCollectiveOne implements DiscoveryService {
   getKnownSources(hash: string): Promise<string[]> {
     return http.get(`/discovery/${hash}`);
   }
-  addKnownSources(hash: string, sources: string[]): Promise<void> {
-    return new Promise<void>((resolve) => {
-      http.put(`/discovery/${hash}`, sources).then(() => {
-        resolve();
-      })
-    });
+  async addKnownSources(hash: string, sources: string[]): Promise<void> {
+    await http.put(`/discovery/${hash}`, sources);
   }
   removeKnownSource(hash: string, source: string): Promise<void> {
     console.log(hash);
