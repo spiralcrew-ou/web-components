@@ -19,8 +19,17 @@ export class DataCollectiveOne implements DataService {
     
     async createData(data: any): Promise<string> {
         const dataC1 = new DataC1();
+        dataC1.id = data.id;
         dataC1.type = 'NODE';
-        dataC1.jsonData = JSON.stringify(data);
+
+        /** remove the id  */
+        let dataPlain = {
+            'text': data.text,
+            'type': data.type,
+            'links': data.links
+        }
+
+        dataC1.jsonData = JSON.stringify(dataPlain);
         return http.post('/data', [ dataC1 ]);
     }
    
