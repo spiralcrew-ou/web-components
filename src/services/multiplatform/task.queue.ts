@@ -11,7 +11,7 @@ export class TaskQueue {
   tasksIds: { [key: string]: Task } = {};
   queue: Task[] = [];
 
-  constructor(retryEnabled: boolean = true, retryInterval: number = 3000) {
+  constructor(retryEnabled: boolean = true, retryInterval: number = 100) {
     this.retryEnabled = retryEnabled;
     this.retryInterval = retryInterval;
   }
@@ -68,7 +68,7 @@ export class TaskQueue {
     } catch (e) {
       if (this.retryEnabled) {
         console.log(
-          `Task failed, retrying in ${this.retryInterval / 1000}s`,
+          `Task failed, retrying when online ${this.retryInterval / 1000}s`,
           task
         );
 
