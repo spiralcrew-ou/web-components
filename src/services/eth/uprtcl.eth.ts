@@ -18,6 +18,12 @@ function makeid(length) {
 
 const userId = 'did:sec256k1:' + makeid(10);
 const enableDebug = true;
+
+const ADD_PERSP = 'addPerspective(bytes32,bytes32,address,string)';
+const UPDATE_HEAD = 'updateHead(bytes32,string)';
+// const CHANGE_OWNER = 'changeOwner(bytes32,address)';
+const GET_PERSP_SIG = 'getPerspective(bytes32)';
+
 export class UprtclEthereum implements UprtclService {
   
   ipfsClient = null;
@@ -42,7 +48,7 @@ export class UprtclEthereum implements UprtclService {
 
     /** Head comes from ethereum */
     const perspectiveIdHash = await hash(perspectiveId);
-    const result = await this.ethereum.uprtclInstance.getPerspective(perspectiveIdHash);
+    const result = await this.ethereum.uprtclInstance.methods[GET_PERSP_SIG](perspectiveIdHash);
     persp.headId = result.headCid;
 
     return persp;
@@ -59,8 +65,7 @@ export class UprtclEthereum implements UprtclService {
     
     let perspectiveIdHash = await hash(perspectiveId);
     
-    let perspData = await this.ethereum.uprtclInstance.methods
-      .getPerspective(perspectiveIdHash)
+    let perspData = await this.ethereum.uprtclInstance.methods[GET_PERSP_SIG](perspectiveIdHash)
       .call();
 
     return perspData.headCid;
@@ -168,11 +173,11 @@ export class UprtclEthereum implements UprtclService {
     let contextIdHash = await hash(perspective.contextId);
     
     /** perspective is added but the head is null by default */
-    let result = await this.ethereum.uprtclInstance.methods['addPerspective(bytes32,bytes32,address,string)']
+    let result = await this.ethereum.uprtclInstance.methods[ADD_PERSP]
       (perspectiveIdHash, contextIdHash, this.ethereum.account, perspectiveId)
       .send({ from: this.ethereum.account });
 
-    console.log(result);
+    console.log('[ETH] Perspective created', result);
 
     return perspectiveId;
   }
@@ -181,8 +186,7 @@ export class UprtclEthereum implements UprtclService {
     if (enableDebug) debugger;
     let perspectiveIdHash = await hash(perspectiveId);
 
-    await this.ethereum.uprtclInstance.methods
-      .updateHead(perspectiveIdHash, headId)
+    await this.ethereum.uprtclInstance.methods[UPDATE_HEAD](perspectiveIdHash, headId)
       .send({ from: this.ethereum.account })
   }
 

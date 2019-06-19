@@ -6,7 +6,7 @@ export interface Task {
 export class TaskQueue {
   interval = null;
   retryInterval: number; // Milliseconds
-  retryEnabled = true;
+  retryEnabled = false;
 
   tasksIds: { [key: string]: Task } = {};
   queue: Task[] = [];
