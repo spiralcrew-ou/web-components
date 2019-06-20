@@ -1,7 +1,6 @@
 import { UprtclMultiplatform } from './multiplatform/uprtcl.multiplatform';
 import { DataMultiplatform } from './multiplatform/data.multiplatform';
 
-import { DataLocal } from './local/data.local';
 import { DraftLocal } from './local/draft.local';
 
 import { DataHolochain } from './holochain/data.holochain';
@@ -17,7 +16,6 @@ import { DiscoveryCollectiveOne } from './c1/discovery.c1';
 import { UprtclEthereum } from './eth/uprtcl.eth';
 
 import { DataIpfs } from './data.ipfs';
-import { CidConfig } from './local/cid.config';
 import { DiscoveryEthereum } from './eth/discovery.eth';
 
 export const holochainEnabled = false;
@@ -35,11 +33,6 @@ export const ethServiceProvider =
 
 const ethLocation = 'ws://127.0.0.1:9545';
 
-/** standard C1 settings */
-export const c1Cid   = new CidConfig('base58btc', 1, 'raw',    'sha3-256', false);
-export const hcCid   = new CidConfig('base58btc', 0, 'dag-pb', 'sha2-256', false);
-export const ipfsCid = new CidConfig('base58btc', 0, 'dag-pb', 'sha2-256', true);
- 
 let uprtclConfig = {};
 let dataConfig = {};
 
@@ -87,12 +80,12 @@ if (ethEnabled) {
   dataConfig[ethServiceProvider] = {
     discovery: new DiscoveryEthereum(),
     service: {
-      data: new DataLocal(ipfsCid),
+      data: new DataIpfs('ipfs.infura.io'),
       draft: new DraftLocal()
     }
   };
 }
 
-export const uprtclMultiplatform = new UprtclMultiplatform(uprtclConfig, ipfsCid);
+export const uprtclMultiplatform = new UprtclMultiplatform(uprtclConfig);
 
-export const dataMultiplatform = new DataMultiplatform(dataConfig, ipfsCid);
+export const dataMultiplatform = new DataMultiplatform(dataConfig);

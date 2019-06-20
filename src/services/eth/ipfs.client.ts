@@ -1,4 +1,4 @@
-import { CidConfig } from "../local/cid.config";
+import { CidConfig } from "../cid.config";
 
 const ipfsClient = window['IpfsHttpClient']
 

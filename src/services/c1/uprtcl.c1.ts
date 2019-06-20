@@ -1,9 +1,28 @@
 import { Commit, Context, Perspective } from '../../types';
 import { UprtclService } from '../uprtcl.service';
 import { http } from './http';
+import { CidConfig } from '../cid.config';
 
 export class UprtclCollectiveOne implements UprtclService {
-  constructor() {}
+  
+  cidConfig: CidConfig;
+  
+  constructor() {
+    this.cidConfig = new CidConfig('base58btc', 1, 'raw',    'sha3-256', false);
+  }
+
+  getCidConfig(): CidConfig {
+    return this.cidConfig;
+  }
+
+  setCidConfig(): CidConfig {
+    throw new Error('Collectiveone Cid version is fixed for the moment');
+  }
+
+  computeContextId(context: Context): Promise<string> {
+    console.log({context});
+    throw new Error('Not implemented');
+  }
 
   async getContext(contextId: string): Promise<Context> {
     return await http.get<Context>(`/ctx/${contextId}`);
@@ -15,10 +34,6 @@ export class UprtclCollectiveOne implements UprtclService {
 
   async getCommit(commitId: string): Promise<Commit> {
     return await http.get<Commit>(`/commit/${commitId}`);
-  }
-
-  async getRootContextId(): Promise<string> {
-    return await http.get<string>('/u/rootContextId');
   }
 
   async getContextPerspectives(contextId: string): Promise<Perspective[]> {

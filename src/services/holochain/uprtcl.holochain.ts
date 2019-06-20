@@ -1,14 +1,17 @@
 import { UprtclService } from '../uprtcl.service';
 import { HolochainConnection, EntryResult } from './holochain.connection';
 import { Perspective, Commit, Context } from '../../types';
+import { CidConfig } from '../cid.config';
 
 export class UprtclHolochain implements UprtclService {
   uprtclZome: HolochainConnection;
   proxyZome: HolochainConnection;
+  cidConfig: CidConfig;
 
   constructor() {
     this.uprtclZome = new HolochainConnection('test-instance', 'uprtcl');
     this.proxyZome = new HolochainConnection('test-instance', 'proxy');
+    this.cidConfig = new CidConfig('base58btc', 0, 'dag-pb', 'sha2-256', false);
   }
 
   splitId(object: any) {
@@ -31,12 +34,19 @@ export class UprtclHolochain implements UprtclService {
       .then(entry => this.uprtclZome.parseEntryResult(entry));
   }
 
-  getRootContextId(): Promise<string> {
-    return this.uprtclZome
-      .call('get_root_context_id', {})
-      .then(result => (result.Ok ? result.Ok : result));
+  getCidConfig(): CidConfig {
+    return this.cidConfig;
   }
 
+  setCidConfig(): CidConfig {
+    throw new Error('Holochain Cid version is fixed for the moment');
+  }
+
+  computeContextId(context: Context): Promise<string> {
+    console.log({context});
+    throw new Error('Not implemented');
+  }
+  
   getContext(contextId: string): Promise<Context> {
     return this.getEntry(contextId).then(result => result.entry);
   }

@@ -10,38 +10,52 @@ import { Perspective, Commit, Context } from './db.objects';
 
 import Dexie from 'dexie';
 import { ipldService } from '../ipld';
-import { CidConfig } from './cid.config';
+import { CidConfig } from '../cid.config';
+import { CidCompatible } from '../cid.service';
 
-export class UprtclLocal extends Dexie implements UprtclService {
-  rootContexts: Dexie.Table<string, string>;
+export class UprtclLocal extends Dexie implements UprtclService, CidCompatible {
+  
   contexts: Dexie.Table<Context, string>;
   perspectives: Dexie.Table<Perspective, string>;
   heads: Dexie.Table<string, string>;
   commits: Dexie.Table<Commit, string>;
   currentConfig: CidConfig;
 
-  constructor(config: CidConfig) {
+  constructor() {
     super('_prtcl');
     this.version(0.1).stores({
-      rootContexts: '',
       perspectives: 'id,contextId',
       heads: '',
       commits: 'id',
       contexts: 'id'
     });
-    this.rootContexts = this.table('rootContexts');
     this.contexts.mapToClass(Context);
     this.perspectives.mapToClass(Perspective);
     this.heads = this.table('heads');
     this.commits.mapToClass(Commit);
+  }
+
+  setCidConfig(config: CidConfig) {
     this.currentConfig = config;
+  }
+
+  getCidConfig() {
+    return this.currentConfig;
+  }
+
+  computeContextId(context: IContext): Promise<string> {
+    return this.generateCid(context, [
+      'creatorId',
+      'timestamp',
+      'nonce'
+    ]);
   }
 
   updateConfig(config: CidConfig) {
     this.currentConfig = config;
   }
 
-  generateCid(object: any, propertyOrder: string[]) {
+  generateCid(object: object, propertyOrder: string[]) {
     const plain = {};
 
     for (const key of propertyOrder) {
@@ -66,21 +80,6 @@ export class UprtclLocal extends Dexie implements UprtclService {
     return this.commits.get(commitId);
   }
 
-  async getRootContextId(): Promise<string> {
-    throw new Error('not implemented');
-  }
-
-  getProviderRootContextId(serviceProvider: string): Promise<string> {
-    return this.rootContexts.get(serviceProvider);
-  }
-
-  async setProviderRootContextId(
-    serviceProvider: string,
-    rootContextId: string
-  ): Promise<void> {
-    await this.rootContexts.put(rootContextId, serviceProvider);
-  }
-
   async getContextPerspectives(contextId: string): Promise<IPerspective[]> {
     return this.perspectives
       .where('contextId')
@@ -89,12 +88,7 @@ export class UprtclLocal extends Dexie implements UprtclService {
   }
 
   async createContext(context: Context): Promise<string> {
-    const contextId = await this.generateCid(context, [
-      'creatorId',
-      'timestamp',
-      'nonce'
-    ]);
-    context.id = contextId;
+    context.id = await this.computeContextId(context);
     return this.contexts.put(context);
   }
 

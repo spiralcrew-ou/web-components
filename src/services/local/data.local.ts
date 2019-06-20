@@ -1,5 +1,5 @@
 import { DataService } from '../data.service';
-import { CidConfig } from './cid.config';
+import { CidConfig } from '../cid.config';
 import { ipldService } from '../ipld';
 import { ExtensionsLocal } from './extensions.local';
 
@@ -7,9 +7,16 @@ export class DataLocal<T> implements DataService<T> {
 
   currentConfig: CidConfig;
   uprtclExtensions = new ExtensionsLocal<T>();
+  
+  constructor() {
+  }
 
-  constructor(config: CidConfig) {
-    this.currentConfig = config
+  getCidConfig(): CidConfig {
+    return this.currentConfig;
+  }
+
+  setCidConfig(config: CidConfig)  {
+    this.currentConfig = config;
   }
 
   generateCid(object: any, propertyOrder: string[]) {

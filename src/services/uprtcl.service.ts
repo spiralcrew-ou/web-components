@@ -1,26 +1,23 @@
 import { Commit, Perspective, Context } from '../types';
+import { CidCompatible } from './cid.service';
 
-export interface UprtclService {
+export interface UprtclService extends CidCompatible {
+
   /** ---------------
    * Basic Getters
    * ---------------- */
   getContext(contextId: string): Promise<Context>;
   getPerspective(perspectiveId: string): Promise<Perspective>;
   getCommit(commitId: string): Promise<Commit>;
+  computeContextId(context: Context): Promise<string>;
 
   /** ---------------
    * Support getters
    * ---------------- */
-
-  /** getRootContextId() returns the id of the root context of the authenticated
-   * user on that platform. The root context of a user is unique and equal to
-   * {"creatorId":userDid,"timestamp":"0","nonce":"0"}
-   */
-  getRootContextId(): Promise<string>;
-
-  /** getContextId() returns the id of a given context using the platform native
-   * hash algorithm, allowing the same context to exist with different IDs depending
-   * on the hash algorithm (twin ids).
+  /** getContextPerspectives() returns all the perspectives associated to a 
+   * context.
+   * 
+   * @param contextId The context id
    */
   getContextPerspectives(contextId: string): Promise<Perspective[]>;
 

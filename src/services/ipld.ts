@@ -1,8 +1,8 @@
 import CID from 'cids';
 import multihashing from 'multihashing-async';
 import Buffer from 'buffer/';
-import { CidConfig } from './local/cid.config';
 import { IpfsClient } from './eth/ipfs.client';
+import { CidConfig } from './cid.config';
 
 export class IpldService {
 

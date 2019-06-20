@@ -3,9 +3,9 @@ import { Context, Commit, Perspective } from '../../types';
 
 import { EthereumConnection } from './eth.connection';
 import { IpfsClient } from './ipfs.client';
-import { ipfsCid as cidConfig } from './../index';
 
 import { hash } from './eth.support';
+import { CidConfig } from '../cid.config';
 
 const enableDebug = true;
 
@@ -29,10 +29,26 @@ export class UprtclEthereum implements UprtclService {
   
   ipfsClient: IpfsClient;
   ethereum: EthereumConnection;
+  cidConfig: CidConfig;
 
   constructor(host: string) {
     this.ipfsClient = new IpfsClient();
     this.ethereum = new EthereumConnection(host);
+    this.cidConfig = new CidConfig(
+      'base58btc', 0, 'dag-pb', 'sha2-256', true);
+  }
+
+  getCidConfig(): CidConfig {
+    return this.cidConfig;
+  }
+
+  setCidConfig(): CidConfig {
+    throw new Error('Ethereum Cid version is fixed for the moment');
+  }
+
+  computeContextId(context: Context): Promise<string> {
+    console.log({context});
+    throw new Error('Not implemented');
   }
 
   async getContext(contextId: string): Promise<Context> {
@@ -81,7 +97,7 @@ export class UprtclEthereum implements UprtclService {
       timestamp: 0,
       nonce: 0
     }
-    return this.ipfsClient.computeHash(context, cidConfig);
+    return this.ipfsClient.computeHash(context, this.cidConfig);
   }
 
   async getContextPerspectives(contextId: string): Promise<Perspective[]> {
@@ -132,7 +148,7 @@ export class UprtclEthereum implements UprtclService {
       'nonce': context.nonce,
     }
 
-    let contextId = await this.ipfsClient.addObject(contextPlain, cidConfig);
+    let contextId = await this.ipfsClient.addObject(contextPlain, this.cidConfig);
 
     if (contextIdOrg) {
       if (contextIdOrg != contextId) {
@@ -163,7 +179,7 @@ export class UprtclEthereum implements UprtclService {
     }
 
     /** Store the perspective data in the data layer */
-    let perspectiveId = await this.ipfsClient.addObject(perspectivePlain, cidConfig);
+    let perspectiveId = await this.ipfsClient.addObject(perspectivePlain, this.cidConfig);
 
     if (perspectiveIdOrg) {
       if (perspectiveIdOrg != perspectiveId) {
@@ -204,7 +220,7 @@ export class UprtclEthereum implements UprtclService {
     }
 
     /** Store the perspective data in the data layer */
-    let commitId = await this.ipfsClient.addObject(commitPlain, cidConfig);
+    let commitId = await this.ipfsClient.addObject(commitPlain, this.cidConfig);
 
     if (commitIdOrg) {
       if (commitIdOrg != commitId) {
