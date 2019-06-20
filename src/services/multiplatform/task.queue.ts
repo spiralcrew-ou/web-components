@@ -11,13 +11,12 @@ export class TaskQueue {
   tasksIds: { [key: string]: Task } = {};
   queue: Task[] = [];
 
-  constructor(retryEnabled: boolean = true, retryInterval: number = 3000) {
+  constructor(retryEnabled: boolean = true, retryInterval: number = 100) {
     this.retryEnabled = retryEnabled;
     this.retryInterval = retryInterval;
   }
 
   public queueTask(task: Task): void {
-    console.log('Task ', task);
     // Remove the task with the same id from the queue, if it existed
     if (task.id) {
       this.tasksIds[task.id] = task;
@@ -29,20 +28,33 @@ export class TaskQueue {
       }
     }
 
-    this.runTask(task);
+    if (navigator.onLine) {
+      this.runTask(task);
+    } else {
+      this.queue.push(task);
+      this.scheduleTasksRun();
+    }
+  }
+
+  private scheduleTasksRun() {
+    if (this.interval == null) {
+      this.interval = setInterval(() => this.runTasks(), this.retryInterval);
+    }
   }
 
   private runTasks() {
-    // Clear queue
-    const queue = this.queue;
-    this.queue = [];
+    if (navigator.onLine) {
+      // Clear queue
+      const queue = this.queue;
+      this.queue = [];
 
-    // Clear interval
-    clearInterval(this.interval);
-    this.interval = null;
+      // Clear interval
+      clearInterval(this.interval);
+      this.interval = null;
 
-    for (const task of queue) {
-      this.runTask(task);
+      for (const task of queue) {
+        this.runTask(task);
+      }
     }
   }
 
@@ -56,7 +68,7 @@ export class TaskQueue {
     } catch (e) {
       if (this.retryEnabled) {
         console.log(
-          `Task failed, retrying in ${this.retryInterval / 1000}s`,
+          `Task failed, retrying when online ${this.retryInterval / 1000}s`,
           task
         );
 
@@ -66,12 +78,7 @@ export class TaskQueue {
 
         this.queue.push(task);
 
-        if (this.interval == null) {
-          this.interval = setInterval(
-            () => this.runTasks(),
-            this.retryInterval
-          );
-        }
+        this.scheduleTasksRun();
       } else {
         console.log(`Task failed, not retrying`, task);
       }

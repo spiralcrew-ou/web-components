@@ -94,7 +94,6 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
     serviceProvider: string,
     perspective: Perspective
   ): Promise<string> {
-    console.log('createPerspective');
     return this.optimisticCreate(
       serviceProvider,
       perspective,
