@@ -19,8 +19,8 @@ import { DataIpfs } from './data.ipfs';
 import { DiscoveryEthereum } from './eth/discovery.eth';
 
 export const holochainEnabled = false;
-export const c1Enabled = false;
-export const ethEnabled = true;
+export const c1Enabled = true;
+export const ethEnabled = false;
 
 export const holochainServiceProvider =
   'holochain://Qmag7yGbYSMhkzDZLnSJkc4pzNWpHLtfP5o2jL8jGF4W5w';

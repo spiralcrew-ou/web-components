@@ -34,7 +34,25 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
     this.cacheService.setCidConfig(
       this.serviceProviders[serviceProvider].service.getCidConfig()
     );
-    return this.cacheService.computeContextId(userContext)
+    let rootContextId = await this.cacheService.computeContextId(userContext)
+
+    /** check that the root context do exist in the platform */
+    let rootContext = await this.serviceProviders[serviceProvider].service
+      .getContext(rootContextId);
+
+    if (rootContext == null) {
+      let rootContextId1 = await this.serviceProviders[serviceProvider].service
+        .createContext(userContext);
+
+      if (rootContextId !== rootContextId1) {
+        throw new Error(
+          `Unexpected condition on service provider. 
+          The computeContextId ${rootContextId} is different 
+          from ${rootContextId1} id of the generated context`);
+      }
+    }
+
+    return rootContextId;
   }
 
   async getContext(contextId: string): Promise<Context> {

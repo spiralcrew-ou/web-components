@@ -28,6 +28,9 @@ export class DataMultiplatform extends CachedMultiplatform<DataProvider> {
   }
 
   createData(serviceProvider: string, data: TextNode): Promise<string> {
+    this.cacheService.data.setCidConfig(
+      this.serviceProviders[serviceProvider].service.data.getCidConfig()
+    );
     return this.optimisticCreate(
       serviceProvider,
       data,
