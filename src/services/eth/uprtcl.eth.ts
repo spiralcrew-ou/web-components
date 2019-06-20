@@ -45,17 +45,9 @@ export class UprtclEthereum implements UprtclService {
     await this.ethereum.ready();
 
     /** Content addressable part comes from IPFS */
-    const perspBody = await this.ipfsClient.get(perspectiveId);
-    perspBody.id = perspectiveId;
-
-    /** Head comes from ethereum */
-    let perspectiveIdHash = await hash(perspectiveId);
-    const perspEth = await this.ethereum.call(
-      GET_PERSP, 
-      [perspectiveIdHash]);
-      
-    perspBody.headId = perspEth.headCid !== '' ? perspEth.headCid : null ;
-    return perspBody;
+    const perspective: Perspective = await this.ipfsClient.get(perspectiveId);
+    perspective.id = perspectiveId;
+    return perspective;
   }
 
   async getCommit(commitId: string): Promise<Commit> {
