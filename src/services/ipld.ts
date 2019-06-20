@@ -2,15 +2,27 @@ import CID from 'cids';
 import multihashing from 'multihashing-async';
 import Buffer from 'buffer/';
 import { CidConfig } from './local/cid.config';
+import { IpfsClient } from './eth/ipfs.client';
 
 export class IpldService {
 
+  ipfsClient = new IpfsClient();
+
   /** wrapper that takes a message and computes its [cid](https://github.com/multiformats/cid) */
   async generateCid(
-    message: string, 
+    object: object, 
     cidConfig: CidConfig): Promise<string> {
+    
+    if (typeof(object) !== 'object') throw new Error('Object expected, not the stringified string!');
 
-    const b = Buffer.Buffer.from(message);
+    /** ipfs hash is not "just" the buffer hash, 
+     * so use ipfs client to compute the ID */
+    if (cidConfig.onIpfs) {
+      return this.ipfsClient.computeHash(object, cidConfig);
+    }
+
+    /** other clients should hash the stringified object directly  */
+    const b = Buffer.Buffer.from(JSON.stringify(object));
     const encoded = await multihashing(b, cidConfig.type);
     // TODO check if raw or dag-pb
     const cid = new CID(cidConfig.version, cidConfig.codec, encoded, cidConfig.base);

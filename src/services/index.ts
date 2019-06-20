@@ -33,10 +33,12 @@ export const c1ServiceProvider =
 export const ethServiceProvider = 
   'eth://smartContract';
 
+const ethLocation = 'ws://127.0.0.1:9545';
+
 /** standard C1 settings */
-export const c1Cid   = new CidConfig('base58btc', 1, 'raw',    'sha3-256');
-export const hcCid   = new CidConfig('base58btc', 0, 'dag-pb', 'sha2-256');
-export const ipfsCid = new CidConfig('base58btc', 0, 'dag-pb', 'sha2-256');
+export const c1Cid   = new CidConfig('base58btc', 1, 'raw',    'sha3-256', false);
+export const hcCid   = new CidConfig('base58btc', 0, 'dag-pb', 'sha2-256', false);
+export const ipfsCid = new CidConfig('base58btc', 0, 'dag-pb', 'sha2-256', true);
  
 let uprtclConfig = {};
 let dataConfig = {};
@@ -79,7 +81,7 @@ if (holochainEnabled) {
 
 if (ethEnabled) {
   uprtclConfig[ethServiceProvider] = {
-    service: new UprtclEthereum('ws://127.0.0.1:8545'),
+    service: new UprtclEthereum(ethLocation),
     discovery: new DiscoveryEthereum(),
   };
   dataConfig[ethServiceProvider] = {

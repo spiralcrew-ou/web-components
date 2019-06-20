@@ -6,7 +6,7 @@ import {
   Context as IContext
 } from '../../types';
 
-import { Perspective, Commit, Context } from '../../objects';
+import { Perspective, Commit, Context } from './db.objects';
 
 import Dexie from 'dexie';
 import { ipldService } from '../ipld';
@@ -49,7 +49,7 @@ export class UprtclLocal extends Dexie implements UprtclService {
     }
 
     return ipldService.generateCid(
-      JSON.stringify(plain),
+      plain,
       this.currentConfig
     );
   }

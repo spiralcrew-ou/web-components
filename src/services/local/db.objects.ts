@@ -1,10 +1,8 @@
 import {
   Perspective as IPerspective,
   Commit as ICommit,
-  Context as IContext,
-  TextNode as ITextNode,
-  Position
-} from './types';
+  Context as IContext
+} from '../../types';
 
 export class Perspective implements IPerspective {
   id: string;
@@ -53,22 +51,5 @@ export class Context implements IContext {
     this.creatorId = _creatorId;
     this.timestamp = _timestamp;
     this.nonce = _nonce;
-  }
-}
-
-export class TextNode implements ITextNode {
-  id?: string;
-  text: string;
-  type: string;
-  links: {
-    position?: Position;
-    link: string;
-  }[];
-
-  constructor(_text: string, _type: string, _links: any) {
-    this.id = null;
-    this.text = _text;
-    this.type = _type;
-    this.links = _links;
   }
 }

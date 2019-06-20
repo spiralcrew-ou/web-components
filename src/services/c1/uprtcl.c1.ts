@@ -1,4 +1,4 @@
-import { Commit, Context, Perspective } from './../../objects';
+import { Commit, Context, Perspective } from '../../types';
 import { UprtclService } from '../uprtcl.service';
 import { http } from './http';
 

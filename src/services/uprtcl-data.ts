@@ -3,22 +3,29 @@ import {
   PerspectiveFull,
   CommitFull,
   TextNodeFull,
-  TextNode as ITextNode,
+  TextNode,
   Perspective,
   Context,
   Commit
 } from './../types';
-import { TextNode } from './../objects';
 
 export class UprtclData {
   uprtcl = uprtclMultiplatform;
   data = dataMultiplatform;
 
-  /** -----------------------------------------------------------------
-   * ADDITIONAL HELPER FUNCTIONS THAT COMBINE UPRTCL AND DATA SERVICES
-   * ------------------------------------------------------------------
-   */
+  /** Single point to initialize empty text nodes
+   * 
+   * @param _content Text used to initialize the text node
+    */
+  public initEmptyTextNode(_content: string) :TextNode {
+    return {
+      text: _content, 
+      type: 'paragraph', 
+      links: []
+    }
+  }
 
+  
   /** Gets a PerspectiveFull object with the head, context and draft objects nested.
    * It may recurse if the head commit or the draft have a TextNode with links, getting
    * their content as PerspectiveFull recursively.
@@ -92,7 +99,7 @@ export class UprtclData {
    *
    * @returns A TextNodeFull with perspectives in place of links. */
   async getTextNodeFull(
-    textNode: ITextNode,
+    textNode: TextNode,
     levels: number
   ): Promise<TextNodeFull> {
     if (textNode == null) return null;
@@ -259,7 +266,7 @@ export class UprtclData {
     await this.data.setDraft(
       serviceProvider,
       perspectiveId,
-      new TextNode(content, 'paragraph', [])
+      this.initEmptyTextNode(content)
     );
 
     return perspectiveId;
@@ -380,7 +387,7 @@ export class UprtclData {
   async getOrCreateDraft(
     serviceProvider: string,
     perspectiveId: string
-  ): Promise<ITextNode> {
+  ): Promise<TextNode> {
     let draft = await this.data.getDraft(serviceProvider, perspectiveId);
 
     if (draft != null) {
@@ -390,7 +397,7 @@ export class UprtclData {
     await this.data.setDraft(
       serviceProvider,
       perspectiveId,
-      new TextNode('', 'paragraph', [])
+      this.initEmptyTextNode('')
     );
 
     return this.data.getDraft(serviceProvider, perspectiveId);

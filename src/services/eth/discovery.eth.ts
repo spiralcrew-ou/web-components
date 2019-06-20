@@ -8,12 +8,12 @@ export class DiscoveryEthereum implements DiscoveryService {
   }
 
   async getKnownSources(hash: string): Promise<string[]> {
-    console.log('[ETH DISCOVERY] I am actually ignoring your hash', { hash })
+    console.log('[ETH DISCOVERY] I am actually ignoring your hash and returning myself always', { hash })
     let ownsource = await this.getOwnSource();
     return Promise.resolve([ownsource]);
   }
   async addKnownSources(hash: string, sources: string[]): Promise<void> {
-    console.log('[ETH DISCOVERY] I dont know how to do this, sorry', { hash, sources })
+    console.log('[ETH DISCOVERY] I cant add known sources, I only know of myself, sorry', { hash, sources })
     return Promise.resolve();
   }
   removeKnownSource(hash: string, source: string): Promise<void> {

@@ -20,7 +20,7 @@ export class DataLocal<T> implements DataService<T> {
     }
 
     return ipldService.generateCid(
-      JSON.stringify(plain),
+     plain,
       this.currentConfig
     );
   }
