@@ -114,6 +114,7 @@ export class CachedMultiplatform<T> extends Multiplatform<T> {
         );
       } catch (e) {
         // If failed, remove the source from the known sources
+        console.error('[CACHE] creator call failed', e)
         await this.knownSources.removeKnownSource(objectId, serviceProvider);
       }
     };

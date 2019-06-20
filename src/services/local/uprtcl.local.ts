@@ -59,7 +59,7 @@ export class UprtclLocal extends Dexie implements UprtclService {
   }
 
   getPerspective(perspectiveId: string): Promise<IPerspective> {
-    console.log('local getPerspective', perspectiveId);
+    // console.log('local getPerspective', perspectiveId);
     this.perspectives
       .get(perspectiveId)
       .then(perspective => console.log('local getPerspective', perspective));

@@ -18,6 +18,7 @@ import { UprtclEthereum } from './eth/uprtcl.eth';
 
 import { DataIpfs } from './data.ipfs';
 import { CidConfig } from './local/cid.config';
+import { DiscoveryEthereum } from './eth/discovery.eth';
 
 export const holochainEnabled = false;
 export const c1Enabled = false;
@@ -79,10 +80,10 @@ if (holochainEnabled) {
 if (ethEnabled) {
   uprtclConfig[ethServiceProvider] = {
     service: new UprtclEthereum('ws://127.0.0.1:8545'),
-    discovery: null
+    discovery: new DiscoveryEthereum(),
   };
   dataConfig[ethServiceProvider] = {
-    discovery: null,
+    discovery: new DiscoveryEthereum(),
     service: {
       data: new DataLocal(ipfsCid),
       draft: new DraftLocal()

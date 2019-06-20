@@ -33,8 +33,6 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
   }
 
   async getPerspective(perspectiveId: string): Promise<Perspective> {
-    console.log('getPerspective');
-
     return await this.cachedDiscover(
       perspectiveId,
       service => service.getPerspective(perspectiveId),

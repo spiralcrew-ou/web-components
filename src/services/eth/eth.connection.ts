@@ -29,4 +29,39 @@ export class EthereumConnection {
     if (this.uprtclInstance) return Promise.resolve();
     else return this.connectionReady;
   }
+
+  /** a function to call a method and resolve only when confirmed */
+  public send(funcName: string, pars: any[]): Promise<any> {
+    return new Promise(async resolve => {
+      
+      let gasEstimated = await this.uprtclInstance.methods[funcName](...pars).estimateGas()
+      
+      this.uprtclInstance.methods[funcName](...pars)
+      .send({ 
+        from: this.account,
+        gas: Math.ceil(gasEstimated * 1.1)
+      })
+      .once('transactionHash', (transactionHash) => {
+        console.log(`[ETH] TX HASH ${funcName} `, { transactionHash, pars });
+      })
+      .once('receipt', (receipt) => {
+        console.log(`[ETH] RECEIPT ${funcName} receipt`, { receipt, pars });
+      })
+      .on('error', (error) => {
+        console.error(`[ETH] ERROR ${funcName} `, { error, pars });
+      })
+      .on('confirmation', (confirmationNumber) => {
+        console.log(`[ETH] CONFIRMED ${funcName}`, { confirmationNumber, pars });
+      })
+      .then((receipt: any) => {
+        console.log(`[ETH] MINED ${funcName} call mined`, { pars, receipt });
+        resolve();
+      })
+    });
+  }
+
+  public call(funcName: string, pars: any[]): Promise<any> {
+    return this.uprtclInstance.methods[funcName](...pars)
+      .call({ from: this.account });
+  }
 }
