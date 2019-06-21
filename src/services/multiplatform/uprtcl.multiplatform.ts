@@ -11,7 +11,7 @@ import { CachedMultiplatform } from './cached.multiplatform';
 import { UprtclLocal } from '../local/uprtcl.local';
 import { ipldService } from '../ipld';
 
-const currentAuthorId = 'anonymous:01';
+const currentAuthorId = 'anonymous:30';
 
 export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
   linksFromPerspective(perspective: Perspective) {
@@ -138,7 +138,6 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
   }
 
   createCommit(serviceProvider: string, commit: Commit): Promise<string> {
-    debugger
     this.cacheService.setCidConfig(
       this.serviceProviders[serviceProvider].service.getCidConfig()
     );

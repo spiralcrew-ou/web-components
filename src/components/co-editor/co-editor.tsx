@@ -2,12 +2,12 @@ import { Component, State } from '@stencil/core';
 import {
   uprtclMultiplatform,
   dataMultiplatform,
-  c1ServiceProvider as serviceProvider,
-  //ethServiceProvider as serviceProvider
+  //c1ServiceProvider as serviceProvider,
+  ethServiceProvider as serviceProvider
 } from '../../services';
 import { uprtclData } from '../../services/uprtcl-data';
 import { TextNode, Context, Perspective } from '../../types';
-
+import { test } from './startup-playground'
 @Component({
   tag: 'co-editor',
   styleUrl: 'co-editor.scss',
@@ -26,6 +26,7 @@ export class CoEditor {
   async componentWillLoad() {
     this.loading = true;
     
+    await test()
     debugger
 
     /** MVP assumes one root perspective per user in platform */
@@ -47,7 +48,7 @@ export class CoEditor {
       this.rootPerspectiveId = rootPerspectives[0].id;
     }
 
-    const draft = await this.dataService.getDraft(
+    const draft = await this.dataService.getDraft<TextNode>(
       this.defaultService,
       this.rootPerspectiveId
     );
@@ -94,7 +95,7 @@ export class CoEditor {
   }
 
   async addLinkToPerspective(_link: string, perspectiveId: string) {
-    let newDraft = await this.dataService.getDraft(
+    let newDraft = await this.dataService.getDraft<TextNode>(
       this.defaultService,
       perspectiveId
     );

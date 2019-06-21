@@ -1,4 +1,3 @@
-const w3w = window['w3w'];
 import * as UprtclContractArtifact from './Uprtcl.json';
 
 export class EthereumConnection {
@@ -9,19 +8,26 @@ export class EthereumConnection {
 
   constructor(host: string) {
     this.connectionReady = new Promise((resolve) => {
-      w3w.initializeWeb3({
-        localProvider: host,
-        handlers: {
-          web3Ready: () => {
-            this.web3 = w3w.getWeb3js()
-            this.account = w3w.getAccount();
-            this.uprtclInstance = new this.web3.eth.Contract(
-              UprtclContractArtifact.abi,
-              UprtclContractArtifact.networks[w3w.getNetworkId()].address);
-            resolve()
-          }
+      let interval = setInterval(() => {
+        let w3w = window['w3w']
+        console.log('[ETH] Waiting for client injection')
+        if (w3w) {
+          w3w.initializeWeb3({
+            localProvider: host,
+            handlers: {
+              web3Ready: () => {
+                this.web3 = w3w.getWeb3js()
+                this.account = w3w.getAccount();
+                this.uprtclInstance = new this.web3.eth.Contract(
+                  UprtclContractArtifact.abi,
+                  UprtclContractArtifact.networks[w3w.getNetworkId()].address);
+                resolve()
+              }
+            }
+          })
+          clearInterval(interval)
         }
-      })
+      }, 200)
     })
   }
 
@@ -44,7 +50,7 @@ export class EthereumConnection {
       .once('transactionHash', (transactionHash) => {
         console.log(`[ETH] TX HASH ${funcName} `, { transactionHash, pars });
       })
-      .once('receipt', (receipt) => {
+      .on('receipt', (receipt) => {
         console.log(`[ETH] RECEIPT ${funcName} receipt`, { receipt, pars });
       })
       .on('error', (error) => {

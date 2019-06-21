@@ -45,7 +45,7 @@ export class UprtclData {
     const headId = await this.uprtcl.getHead(perspectiveId);
     const perspectiveFull = new PerspectiveFull();
 
-    const draft = await this.data.getDraft(perspective.origin, perspectiveId);
+    const draft = await this.data.getDraft<TextNode>(perspective.origin, perspectiveId);
     perspectiveFull.id = perspective.id;
     perspectiveFull.origin = perspective.origin;
     perspectiveFull.creatorId = perspective.creatorId;
@@ -83,7 +83,7 @@ export class UprtclData {
     commitFull.parentsIds = commit.parentsIds;
 
     // TODO: why is the data read here and not inside getTextNodeFull? not sure
-    const data = await this.data.getData(commit.dataId);
+    const data = await this.data.getData<TextNode>(commit.dataId);
     commitFull.data = await this.getTextNodeFull(data, levels);
 
     return commitFull;
@@ -153,7 +153,7 @@ export class UprtclData {
     const perspective = await this.uprtcl.getPerspective(perspectiveId);
     const headId = await this.uprtcl.getHead(perspectiveId);
     const head = headId ? await this.uprtcl.getCommit(headId) : null;
-    const data = head ? await this.data.getData(head.dataId) : null;
+    const data = head ? await this.data.getData<TextNode>(head.dataId) : null;
 
     /** global perspectives are created bottom-up in the tree of
      * perspectives */
@@ -178,13 +178,13 @@ export class UprtclData {
     let newCommitId = headId;
 
     if (links.length > 0) {
-      let newNode = {
+      let newNode : TextNode = {
         text: data.text,
         type: data.type,
         links: newLinks
       };
 
-      const newDataId = await this.data.createData(serviceProvider, newNode);
+      const newDataId = await this.data.createData<TextNode>(serviceProvider, newNode);
 
       const commit: Commit = {
         creatorId: 'anon',
@@ -361,7 +361,7 @@ export class UprtclData {
     fromPerspectiveId: string,
     perspectiveId: string
   ): Promise<void> {
-    let draft = await this.data.getDraft(serviceProvider, fromPerspectiveId);
+    let draft = await this.data.getDraft<TextNode>(serviceProvider, fromPerspectiveId);
 
     let index = draft.links.findIndex(link => link.link === perspectiveId);
     if (index == -1)
@@ -388,7 +388,7 @@ export class UprtclData {
     serviceProvider: string,
     perspectiveId: string
   ): Promise<TextNode> {
-    let draft = await this.data.getDraft(serviceProvider, perspectiveId);
+    let draft = await this.data.getDraft<TextNode>(serviceProvider, perspectiveId);
 
     if (draft != null) {
       return draft;

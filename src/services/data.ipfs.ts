@@ -4,29 +4,48 @@ import { IpfsClient } from './eth/ipfs.client';
 
 export class DataIpfs implements DataService {
   ipfsClient: IpfsClient;
+  cidConfig: CidConfig;
 
   getCidConfig(): CidConfig {
-    return new CidConfig('base58btc', 0, 'dag-pb', 'sha2-256');
+    return this.cidConfig;
   }
 
   setCidConfig(cidConfig: CidConfig): void {
-    console.error({ cidConfig });
-    throw new Error('IPFS dont accept new Cid configurations for the moment');
+    this.cidConfig = cidConfig;
   }
 
-  constructor(host: string) {
-    this.ipfsClient = new IpfsClient({ host: host });
+  constructor(options?: any) {
+    this.ipfsClient = new IpfsClient(options);
+    this.cidConfig = new CidConfig(
+      'base58btc', 1, 'raw', 'sha2-256');
   }
 
   async getData(dataId: string): Promise<any> {
+    console.log('[IPFS] geting', dataId);
     const data = await this.ipfsClient.get(dataId);
-    console.log('[IPFS] getData', data);
+    console.log('[IPFS] got', dataId, data);
     return data;
   }
 
   async createData(data: any): Promise<string> {
-    const dataId = await this.ipfsClient.addObject(data, this.getCidConfig());
-    console.log('[IPFS] createData', dataId);
+    let dataIdOrg = data.id;
+
+    let dataPlain = {
+      'text': data.text,
+      'type': data.type,
+      'links': data.links,
+    }
+
+    const dataId = await this.ipfsClient.addObject(dataPlain, this.cidConfig);
+    console.log('[IPFS] createData', data, dataId);
+
+    if (dataIdOrg) {
+      if (dataIdOrg != dataId) {
+        throw new Error(`Data ID computed by IPFS ${dataId} is 
+        not the same as the input one ${dataIdOrg}`)
+      }
+    }
+
     return dataId;
   }
 }
