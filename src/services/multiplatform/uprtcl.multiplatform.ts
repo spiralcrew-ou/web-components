@@ -1,8 +1,15 @@
 import { UprtclService } from '../uprtcl.service';
-import { Context, Perspective, Commit, Dictionary } from '../../types';
+import {
+  Context,
+  Perspective,
+  Commit,
+  Dictionary,
+  PropertyOrder
+} from '../../types';
 import { DiscoveryService } from '../discovery.service';
 import { CachedMultiplatform } from './cached.multiplatform';
 import { UprtclLocal } from '../local/uprtcl.local';
+import { ipldService } from '../ipld';
 
 const currentAuthorId = 'anonymous';
 
@@ -19,7 +26,8 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
     serviceProviders: Dictionary<{
       service: UprtclService;
       discovery: DiscoveryService;
-    }>) {
+    }>
+  ) {
     super(serviceProviders, new UprtclLocal());
   }
 
@@ -29,26 +37,32 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
       creatorId: currentAuthorId,
       timestamp: 0,
       nonce: 0
-    }
-    
-    this.cacheService.setCidConfig(
-      this.serviceProviders[serviceProvider].service.getCidConfig()
+    };
+
+    const cidConfig = this.getServiceProvider(serviceProvider).getCidConfig();
+
+    let rootContextId = await ipldService.generateCidOrdered(
+      userContext,
+      cidConfig,
+      PropertyOrder.Context
     );
-    let rootContextId = await this.cacheService.computeContextId(userContext)
 
     /** check that the root context do exist in the platform */
-    let rootContext = await this.serviceProviders[serviceProvider].service
-      .getContext(rootContextId);
+    let rootContext = await this.getServiceProvider(serviceProvider).getContext(
+      rootContextId
+    );
 
     if (rootContext == null) {
-      let rootContextId1 = await this.serviceProviders[serviceProvider].service
-        .createContext(userContext);
+      let rootContextId1 = await this.serviceProviders[
+        serviceProvider
+      ].service.createContext(userContext);
 
       if (rootContextId !== rootContextId1) {
         throw new Error(
           `Unexpected condition on service provider. 
           The computeContextId ${rootContextId} is different 
-          from ${rootContextId1} id of the generated context`);
+          from ${rootContextId1} id of the generated context`
+        );
       }
     }
 

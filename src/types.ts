@@ -28,6 +28,12 @@ export interface Position {
   after: string;
 }
 
+export const PropertyOrder = {
+  Context: ['creatorId', 'timestamp', 'nonce'],
+  Perspective: ['origin', 'creatorId', 'timestamp', 'contextId', 'name'],
+  Commit: ['creatorId', 'timestamp', 'message', 'parentsIds', 'dataId']
+};
+
 export interface TextNode {
   id?: string;
   text: string;

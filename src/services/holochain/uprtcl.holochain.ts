@@ -41,11 +41,6 @@ export class UprtclHolochain implements UprtclService {
   setCidConfig(): CidConfig {
     throw new Error('Holochain Cid version is fixed for the moment');
   }
-
-  computeContextId(context: Context): Promise<string> {
-    console.log({context});
-    throw new Error('Not implemented');
-  }
   
   getContext(contextId: string): Promise<Context> {
     return this.getEntry(contextId).then(result => result.entry);

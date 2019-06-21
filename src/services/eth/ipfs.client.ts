@@ -2,7 +2,7 @@ import { CidConfig } from "../cid.config";
 
 const ipfsClient = window['IpfsHttpClient']
 
-const defaultOptions = {
+const defaultOptions: any = {
   host: 'ipfs.infura.io',
   port: 5001,
   protocol: 'https'

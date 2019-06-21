@@ -3,7 +3,8 @@ import { UprtclService } from '../uprtcl.service';
 import {
   Perspective as IPerspective,
   Commit as ICommit,
-  Context as IContext
+  Context as IContext,
+  PropertyOrder
 } from '../../types';
 
 import { Perspective, Commit, Context } from './db.objects';
@@ -14,11 +15,11 @@ import { CidConfig } from '../cid.config';
 import { CidCompatible } from '../cid.service';
 
 export class UprtclLocal extends Dexie implements UprtclService, CidCompatible {
-  
   contexts: Dexie.Table<Context, string>;
   perspectives: Dexie.Table<Perspective, string>;
   heads: Dexie.Table<string, string>;
   commits: Dexie.Table<Commit, string>;
+
   currentConfig: CidConfig;
 
   constructor() {
@@ -43,29 +44,8 @@ export class UprtclLocal extends Dexie implements UprtclService, CidCompatible {
     return this.currentConfig;
   }
 
-  computeContextId(context: IContext): Promise<string> {
-    return this.generateCid(context, [
-      'creatorId',
-      'timestamp',
-      'nonce'
-    ]);
-  }
-
   updateConfig(config: CidConfig) {
     this.currentConfig = config;
-  }
-
-  generateCid(object: object, propertyOrder: string[]) {
-    const plain = {};
-
-    for (const key of propertyOrder) {
-      plain[key] = object[key];
-    }
-
-    return ipldService.generateCid(
-      plain,
-      this.currentConfig
-    );
   }
 
   getContext(contextId: string): Promise<IContext> {
@@ -88,30 +68,30 @@ export class UprtclLocal extends Dexie implements UprtclService, CidCompatible {
   }
 
   async createContext(context: Context): Promise<string> {
-    context.id = await this.computeContextId(context);
+    context.id = await ipldService.generateCidOrdered(
+      context,
+      this.currentConfig,
+      PropertyOrder.Context
+    );
     return this.contexts.put(context);
   }
 
   async createPerspective(perspective: Perspective): Promise<string> {
-    const perspectiveId = await this.generateCid(perspective, [
-      'origin',
-      'creatorId',
-      'timestamp',
-      'contextId',
-      'name'
-    ]);
+    const perspectiveId = await ipldService.generateCidOrdered(
+      perspective,
+      this.currentConfig,
+      PropertyOrder.Perspective
+    );
     perspective.id = perspectiveId;
     return this.perspectives.put(perspective);
   }
 
   async createCommit(commit: Commit): Promise<string> {
-    const commitId = await this.generateCid(commit, [
-      'creatorId',
-      'timestamp',
-      'message',
-      'parentsIds',
-      'dataId'
-    ]);
+    const commitId = await ipldService.generateCidOrdered(
+      commit,
+      this.currentConfig,
+      PropertyOrder.Commit
+    );
     commit.id = commitId;
     return this.commits.put(commit);
   }

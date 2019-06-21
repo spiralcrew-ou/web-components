@@ -9,7 +9,6 @@ export interface UprtclService extends CidCompatible {
   getContext(contextId: string): Promise<Context>;
   getPerspective(perspectiveId: string): Promise<Perspective>;
   getCommit(commitId: string): Promise<Commit>;
-  computeContextId(context: Context): Promise<string>;
 
   /** ---------------
    * Support getters

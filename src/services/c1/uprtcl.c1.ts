@@ -19,11 +19,6 @@ export class UprtclCollectiveOne implements UprtclService {
     throw new Error('Collectiveone Cid version is fixed for the moment');
   }
 
-  computeContextId(context: Context): Promise<string> {
-    console.log({context});
-    throw new Error('Not implemented');
-  }
-
   async getContext(contextId: string): Promise<Context> {
     return await http.get<Context>(`/ctx/${contextId}`);
   }
