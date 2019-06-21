@@ -10,7 +10,7 @@ export class DataHolochain<T = any> implements DataService<T> {
   constructor() {
     this.proxyZome = new HolochainConnection('test-instance', 'proxy');
     this.documentsZome = new HolochainConnection('test-instance', 'documents');
-    this.cidConfig = new CidConfig('base58btc', 0, 'dag-pb', 'sha2-256', false);
+    this.cidConfig = new CidConfig('base58btc', 0, 'dag-pb', 'sha2-256');
   }
 
   getCidConfig(): CidConfig {

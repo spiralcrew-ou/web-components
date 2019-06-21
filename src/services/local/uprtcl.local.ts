@@ -77,12 +77,19 @@ export class UprtclLocal extends Dexie implements UprtclService, CidCompatible {
   }
 
   async createPerspective(perspective: Perspective): Promise<string> {
-    const perspectiveId = await ipldService.generateCidOrdered(
-      perspective,
-      this.currentConfig,
-      PropertyOrder.Perspective
-    );
-    perspective.id = perspectiveId;
+    if (perspective.id) {
+      let valid = await ipldService.validateCid(perspective.id, perspective, PropertyOrder.Perspective);
+      if (!valid) {
+        throw new Error(`Invalid cid ${perspective.id}`);
+      } 
+    } else {
+      perspective.id = await ipldService.generateCidOrdered(
+        perspective,
+        this.currentConfig,
+        PropertyOrder.Perspective
+      );
+    }
+    
     return this.perspectives.put(perspective);
   }
 

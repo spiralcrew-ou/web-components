@@ -21,16 +21,16 @@ export class IpldService {
     return ipldService.generateCid(plain, cidConfig);
   }
 
+  async validateCid (cidStr: string, object: object, propertyOrder: string[]): Promise<boolean> {
+    let cidConfig = CidConfig.fromCid(cidStr);
+    let cidCheck = await this.generateCidOrdered(object, cidConfig, propertyOrder);
+    return cidCheck === cidStr;
+  }
+
   /** wrapper that takes a message and computes its [cid](https://github.com/multiformats/cid) */
   async generateCid(object: object, cidConfig: CidConfig): Promise<string> {
     if (typeof object !== 'object')
       throw new Error('Object expected, not the stringified string!');
-
-    /** ipfs hash is not "just" the buffer hash,
-     * so use ipfs client to compute the ID */
-    if (cidConfig.onIpfs) {
-      return this.ipfsClient.computeHash(object, cidConfig);
-    }
 
     /** other clients should hash the stringified object directly  */
     const b = Buffer.Buffer.from(JSON.stringify(object));

@@ -8,7 +8,7 @@ export class UprtclCollectiveOne implements UprtclService {
   cidConfig: CidConfig;
   
   constructor() {
-    this.cidConfig = new CidConfig('base58btc', 1, 'raw',    'sha3-256', false);
+    this.cidConfig = new CidConfig('base58btc', 1, 'raw',    'sha3-256');
   }
 
   getCidConfig(): CidConfig {

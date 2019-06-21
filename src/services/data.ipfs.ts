@@ -6,7 +6,7 @@ export class DataIpfs implements DataService {
   ipfsClient: IpfsClient;
 
   getCidConfig(): CidConfig {
-    return new CidConfig('base58btc', 0, 'dag-pb', 'sha2-256', true);
+    return new CidConfig('base58btc', 0, 'dag-pb', 'sha2-256');
   }
 
   setCidConfig(cidConfig: CidConfig): void {

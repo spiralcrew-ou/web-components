@@ -11,7 +11,7 @@ import { CachedMultiplatform } from './cached.multiplatform';
 import { UprtclLocal } from '../local/uprtcl.local';
 import { ipldService } from '../ipld';
 
-const currentAuthorId = 'anonymous';
+const currentAuthorId = 'anonymous:01';
 
 export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
   linksFromPerspective(perspective: Perspective) {
@@ -47,25 +47,17 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
       PropertyOrder.Context
     );
 
-    /** check that the root context do exist in the platform */
-    let rootContext = await this.getServiceProvider(serviceProvider).getContext(
-      rootContextId
-    );
+    /** Force the root context object to exist in the service provider */
+    let rootContextId1 = await this.createContext(serviceProvider, userContext);
 
-    if (rootContext == null) {
-      let rootContextId1 = await this.serviceProviders[
-        serviceProvider
-      ].service.createContext(userContext);
-
-      if (rootContextId !== rootContextId1) {
-        throw new Error(
-          `Unexpected condition on service provider. 
-          The computeContextId ${rootContextId} is different 
-          from ${rootContextId1} id of the generated context`
-        );
-      }
+    if (rootContextId !== rootContextId1) {
+      throw new Error(
+        `Unexpected condition on service provider. 
+        The computeContextId ${rootContextId} is different 
+        from ${rootContextId1} id of the generated context`
+      );
     }
-
+    
     return rootContextId;
   }
 
@@ -107,9 +99,10 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
           const flat = Array.prototype.concat.apply([], perspectives);
           return flat.map(p => this.linksFromPerspective(p));
         }
-      ).then(perspectives => Array.prototype.concat.apply([], perspectives));
+      ).then(
+        perspectives => Array.prototype.concat.apply([], perspectives));
 
-    const clonePerspectives = (service, perspectives: Perspective[]) =>
+    const clonePerspectives = (service: UprtclService, perspectives: Perspective[]) =>
       Promise.all(perspectives.map(p => service.createPerspective(p)));
 
     return this.fallback(sourcesGetter, clonePerspectives, service =>
@@ -145,6 +138,7 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
   }
 
   createCommit(serviceProvider: string, commit: Commit): Promise<string> {
+    debugger
     this.cacheService.setCidConfig(
       this.serviceProviders[serviceProvider].service.getCidConfig()
     );

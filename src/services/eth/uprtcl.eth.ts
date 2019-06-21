@@ -7,8 +7,6 @@ import { IpfsClient } from './ipfs.client';
 import { hash } from './eth.support';
 import { CidConfig } from '../cid.config';
 
-const enableDebug = true;
-
 // function makeid(length) {
 //   var result           = '';
 //   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -19,7 +17,6 @@ const enableDebug = true;
 //   return result;
 // }
 
-const userId = 'did:sec256k1:06' // + makeid(10);
 const ADD_PERSP = 'addPerspective(bytes32,bytes32,address,string)';
 const UPDATE_HEAD = 'updateHead(bytes32,string)';
 // const CHANGE_OWNER = 'changeOwner(bytes32,address)';
@@ -35,7 +32,7 @@ export class UprtclEthereum implements UprtclService {
     this.ipfsClient = new IpfsClient();
     this.ethereum = new EthereumConnection(host);
     this.cidConfig = new CidConfig(
-      'base58btc', 0, 'dag-pb', 'sha2-256', true);
+      'base58btc', 1, 'raw', 'sha2-256');
   }
 
   getCidConfig(): CidConfig {
@@ -47,27 +44,28 @@ export class UprtclEthereum implements UprtclService {
   }
   
   async getContext(contextId: string): Promise<Context> {
-    if (enableDebug) debugger;
-    return this.ipfsClient.get(contextId);
+    let result = await this.ipfsClient.get(contextId);
+    console.log(`[ETH] getContext ${contextId}`, result)
+    return result;
   }
 
   async getPerspective(perspectiveId: string): Promise<Perspective> {
-    if (enableDebug) debugger;
     await this.ethereum.ready();
 
     /** Content addressable part comes from IPFS */
     const perspective: Perspective = await this.ipfsClient.get(perspectiveId);
     perspective.id = perspectiveId;
+    console.log(`[ETH] getPerspective ${perspectiveId}`, perspective)
     return perspective;
   }
 
   async getCommit(commitId: string): Promise<Commit> {
-    if (enableDebug) debugger;
-    return this.ipfsClient.get(commitId);
+    let result = await this.ipfsClient.get(commitId);
+    console.log(`[ETH] getCommit ${commitId}`, result);
+    return result;
   }
 
   async getHead(perspectiveId: string): Promise<string> {
-    if (enableDebug) debugger;
     await this.ethereum.ready();
     
     let perspectiveIdHash = await hash(perspectiveId);
@@ -76,27 +74,13 @@ export class UprtclEthereum implements UprtclService {
       GET_PERSP, 
       [perspectiveIdHash]);
 
+    console.log(`[ETH] getHead ${perspectiveId}`, perspective);
+    
     /** empty string is null */
     return perspective.headCid !== '' ? perspective.headCid : null;
   }
 
-  /** 
-   * Ethereum dont know of root contexts. The consumer app can decide
-   * the logic (multihash) used to derive the id of the root context of
-   * a user and directly query for it using getContext(rootContextId)
-   */
-  async getRootContextId(): Promise<string> {
-    if (enableDebug) debugger;
-    const context: Context = {
-      creatorId: userId,
-      timestamp: 0,
-      nonce: 0
-    }
-    return this.ipfsClient.computeHash(context, this.cidConfig);
-  }
-
   async getContextPerspectives(contextId: string): Promise<Perspective[]> {
-    if (enableDebug) debugger;
     await this.ethereum.ready();
     const contextIdHash = await hash(contextId);
 
@@ -108,11 +92,9 @@ export class UprtclEthereum implements UprtclService {
     )
     
     let perspectiveIdHashes = perspectiveOfContextAddedEvents.map(e => e.returnValues.perspectiveIdHash);
-    let perspectives = [];
+    console.log(`[ETH] getContextPerspectives Hases ${contextId}`, perspectiveIdHashes);
 
-    for (let i=0; i<perspectiveIdHashes.length; i++) {
-      let perspectiveIdHash = perspectiveIdHashes[i];
-
+    let promises : Promise<Perspective>[] = perspectiveIdHashes.map(async (perspectiveIdHash) => {
       /** check the creation event to reverse map the cid */
       let perspectiveAddedEvent = await this.ethereum.uprtclInstance.getPastEvents(
         'PerspectiveAdded', {
@@ -124,15 +106,14 @@ export class UprtclEthereum implements UprtclService {
       /** one event should exist only */
       perspectiveAddedEvent = perspectiveAddedEvent[0];
 
-      let perspective = await this.getPerspective(perspectiveAddedEvent.returnValues.perspectiveCid);
-      perspectives.push(perspective);
-    } 
+      console.log(`[ETH] Reverse map perspective hash ${perspectiveIdHash}`, perspectiveAddedEvent);
+      return this.getPerspective(perspectiveAddedEvent.returnValues.perspectiveCid);
+    })
 
-    return perspectives;
+    return Promise.all(promises);
   }
 
   async createContext(context: Context): Promise<string> {
-    if (enableDebug) debugger;
     await this.ethereum.ready();
     
     let contextIdOrg = context.id;
@@ -151,11 +132,11 @@ export class UprtclEthereum implements UprtclService {
       }
     }
 
+    console.log(`[ETH] createContext`, context, contextId);
     return contextId;
   }
 
   async createPerspective(perspective: Perspective) : Promise<string> {
-    if (enableDebug) debugger;
     await this.ethereum.ready();
 
     /** validate */
@@ -175,6 +156,7 @@ export class UprtclEthereum implements UprtclService {
 
     /** Store the perspective data in the data layer */
     let perspectiveId = await this.ipfsClient.addObject(perspectivePlain, this.cidConfig);
+    console.log(`[ETH] createPerspective - added to IPFS`, perspectiveId);
 
     if (perspectiveIdOrg) {
       if (perspectiveIdOrg != perspectiveId) {
@@ -185,22 +167,26 @@ export class UprtclEthereum implements UprtclService {
     let perspectiveIdHash = await hash(perspectiveId);
     let contextIdHash = await hash(perspective.contextId);
     
-    return this.ethereum.send(
+    let result = await this.ethereum.send(
         ADD_PERSP, 
         [perspectiveIdHash, contextIdHash, this.ethereum.account, perspectiveId]);
+
+    console.log(`[ETH] createPerspective - TX mined`, result);
+    return result;
   }
 
   async updateHead(perspectiveId: string, headId: string): Promise<void> {
-    if (enableDebug) debugger;
     let perspectiveIdHash = await hash(perspectiveId);
 
-    return this.ethereum.send(
+    let result = await this.ethereum.send(
       UPDATE_HEAD, 
       [perspectiveIdHash, headId]);
+
+    console.log(`[ETH] updateHead - TX mined`, result);
+    return result;
   }
 
   async createCommit(commit: Commit) {
-    if (enableDebug) debugger;
     await this.ethereum.ready();
 
     let commitIdOrg = commit.id;
@@ -221,8 +207,9 @@ export class UprtclEthereum implements UprtclService {
       if (commitIdOrg != commitId) {
         throw new Error('commit ID computed by IPFS is not the same as the input one.')
       }
-    }    
+    }
 
+    console.log(`[ETH] createCommit - added to IPFS`, commitId);
     return commitId;
   }
 

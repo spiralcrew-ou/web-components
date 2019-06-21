@@ -11,7 +11,7 @@ export class UprtclHolochain implements UprtclService {
   constructor() {
     this.uprtclZome = new HolochainConnection('test-instance', 'uprtcl');
     this.proxyZome = new HolochainConnection('test-instance', 'proxy');
-    this.cidConfig = new CidConfig('base58btc', 0, 'dag-pb', 'sha2-256', false);
+    this.cidConfig = new CidConfig('base58btc', 0, 'dag-pb', 'sha2-256');
   }
 
   splitId(object: any) {

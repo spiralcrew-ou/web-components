@@ -19,32 +19,10 @@ export class IpfsClient {
     return Buffer.from(JSON.stringify(object));
   }
 
-  private cidConfigToOptions(cidConfig: CidConfig): any {
-    // TODO check if this is correct and IPFS codec is always 
-    if (cidConfig.codec !== 'dag-pb') throw new Error('unexpected codec');
-    return {
-      cidVersion: cidConfig.version,
-      cidBase: cidConfig.base,
-      hashAlg: cidConfig.type
-    }
-  }
-
-  public async computeHash(object: object, cidConfig: CidConfig): Promise<string> {
-    /** just like add but overwrite onlyHash option */
-    let options = this.cidConfigToOptions(cidConfig);
-    options.onlyHash = true;
-    const result = await this.client.add(
-      this.getObjectBuffer(object), options)
-    
-    return result[0].hash;
-  }
-
   public async addObject(object: any, cidConfig: CidConfig): Promise<string> {
-    const result = await this.client.add(
-      this.getObjectBuffer(object),
-      this.cidConfigToOptions(cidConfig));
-
-    return result[0].hash;
+    const result = await this.client.dag.put(
+      this.getObjectBuffer(object), { format: cidConfig.codec, hashAlg: cidConfig.type, cidVersion: cidConfig.version });
+    return result.toString(cidConfig.base)
   }
 
   public async get(hash: string): Promise<any> {
