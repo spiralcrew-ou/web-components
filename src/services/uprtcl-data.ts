@@ -258,7 +258,6 @@ export class UprtclData {
     serviceProvider: string,
     contextId: string,
     content: string): Promise<string> {
-
     const perspectiveId = await this.uprtcl.createPerspective(
       serviceProvider,
       contextId,
@@ -297,7 +296,6 @@ export class UprtclData {
     perspectiveId: string,
     index: number,
     content: string): Promise<string> {
-
     const newPerspectiveId = await this.initContext(serviceProvider, content);
     await this.insertPerspective(serviceProvider, perspectiveId, newPerspectiveId, index)
     return newPerspectiveId;
@@ -324,9 +322,7 @@ export class UprtclData {
     onPerspectiveId: string,
     perspectiveId: string,
     index: number): Promise<void> {
-
     let draft = await this.getOrCreateDraft(serviceProvider, onPerspectiveId);
-    
     if (index != -1) {
       if ((0 < index) && (index < draft.links.length)) {
         draft.links.splice(index, 0, { link: perspectiveId });

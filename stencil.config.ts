@@ -3,6 +3,8 @@ import builtins from 'rollup-plugin-node-builtins';
 import globals from 'rollup-plugin-node-globals';
 import replace from 'rollup-plugin-replace';
 import { sass } from '@stencil/sass';
+import { less } from '@stencil/less';
+
 
 export const config: Config = {
   namespace: 'collectiveone-component-lib',
@@ -20,7 +22,8 @@ export const config: Config = {
       // injectGlobalPaths: ['src/globals/variables.scss']
     }),
     builtins(),
-    globals()
+    globals(),
+    less()
   ],
   nodeResolve: {
     browser: true,

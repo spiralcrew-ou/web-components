@@ -19,7 +19,7 @@ export class CONode {
   @State() block;
   @State() tree; 
   @State() showMenuOption: boolean
-
+  
   newBlock: Action
   removeBlock: Action
   reloadTree: Action
@@ -41,8 +41,6 @@ export class CONode {
         showMenuOption: !state.menu.isClose
       }
     })
-
- 
   }
 
   @Listen('keydown')
@@ -56,8 +54,7 @@ export class CONode {
       } else {
         this.newBlock({ status: 'DRAFT', content: '', type: 'paragraph' }, this.nodeId)
       }
-     
-      this.updateBlockContent(event['path'][0].innerText)
+      this.updateContentFromUser(this.block,event['path'][0].innerText)
     }
   }
 
@@ -81,16 +78,22 @@ export class CONode {
     }
   }
 
+  
+  /*
+  componentWillUpdate() {
+    const element = this._element.shadowRoot.getElementById(this.nodeId);
+    if (element) element.innerHTML = this.block.content;
+  }*/
 
-  updateBlockContent(newContent) { 
+
+  updateBlockContent(event:FocusEvent, newContent) { 
+    event.stopPropagation()
     this.updateContentFromUser(this.block,newContent)
   }
 
 
-
   render() {
     const isDocTitle = this.block.id === this.block.parentPerspectiveID 
-
     const blockClasses = 'text-gray-800 p-2 leading-relaxed'
     const draftClasses = this.hasUIChanges  ?  'bg-red-100'  :  '' 
     const titleClasses = this.block.style ==='title' ? 'text-5xl' : ''
@@ -98,10 +101,11 @@ export class CONode {
     const commitedClasses = ''
     const classes = [blockClasses, draftClasses, commitedClasses,titleClasses,paragraphClasses].join(" ")
 
-    const contentBlock = <div onBlur={event => {if (this.hasUIChanges && !this.showMenuOption) this.updateBlockContent(event['path'][0].innerText)}}
+    const contentBlock = <div 
+                          onBlur={event => {if (this.hasUIChanges && !this.showMenuOption) this.updateBlockContent(event,event['path'][0].innerText)}}
                           class= {classes} 
                           data-placeholder = {'More options, press "/" '}
-                          id={this.nodeId + this.parentId + '-content'} 
+                          id={this.nodeId} 
                           contentEditable>
                           {this.block.content}
                         </div>

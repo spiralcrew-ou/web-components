@@ -18,6 +18,26 @@ export namespace Components {
   interface CoEditor {}
   interface CoEditorAttributes extends StencilHTMLAttributes {}
 
+  interface CoInputChangePerspective {}
+  interface CoInputChangePerspectiveAttributes extends StencilHTMLAttributes {
+    'onShowInputChangePerspective'?: (event: CustomEvent) => void;
+  }
+
+  interface CoInputCommit {}
+  interface CoInputCommitAttributes extends StencilHTMLAttributes {
+    'onShowInputCommit'?: (event: CustomEvent) => void;
+  }
+
+  interface CoInputMerge {}
+  interface CoInputMergeAttributes extends StencilHTMLAttributes {
+    'onShowInputMerge'?: (event: CustomEvent) => void;
+  }
+
+  interface CoInputNewPerspective {}
+  interface CoInputNewPerspectiveAttributes extends StencilHTMLAttributes {
+    'onShowInputNewPerspective'?: (event: CustomEvent) => void;
+  }
+
   interface CoLoading {}
   interface CoLoadingAttributes extends StencilHTMLAttributes {}
 
@@ -42,15 +62,30 @@ export namespace Components {
     'parentId'?: string;
   }
 
+  interface CoWaitingApp {}
+  interface CoWaitingAppAttributes extends StencilHTMLAttributes {}
+
   interface CoWorkpad {
     'documentId': string;
   }
   interface CoWorkpadAttributes extends StencilHTMLAttributes {
     'documentId'?: string;
+    'onIsStarting'?: (event: CustomEvent) => void;
+    'onShowInputChangePerspective'?: (event: CustomEvent) => void;
+    'onShowInputCommit'?: (event: CustomEvent) => void;
+    'onShowInputMerge'?: (event: CustomEvent) => void;
+    'onShowInputNewPerspective'?: (event: CustomEvent) => void;
   }
 
-  interface CoWorkspace {}
-  interface CoWorkspaceAttributes extends StencilHTMLAttributes {}
+  interface CoWorkspaceSelector {}
+  interface CoWorkspaceSelectorAttributes extends StencilHTMLAttributes {}
+
+  interface CoWorkspace {
+    'defaultService': string;
+  }
+  interface CoWorkspaceAttributes extends StencilHTMLAttributes {
+    'defaultService'?: string;
+  }
 
   interface TextBlock {
     'id': string;
@@ -95,11 +130,17 @@ export namespace Components {
 declare global {
   interface StencilElementInterfaces {
     'CoEditor': Components.CoEditor;
+    'CoInputChangePerspective': Components.CoInputChangePerspective;
+    'CoInputCommit': Components.CoInputCommit;
+    'CoInputMerge': Components.CoInputMerge;
+    'CoInputNewPerspective': Components.CoInputNewPerspective;
     'CoLoading': Components.CoLoading;
     'CoLogin': Components.CoLogin;
     'CoMenu': Components.CoMenu;
     'CoNode': Components.CoNode;
+    'CoWaitingApp': Components.CoWaitingApp;
     'CoWorkpad': Components.CoWorkpad;
+    'CoWorkspaceSelector': Components.CoWorkspaceSelector;
     'CoWorkspace': Components.CoWorkspace;
     'TextBlock': Components.TextBlock;
     'TextNode': Components.TextNode;
@@ -108,11 +149,17 @@ declare global {
 
   interface StencilIntrinsicElements {
     'co-editor': Components.CoEditorAttributes;
+    'co-input-change-perspective': Components.CoInputChangePerspectiveAttributes;
+    'co-input-commit': Components.CoInputCommitAttributes;
+    'co-input-merge': Components.CoInputMergeAttributes;
+    'co-input-new-perspective': Components.CoInputNewPerspectiveAttributes;
     'co-loading': Components.CoLoadingAttributes;
     'co-login': Components.CoLoginAttributes;
     'co-menu': Components.CoMenuAttributes;
     'co-node': Components.CoNodeAttributes;
+    'co-waiting-app': Components.CoWaitingAppAttributes;
     'co-workpad': Components.CoWorkpadAttributes;
+    'co-workspace-selector': Components.CoWorkspaceSelectorAttributes;
     'co-workspace': Components.CoWorkspaceAttributes;
     'text-block': Components.TextBlockAttributes;
     'text-node': Components.TextNodeAttributes;
@@ -124,6 +171,30 @@ declare global {
   var HTMLCoEditorElement: {
     prototype: HTMLCoEditorElement;
     new (): HTMLCoEditorElement;
+  };
+
+  interface HTMLCoInputChangePerspectiveElement extends Components.CoInputChangePerspective, HTMLStencilElement {}
+  var HTMLCoInputChangePerspectiveElement: {
+    prototype: HTMLCoInputChangePerspectiveElement;
+    new (): HTMLCoInputChangePerspectiveElement;
+  };
+
+  interface HTMLCoInputCommitElement extends Components.CoInputCommit, HTMLStencilElement {}
+  var HTMLCoInputCommitElement: {
+    prototype: HTMLCoInputCommitElement;
+    new (): HTMLCoInputCommitElement;
+  };
+
+  interface HTMLCoInputMergeElement extends Components.CoInputMerge, HTMLStencilElement {}
+  var HTMLCoInputMergeElement: {
+    prototype: HTMLCoInputMergeElement;
+    new (): HTMLCoInputMergeElement;
+  };
+
+  interface HTMLCoInputNewPerspectiveElement extends Components.CoInputNewPerspective, HTMLStencilElement {}
+  var HTMLCoInputNewPerspectiveElement: {
+    prototype: HTMLCoInputNewPerspectiveElement;
+    new (): HTMLCoInputNewPerspectiveElement;
   };
 
   interface HTMLCoLoadingElement extends Components.CoLoading, HTMLStencilElement {}
@@ -150,10 +221,22 @@ declare global {
     new (): HTMLCoNodeElement;
   };
 
+  interface HTMLCoWaitingAppElement extends Components.CoWaitingApp, HTMLStencilElement {}
+  var HTMLCoWaitingAppElement: {
+    prototype: HTMLCoWaitingAppElement;
+    new (): HTMLCoWaitingAppElement;
+  };
+
   interface HTMLCoWorkpadElement extends Components.CoWorkpad, HTMLStencilElement {}
   var HTMLCoWorkpadElement: {
     prototype: HTMLCoWorkpadElement;
     new (): HTMLCoWorkpadElement;
+  };
+
+  interface HTMLCoWorkspaceSelectorElement extends Components.CoWorkspaceSelector, HTMLStencilElement {}
+  var HTMLCoWorkspaceSelectorElement: {
+    prototype: HTMLCoWorkspaceSelectorElement;
+    new (): HTMLCoWorkspaceSelectorElement;
   };
 
   interface HTMLCoWorkspaceElement extends Components.CoWorkspace, HTMLStencilElement {}
@@ -182,11 +265,17 @@ declare global {
 
   interface HTMLElementTagNameMap {
     'co-editor': HTMLCoEditorElement
+    'co-input-change-perspective': HTMLCoInputChangePerspectiveElement
+    'co-input-commit': HTMLCoInputCommitElement
+    'co-input-merge': HTMLCoInputMergeElement
+    'co-input-new-perspective': HTMLCoInputNewPerspectiveElement
     'co-loading': HTMLCoLoadingElement
     'co-login': HTMLCoLoginElement
     'co-menu': HTMLCoMenuElement
     'co-node': HTMLCoNodeElement
+    'co-waiting-app': HTMLCoWaitingAppElement
     'co-workpad': HTMLCoWorkpadElement
+    'co-workspace-selector': HTMLCoWorkspaceSelectorElement
     'co-workspace': HTMLCoWorkspaceElement
     'text-block': HTMLTextBlockElement
     'text-node': HTMLTextNodeElement
@@ -195,11 +284,17 @@ declare global {
 
   interface ElementTagNameMap {
     'co-editor': HTMLCoEditorElement;
+    'co-input-change-perspective': HTMLCoInputChangePerspectiveElement;
+    'co-input-commit': HTMLCoInputCommitElement;
+    'co-input-merge': HTMLCoInputMergeElement;
+    'co-input-new-perspective': HTMLCoInputNewPerspectiveElement;
     'co-loading': HTMLCoLoadingElement;
     'co-login': HTMLCoLoginElement;
     'co-menu': HTMLCoMenuElement;
     'co-node': HTMLCoNodeElement;
+    'co-waiting-app': HTMLCoWaitingAppElement;
     'co-workpad': HTMLCoWorkpadElement;
+    'co-workspace-selector': HTMLCoWorkspaceSelectorElement;
     'co-workspace': HTMLCoWorkspaceElement;
     'text-block': HTMLTextBlockElement;
     'text-node': HTMLTextNodeElement;

@@ -10,3 +10,7 @@
     display: grid;
     grid-template-rows: 1fr 90% 1fr
 }
+
+button:focus{
+    outline: none;
+}

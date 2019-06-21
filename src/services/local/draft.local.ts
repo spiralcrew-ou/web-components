@@ -1,5 +1,5 @@
 import { DraftService } from '../draft.service';
-import { insertDraft, getDraft, modifyDraft } from './dataservices';
+import {  getDraft, modifyDraft, insertDraft } from './dataservices';
 
 
 export class DraftLocal<T> implements DraftService<T> {
@@ -8,10 +8,8 @@ export class DraftLocal<T> implements DraftService<T> {
   }
 
   async setDraft(objectId: string, draft: T): Promise<void> {
-    if (!await this.getDraft(objectId)){
-      draft['id'] = objectId
-      return insertDraft(draft as any)
-    }
+    draft['id'] = objectId
+    if(!await getDraft(objectId)) insertDraft(draft as any)
     modifyDraft(draft as any)
     return draft as any
   }

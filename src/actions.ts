@@ -1,7 +1,7 @@
 import { UprtclData } from "./services/uprtcl-data";
 import { PerspectiveFull, TextNodeFull } from "./types";
 
-const uprtcData = new UprtclData();
+const uprtclData = new UprtclData();
 
 /**
  *
@@ -63,12 +63,16 @@ const readBlockRec = (
   return;
 };
 
+const getMasterTree = async(getState) =>  { 
+  return await uprtclData.getPerspectiveFull(
+    getState().workpad.rootId,
+    -1
+  );
+}
+
 export const reloadTree = () => {
   return async (dispatch, getState) => {
-    const perspectiveFull = await uprtcData.getPerspectiveFull(
-      getState().workpad.rootId,
-      -1
-    );
+    const perspectiveFull = await getMasterTree(getState)
     const t = getState().workpad.tree;
     dispatch({
       type: "RELOAD TREE",
@@ -95,7 +99,7 @@ export const newBlock = (block, initiatorId) => {
 
     switch (initNode.style) {
       case "title":
-        this.uprtcData.initContextUnder(
+        this.uprtclData.initContextUnder(
           initNode.serviceProvider,
           initNode.id,
           0,
@@ -106,24 +110,16 @@ export const newBlock = (block, initiatorId) => {
       default:
         const parentnode = tree[initNode.parentPerspectiveID];
         const index = tree[initNode.parentPerspectiveID].children.findIndex(pId => pId === initiatorId)
-        const newId = await uprtcData.initContextUnder(
+
+        await uprtclData.initContextUnder(
           parentnode.serviceProvider,
           parentnode.id,
           index + 1,
-          block.content
+          ''
         );
-        const newTree = Object.assign({}, tree);
-        newTree[newId] = {
-          id: newId,
-          children:[],
-          status: 'DRAFT',
-          content:'',
-          style: 'paragraph',
-          parentPerspectiveID:initNode.parentPerspectiveID,
-          serviceProvider: parentnode.serviceProvider
-        }
-        newTree[initNode.parentPerspectiveID].children.splice(index+1, 0, newId);
-        dispatch({ type: "NEW BLOCK", tree: newTree });
+        const perspectiveFull =  await getMasterTree(getState) 
+        const newTree =Object.assign({},readBlockRec(perspectiveFull, getState().workpad.tree, getState().workpad.rootId))
+        dispatch({ type: "NEW BLOCK", tree:newTree});
         break;
     }
   };
@@ -138,20 +134,6 @@ export const setView = (block,newView) => {
   }
 }
 
-/*
-setView = (blockId, newView) =>  {
-    
-    blockId.view = newView
-
-    changing the type of a paragraph to a title will move all the next sibling contexts of the paragraph as subcontexts of the new title.
-
-    Changing the type of a title to a paragraph will move all its subcontexts as next-siblings of the new typed paragraph
-
-    uprtclData.createSibling.then(
-        this.list = flat again
-    )
-
-}
 
 /**
  *
@@ -160,30 +142,31 @@ setView = (blockId, newView) =>  {
  * @returns dispatch a reloadTree event
  */
 export const removeBlock = block => {
-  return (dispatch, getState) => {
-    uprtcData.removePerspective(block.serviceProvider,block.parentPerspectiveID,block.id)
-    const tree = Object.assign({}, getState().workpad.tree);
-    delete tree[block.id];
-    tree[block.parentPerspectiveID].children= tree[block.parentPerspectiveID].children.filter(id => id!= block.id)
-    dispatch({ type: "REMOVE BLOCK", tree });
+  return async(dispatch, getState) => {
+    await uprtclData.removePerspective(block.serviceProvider,block.parentPerspectiveID,block.id)
+    const perspectiveFull =  await getMasterTree(getState) 
+    dispatch({ type: "REMOVE BLOCK", tree: readBlockRec(perspectiveFull, getState().workpad.tree, getState().workpad.rootId)});
   };
 };
 
 /**
  * WIP
  */
-export const commitAll = () => {
-  // Update Tree, transform DRAFT to COMMITED
-  // Send only status=DRAFT
-
-  return (dispatch,getState) => {
+export const commitAll = (serviceProvider) => {
+  return async (dispatch,getState) => {
+    /*
     const tree = getState().workpad.tree
-
     const toCommit = Object.keys(tree).
                         map(k => tree[k]).
-                        filter(block => block.contentUser)
+                        filter(block => block.contentUser)*/
+
+    const rootDocument = getState().workpad.tree[getState().workpad.rootId]
     
-    console.log(toCommit)
+    await uprtclData.commitGlobal(
+      rootDocument.serviceProvider,
+      serviceProvider ? serviceProvider : rootDocument.serviceProvider,
+      getState().workpad.rootId,'Commit', new Date().getTime())
+
     dispatch({ type: "COMMIT ALL" });
   };
 };
@@ -194,8 +177,11 @@ export const commitAll = () => {
  * @param newContent  new Content input from user (UI)
  */
 export const updateContentFromUser = (block, newContent) => {
-  return (dispatch,getState) => {
+  return async (dispatch,getState) => {
     const tree = getState().workpad.tree
+    const _draft = await uprtclData.data.getDraft(block.serviceProvider,block.id)
+    _draft.text = newContent
+    uprtclData.data.setDraft(block.serviceProvider,block.id,_draft)
     tree[block.id].contentUser = newContent
     dispatch({type: 'UPDATE CONTENT FROM USER', tree})
   }
@@ -217,5 +203,4 @@ export const closeMenu = () => {
   return (dispatch) => {
     dispatch({type: 'OPEN MENU', isClose:true})
   }
-
 }

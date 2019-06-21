@@ -16,12 +16,20 @@ import {UprtclData} from '../../services/uprtcl-data';
 export class COWorkspace {
   @State() rootPerspectiveId: string;
   @State() documentPerspectiveId: string;
-  @State() defaultService = serviceProvider;
+  //@State() defaultService = serviceProvider;
+  @Prop() defaultService:string
   @Prop({ context: 'store' }) store: Store;
 
   // Multiplatform service is already instantiated, get a reference to it
   uprtcl = uprtclMultiplatform;
   uprtclData = new UprtclData()
+
+  constructor(_defaultServiceId:string) {
+    this.defaultService=_defaultServiceId
+  }
+
+  
+
 
   async componentWillLoad() {
     this.store.setStore(configureStore());
