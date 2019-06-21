@@ -78,6 +78,7 @@ export class TextNodeFull {
   type: string;
   links: Array<{
     position?: Position;
+    type?: string,
     link: PerspectiveFull;
   }> = [];
 }
