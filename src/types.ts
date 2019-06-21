@@ -31,7 +31,8 @@ export interface Position {
 export const PropertyOrder = {
   Context: ['creatorId', 'timestamp', 'nonce'],
   Perspective: ['origin', 'creatorId', 'timestamp', 'contextId', 'name'],
-  Commit: ['creatorId', 'timestamp', 'message', 'parentsIds', 'dataId']
+  Commit: ['creatorId', 'timestamp', 'message', 'parentsIds', 'dataId'],
+  TextNode: ['text', 'type', 'links']
 };
 
 export interface TextNode {

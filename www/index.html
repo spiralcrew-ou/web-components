@@ -1,0 +1,40 @@
+<!DOCTYPE html><html dir="ltr" lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0">
+    <title>_Prtcl Editor</title>
+    
+    <!-- JS bundled because stencil dont use webapack -->
+    <script type="module" src="./assets/js/web3Webpacked.js"></script>
+    <script src="https://unpkg.com/ipfs-http-client/dist/index.js"></script>
+
+    <!-- Setencil components -->
+    
+    <script src="/build/collectiveone-component-lib.js"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">    
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,500" rel="stylesheet">
+  
+  </head>
+
+  <body>
+    <div>
+      <!-- <co-workspace default-service='local'></co-workspace>-->
+      <co-workspace-selector></co-workspace-selector>
+      <!-- <co-waiting-app></co-waiting-app>-->
+    </div>
+  
+  <script>
+    if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+      // auto-unregister service worker during dev mode
+      navigator.serviceWorker.getRegistration().then(function(registration) {
+        if (registration) {
+          registration.unregister().then(function() { location.reload(true) });
+        }
+      });
+    }
+  </script>
+
+
+
+</body></html>

@@ -1,8 +1,6 @@
 import { UprtclMultiplatform } from './multiplatform/uprtcl.multiplatform';
 import { DataMultiplatform } from './multiplatform/data.multiplatform';
 
-import { DraftLocal } from './local/draft.local';
-
 import { DataHolochain } from './holochain/data.holochain';
 import { DraftHolochain } from './holochain/draft.holochain';
 import { UprtclHolochain } from './holochain/uprtcl.holochain';
@@ -16,11 +14,10 @@ import { DiscoveryCollectiveOne } from './c1/discovery.c1';
 import { UprtclEthereum } from './eth/uprtcl.eth';
 
 import { DataIpfs } from './data.ipfs';
-import { DiscoveryEthereum } from './eth/discovery.eth';
 
 export const holochainEnabled = false;
-export const c1Enabled = true;
-export const ethEnabled = false;
+export const c1Enabled = false;
+export const ethEnabled = true;
 
 export const holochainServiceProvider =
   'holochain://Qmag7yGbYSMhkzDZLnSJkc4pzNWpHLtfP5o2jL8jGF4W5w';
@@ -31,7 +28,7 @@ export const c1ServiceProvider =
 export const ethServiceProvider = 
   'eth://smartContract';
 
-const ethLocation = 'ws://127.0.0.1:9545';
+const ethLocation = 'ws://127.0.0.1:8545';
 
 let uprtclConfig = {};
 let dataConfig = {};
@@ -66,7 +63,7 @@ if (holochainEnabled) {
   dataConfig['ipfs'] = {
     discovery: null,
     service: {
-      data: new DataIpfs('ipfs.infura.io'),
+      data: new DataIpfs(),
       draft: null
     }
   };
@@ -75,13 +72,13 @@ if (holochainEnabled) {
 if (ethEnabled) {
   uprtclConfig[ethServiceProvider] = {
     service: new UprtclEthereum(ethLocation),
-    discovery: new DiscoveryEthereum(),
+    discovery: new DiscoveryCollectiveOne(),
   };
   dataConfig[ethServiceProvider] = {
-    discovery: new DiscoveryEthereum(),
+    discovery: new DiscoveryCollectiveOne(),
     service: {
-      data: new DataIpfs('ipfs.infura.io'),
-      draft: new DraftLocal()
+      data: new DataIpfs(),
+      draft: new DraftCollectiveOne()
     }
   };
 }

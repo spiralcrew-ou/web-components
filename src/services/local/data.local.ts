@@ -2,6 +2,7 @@ import { DataService } from '../data.service';
 import { CidConfig } from '../cid.config';
 import { ipldService } from '../ipld';
 import { ExtensionsLocal } from './extensions.local';
+import { PropertyOrder } from './../../types';
 
 export class DataLocal<T> implements DataService<T> {
 
@@ -19,21 +20,12 @@ export class DataLocal<T> implements DataService<T> {
     this.currentConfig = config;
   }
 
-  generateCid(object: any, propertyOrder: string[]) {
-    const plain = {};
-
-    for (const key of propertyOrder) {
-      plain[key] = object[key];
-    }
-
-    return ipldService.generateCid(
-     plain,
-      this.currentConfig
-    );
-  }
-
   async createData(data: T): Promise<string> {
-    const dataId = await this.generateCid(data, ['text', 'type', 'links']);
+    const dataId = await ipldService.generateCidOrdered(
+      data,
+      this.currentConfig,
+      PropertyOrder.TextNode
+    );
     data['id'] = dataId;
     this.uprtclExtensions.data.put(data);
     return dataId;

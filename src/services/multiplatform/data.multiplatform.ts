@@ -6,19 +6,19 @@ import { CachedMultiplatform } from './cached.multiplatform';
 import { DataLocal } from '../local/data.local';
 import { DraftLocal } from '../local/draft.local';
 
-export interface DataProvider {
-  data: DataService<TextNode>;
+export interface DataProvider<T> {
+  data: DataService<T>;
   draft: DraftService;
 }
 
-export class DataMultiplatform extends CachedMultiplatform<DataProvider> {
+export class DataMultiplatform extends CachedMultiplatform<DataProvider<any>> {
   linksFromTextNode = node => node.links.map(link => link.link);
 
-  constructor(serviceProviders: Dictionary<DiscoveryProvider<DataProvider>>) {
+  constructor(serviceProviders: Dictionary<DiscoveryProvider<DataProvider<any>>>) {
     super(serviceProviders, { data: new DataLocal(), draft: new DraftLocal<TextNode>() });
   }
 
-  getData(dataId: string): Promise<TextNode> {
+  getData<T>(dataId: string): Promise<T> {
     return this.cachedDiscover(
       dataId,
       service => service.data.getData(dataId),
@@ -27,7 +27,7 @@ export class DataMultiplatform extends CachedMultiplatform<DataProvider> {
     );
   }
 
-  createData(serviceProvider: string, data: TextNode): Promise<string> {
+  createData<T>(serviceProvider: string, data: T): Promise<string> {
     this.cacheService.data.setCidConfig(
       this.serviceProviders[serviceProvider].service.data.getCidConfig()
     );
@@ -39,7 +39,7 @@ export class DataMultiplatform extends CachedMultiplatform<DataProvider> {
     );
   }
 
-  async getDraft(serviceProvider: string, objectId: string): Promise<TextNode> {
+  async getDraft<T>(serviceProvider: string, objectId: string): Promise<T> {
     const sourceGetter = () =>
       this.getFromSource(
         serviceProvider,

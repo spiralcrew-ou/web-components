@@ -57,7 +57,7 @@ export class TextNodeElement {
     // Head can be null, only go get it if it exists
     if (this.headId) {
       this.commit = await this.uprtclService.getCommit(this.headId);
-      this.node = await this.dataService.getData(this.commit.dataId);
+      this.node = await this.dataService.getData<TextNode>(this.commit.dataId);
     }
   }
 

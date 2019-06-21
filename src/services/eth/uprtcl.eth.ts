@@ -7,19 +7,9 @@ import { IpfsClient } from './ipfs.client';
 import { hash } from './eth.support';
 import { CidConfig } from '../cid.config';
 
-// function makeid(length) {
-//   var result           = '';
-//   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-//   var charactersLength = characters.length;
-//   for ( var i = 0; i < length; i++ ) {
-//      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-//   }
-//   return result;
-// }
-
+/** functions signatures */
 const ADD_PERSP = 'addPerspective(bytes32,bytes32,address,string)';
 const UPDATE_HEAD = 'updateHead(bytes32,string)';
-// const CHANGE_OWNER = 'changeOwner(bytes32,address)';
 const GET_PERSP = 'getPerspective(bytes32)';
 
 export class UprtclEthereum implements UprtclService {
@@ -44,7 +34,7 @@ export class UprtclEthereum implements UprtclService {
   }
   
   async getContext(contextId: string): Promise<Context> {
-    let result = await this.ipfsClient.get(contextId);
+    let result = await this.ipfsClient.get<Context>(contextId);
     console.log(`[ETH] getContext ${contextId}`, result)
     return result;
   }
@@ -53,14 +43,14 @@ export class UprtclEthereum implements UprtclService {
     await this.ethereum.ready();
 
     /** Content addressable part comes from IPFS */
-    const perspective: Perspective = await this.ipfsClient.get(perspectiveId);
+    const perspective: Perspective = await this.ipfsClient.get<Perspective>(perspectiveId);
     perspective.id = perspectiveId;
     console.log(`[ETH] getPerspective ${perspectiveId}`, perspective)
     return perspective;
   }
 
   async getCommit(commitId: string): Promise<Commit> {
-    let result = await this.ipfsClient.get(commitId);
+    let result = await this.ipfsClient.get<Commit>(commitId);
     console.log(`[ETH] getCommit ${commitId}`, result);
     return result;
   }
@@ -209,7 +199,7 @@ export class UprtclEthereum implements UprtclService {
       }
     }
 
-    console.log(`[ETH] createCommit - added to IPFS`, commitId);
+    console.log(`[ETH] createCommit - added to IPFS`, commitId, commitPlain);
     return commitId;
   }
 
