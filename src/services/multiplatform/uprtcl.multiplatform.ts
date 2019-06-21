@@ -138,7 +138,6 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
   }
 
   createCommit(serviceProvider: string, commit: Commit): Promise<string> {
-    debugger
     this.cacheService.setCidConfig(
       this.serviceProviders[serviceProvider].service.getCidConfig()
     );

@@ -66,11 +66,8 @@ export class TaskQueue {
       this.tasksIds[task.id] = null;
       delete this.tasksIds[task.id];
     } catch (e) {
-      if (this.retryEnabled) {
-        console.log(
-          `Task failed, retrying when online ${this.retryInterval / 1000}s`,
-          task
-        );
+      if (this.retryEnabled && !navigator.onLine) {
+        console.log(`Task failed, retrying when online`, task);
 
         if (this.tasksIds[task.id] && this.tasksIds[task.id] !== task) {
           return;
@@ -81,6 +78,9 @@ export class TaskQueue {
         this.scheduleTasksRun();
       } else {
         console.log(`Task failed, not retrying`, task);
+        // Task succeeded, delete the task from the dictionary
+        this.tasksIds[task.id] = null;
+        delete this.tasksIds[task.id];
       }
     }
   }
