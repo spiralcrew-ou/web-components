@@ -204,3 +204,40 @@ export const closeMenu = () => {
     dispatch({type: 'OPEN MENU', isClose:true})
   }
 }
+
+/**
+ * (WIP) change or switch between perspectives. 
+ * @param _oldPerspective A block object of current perspective
+ * @param _newPerspective A block object of new perspective
+ */
+export const changePerspective = (_oldPerspective, _newPerspective) => {
+  return async(dispatch,getState) => {
+    const perspectiveFull =  await getMasterTree(getState) 
+    dispatch({ type: "CHANGE PERSPECTIVE", tree: readBlockRec(perspectiveFull, getState().workpad.tree, getState().workpad.rootId)});
+  }
+}
+
+/**
+ * (WIP) Create a new perspective given a parten perspective 
+ * @param _perspectiveToClone a Block object that represent perspective to clone
+ * @param _message A lil and cool message from the user
+ * 
+ */
+export const newPerspective = (_perspectiveToClone, _message) => {
+  return async(dispatch,getState) => {
+    const perspectiveFull =  await getMasterTree(getState) 
+    dispatch({ type: "NEW PERSPECTIVE", tree: readBlockRec(perspectiveFull, getState().workpad.tree, getState().workpad.rootId)});
+  }
+}
+
+/**
+ * (WIP) Merge two perspectives and get a new perspective in same origin (that destination)
+ * @param _origin a block that represent origin perspective
+ * @param _destination  a block that represent destination perspective
+ */
+export const mergePerspectives = (_origin, _destination) => {
+  return async(dispatch,getState) => {
+    const perspectiveFull =  await getMasterTree(getState) 
+    dispatch({ type: "MERGE", tree: readBlockRec(perspectiveFull, getState().workpad.tree, getState().workpad.rootId)});
+  }
+}
