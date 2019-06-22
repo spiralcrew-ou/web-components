@@ -25,7 +25,32 @@ export const initWorkPad = rootId => {
 };
 
 const hasChanges = (_perspective: PerspectiveFull): boolean => {
-  return _perspective.head ? false : true;
+  
+  if (!_perspective.head) {
+    return true;
+  }
+  
+  let node = _perspective.head.data;
+  let draft = _perspective.draft;
+
+  if (!node) {
+    return true;
+  }
+
+  if (draft != null) {
+    let textEqual = node.text === draft.text;
+    let linksEqual = node.links.length === draft.links.length;
+    for (let i = 0; i < node.links.length; i++) {
+      linksEqual =
+        linksEqual &&
+        node.links[i].link === draft.links[i].link;
+      // TODO: compare position...
+    }
+
+    return !(textEqual && linksEqual);
+  }
+
+  return false;
 };
 
 const getPerspectiveData = (perspective: PerspectiveFull): TextNodeFull => {
