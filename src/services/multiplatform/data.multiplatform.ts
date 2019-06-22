@@ -28,10 +28,14 @@ export class DataMultiplatform extends CachedMultiplatform<DataProvider<any>> {
   }
 
   getData<T>(dataId: string): Promise<T> {
+    let clonner = (service, objectAndCidConfig):Promise<any> => {
+      service.data.setCidConfig(objectAndCidConfig.cidConfig);
+      return service.data.createData(objectAndCidConfig.object);
+    }
     return this.cachedDiscover(
       dataId,
       service => service.data.getData(dataId),
-      (service, data) => service.data.createData(data),
+      clonner,
       this.linksFromTextNode
     );
   }
@@ -49,18 +53,19 @@ export class DataMultiplatform extends CachedMultiplatform<DataProvider<any>> {
   }
 
   async getDraft<T>(serviceProvider: string, objectId: string): Promise<T> {
-    const sourceGetter = () =>
-      this.getFromSource(
+    
+    const objectAndCidConfig = await this.getFromSource(
         serviceProvider,
         service => service.draft.getDraft(objectId),
         this.linksFromTextNode
       );
 
-    return this.fallback(
-      sourceGetter,
-      (service, draft) => service.draft.setDraft(objectId, draft),
-      service => service.draft.getDraft(objectId)
-    );
+    if (objectAndCidConfig.object) {
+      this.cacheService.setCidConfig(objectAndCidConfig.cidConfig);
+      this.cacheService.draft.setDraft(objectId, objectAndCidConfig.object);
+    }
+    
+    return objectAndCidConfig.object;
   }
 
   setDraft(

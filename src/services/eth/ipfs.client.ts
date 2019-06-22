@@ -50,31 +50,6 @@ export class IpfsClient {
     });
   }
 
-  public async addObject(object: object, cidConfig: CidConfig): Promise<string> {
-    await this.ready();
-
-    let putConfig = { 
-      format: cidConfig.codec, 
-      hashAlg: cidConfig.type, 
-      cidVersion: 
-      cidConfig.version 
-    }
-
-    let buffer = this.getObjectBuffer(object);
-
-    /** recursively try */
-    return this.tryPut(buffer, putConfig, 100, 0)
-      .then((result: any)=> {
-        let hashString = result.toString(cidConfig.base)
-        console.log(`[IPFS] Object stored`, object, { hashString });
-        return hashString;
-      })
-      .catch(e => {
-        console.error('[IPFS] error', e);
-        throw new Error('Sorry but it seems impossible to store this on IPFS') 
-      });
-  }
-
   private tryGet(hash: string, wait: number, attempt: number): Promise<any> {
     return new Promise((resolve, reject) => {
       console.log(`[IPFS] trying to get ${hash}. Attempt: ${attempt}`);
@@ -98,19 +73,44 @@ export class IpfsClient {
     });
   }
 
+  public async addObject(object: object, cidConfig: CidConfig): Promise<string> {
+    await this.ready();
+
+    let putConfig = { 
+      format: cidConfig.codec, 
+      hashAlg: cidConfig.type, 
+      cidVersion: 
+      cidConfig.version 
+    }
+
+    let buffer = this.getObjectBuffer(object);
+
+    /** recursively try */
+    return this.tryPut(buffer, putConfig, 500, 0)
+      .then((result: any)=> {
+        let hashString = result.toString(cidConfig.base)
+        console.log(`[IPFS] Object stored`, object, { hashString });
+        return hashString;
+      })
+      .catch(e => {
+        console.error('[IPFS] error', e);
+        throw new Error('Sorry but it seems impossible to store this on IPFS') 
+      });
+  }
+
   public async get<T>(hash: string): Promise<T> {
     await this.ready();
 
     /** recursively try */
-    return this.tryGet(hash, 100, 0)
+    return this.tryGet(hash, 500, 0)
       .then((raw)=> {
         let object = JSON.parse(Buffer.from(raw.value).toString());
         console.log(`[IPFS] Object retrieved ${hash}`, object);
         return object;
       })
       .catch(e => {
-        console.error('[IPFS] error', e);
-        throw new Error(`Sorry, but it seems impossible to get ${hash} from IPFS`) 
+        console.error(`[IPFS ]Impossible to get ${hash} from IPFS, returning null`, e);
+        return null;
       });
   }
 }

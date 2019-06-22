@@ -11,7 +11,7 @@ import { CachedMultiplatform } from './cached.multiplatform';
 import { UprtclLocal } from '../local/uprtcl.local';
 import { ipldService } from '../ipld';
 
-const currentAuthorId = 'anonymous:12';
+const currentAuthorId = 'anonymous:15';
 
 export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
   linksFromPerspective(perspective: Perspective) {
@@ -62,52 +62,69 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
   }
 
   async getContext(contextId: string): Promise<Context> {
+    let clonner = (service, objectAndCidConfig):Promise<any> => {
+      service.setCidConfig(objectAndCidConfig.cidConfig);
+      return service.createContext(objectAndCidConfig.object);
+    }
     return await this.cachedDiscover(
       contextId,
       service => service.getContext(contextId),
-      (service, context) => service.createContext(context),
+      clonner,
       () => []
     );
   }
 
   async getPerspective(perspectiveId: string): Promise<Perspective> {
+    let clonner = (service, objectAndCidConfig):Promise<any> => {
+      service.setCidConfig(objectAndCidConfig.cidConfig);
+      return service.createPerspective(objectAndCidConfig.object);
+    }
+
     return await this.cachedDiscover(
       perspectiveId,
       service => service.getPerspective(perspectiveId),
-      (service, perspective) => service.createPerspective(perspective),
+      clonner,
       this.linksFromPerspective
     );
   }
 
   async getCommit(commitId: string): Promise<Commit> {
+    let clonner = (service, objectAndCidConfig):Promise<any> => {
+      service.setCidConfig(objectAndCidConfig.cidConfig);
+      return service.createCommit(objectAndCidConfig.object);
+    }
+
     return await this.cachedDiscover(
       commitId,
       service => service.getCommit(commitId),
-      (service, commit) => service.createCommit(commit),
+      clonner,
       this.linksFromCommit
     );
   }
 
   async getContextPerspectives(contextId: string): Promise<Perspective[]> {
-    const getter = service => service.getContextPerspectives(contextId);
-
-    const sourcesGetter = () =>
-      this.getFromAllSources(
+    
+    let perspectiveAndCidConfigsGroups = await this.getFromAllSources(
         contextId,
-        getter,
+        service => service.getContextPerspectives(contextId),
         (perspectives: Perspective[]) => {
           const flat = Array.prototype.concat.apply([], perspectives);
           return flat.map(p => this.linksFromPerspective(p));
         }
-      ).then(
-        perspectives => Array.prototype.concat.apply([], perspectives));
+      );
 
-    const clonePerspectives = (service: UprtclService, perspectives: Perspective[]) =>
-      Promise.all(perspectives.map(p => service.createPerspective(p)));
+    let perspectivesGroups = perspectiveAndCidConfigsGroups.map(pAndCidC => pAndCidC.object);
 
-    return this.fallback(sourcesGetter, clonePerspectives, service =>
-      service.getContextPerspectives(contextId)
-    );
+    let perspectives = 
+      Array.prototype.concat.apply([], perspectivesGroups);
+
+    Promise.all(perspectives.map(perspective => {
+      /** @Guillem to be reviewed, why is the 0 index here?*/
+      this.cacheService.setCidConfig(perspectiveAndCidConfigsGroups[0].cidConfig);
+      this.cacheService.createPerspective(perspective);
+    }));
+
+    return perspectives;
   }
 
   createContext(serviceProvider: string, context: Context): Promise<string> {
@@ -156,17 +173,20 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
       return null;
     }
 
+    /** head the special guy. It is always retreived from 
+     * the perspective origin to prevent attacks. */
     const origin = perspective.origin;
-    return this.fallback(
-      () =>
-        this.getFromSource(
-          origin,
-          s => s.getHead(perspectiveId),
-          headId => [headId]
-        ),
-      (service, headId) => service.updateHead(perspectiveId, headId),
-      service => service.getHead(perspectiveId)
-    );
+    
+    let objectAndCidConfig = await this.getFromSource(
+      origin, 
+      s => s.getHead(perspectiveId),
+      headId => [headId])
+
+    if (objectAndCidConfig.object) {
+      await this.updateHead(perspectiveId, objectAndCidConfig.object);
+    }
+
+    return objectAndCidConfig.object;
   }
 
   async updateHead(perspectiveId: string, headId: string): Promise<void> {

@@ -25,7 +25,7 @@ export class CachedMultiplatform<T extends CidCompatible> extends Multiplatform<
   protected async cached<O>(
     getter: (service: T) => Promise<O>,
     discover: () => Promise<ObjectAndCidConfig<O>>,
-    cloner: (service: T, object: O) => Promise<any>
+    cloner: (service: T, objectAndCidConfig: ObjectAndCidConfig<O>) => Promise<any>
   ): Promise<O> {
     // If we have the object already cached, return it
     const cachedObject = await getter(this.cacheService);
@@ -41,7 +41,8 @@ export class CachedMultiplatform<T extends CidCompatible> extends Multiplatform<
      * who knows it, as it knows the service provider. So discover must return the object and
      * the CidConfig. This is why I had to change all the interfaces.
      */
-    await cloner(this.cacheService, objectAndCidConfig.object);
+    await cloner(this.cacheService, objectAndCidConfig);
+    
     return objectAndCidConfig.object;
   }
 
@@ -51,7 +52,7 @@ export class CachedMultiplatform<T extends CidCompatible> extends Multiplatform<
   protected async cachedDiscover<O>(
     hash: string,
     getter: (service: T) => Promise<O>,
-    cloner: (service: T, object: O) => Promise<any>,
+    cloner: (service: T, objectAndCidConfig: ObjectAndCidConfig<O>) => Promise<any>,
     linksSelector: (object: O) => string[]
   ): Promise<O> {
     if (typeof hash !== 'string' || hash == null) {
@@ -69,6 +70,9 @@ export class CachedMultiplatform<T extends CidCompatible> extends Multiplatform<
    * Try to get the object from the server and cache the result,
    * else return the object from cache
    */
+  /*
+  @ Guillem, remove this for simplicity. When its working we can bring it back to life
+  And of course offline mode is not working now... :( 
   protected async fallback<O>(
     sourceGetter: () => Promise<ObjectAndCidConfig<O>>,
     cloner: (service: T, object: O) => Promise<any>,
@@ -89,6 +93,7 @@ export class CachedMultiplatform<T extends CidCompatible> extends Multiplatform<
       return cacheGetter(this.cacheService);
     }
   }
+  */
 
   /**
    * Creates the object in cache synchronously and
