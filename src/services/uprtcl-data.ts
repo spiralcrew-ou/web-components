@@ -211,7 +211,10 @@ export class UprtclData {
       newPerspective
     );
 
-    await this.uprtcl.updateHead(newPerspectiveId, newCommitId);
+    if (newCommitId) {
+      await this.uprtcl.updateHead(newPerspectiveId, newCommitId);
+    }
+
     return newPerspectiveId;
   }
 

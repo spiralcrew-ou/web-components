@@ -16,7 +16,8 @@ export class EthereumConnection {
             localProvider: host,
             handlers: {
               web3Ready: () => {
-                this.web3 = w3w.getWeb3js()
+                this.web3 = w3w.getWeb3js();
+                this.web3.transactionConfirmationBlocks = 1;
                 this.account = w3w.getAccount();
                 this.uprtclInstance = new this.web3.eth.Contract(
                   UprtclContractArtifact.abi,
@@ -38,7 +39,7 @@ export class EthereumConnection {
 
   /** a function to call a method and resolve only when confirmed */
   public send(funcName: string, pars: any[]): Promise<any> {
-    return new Promise(async resolve => {
+    return new Promise(async (resolve, reject) => {
       
       let gasEstimated = await this.uprtclInstance.methods[funcName](...pars).estimateGas()
       
@@ -52,12 +53,15 @@ export class EthereumConnection {
       })
       .on('receipt', (receipt) => {
         console.log(`[ETH] RECEIPT ${funcName} receipt`, { receipt, pars });
+        resolve();
       })
       .on('error', (error) => {
+        reject();
         console.error(`[ETH] ERROR ${funcName} `, { error, pars });
       })
       .on('confirmation', (confirmationNumber) => {
         console.log(`[ETH] CONFIRMED ${funcName}`, { confirmationNumber, pars });
+        resolve();
       })
       .then((receipt: any) => {
         console.log(`[ETH] MINED ${funcName} call mined`, { pars, receipt });

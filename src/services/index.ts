@@ -16,8 +16,8 @@ import { UprtclEthereum } from './eth/uprtcl.eth';
 import { DataIpfs } from './data.ipfs';
 
 export const holochainEnabled = false;
-export const c1Enabled = true;
-export const ethEnabled = false;
+export const c1Enabled = false;
+export const ethEnabled = true;
 
 export const holochainServiceProvider =
   'holochain://Qmag7yGbYSMhkzDZLnSJkc4pzNWpHLtfP5o2jL8jGF4W5w';
