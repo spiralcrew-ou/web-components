@@ -102,6 +102,7 @@ export class UprtclData {
     textNode: TextNode,
     levels: number
   ): Promise<TextNodeFull> {
+
     if (textNode == null) return null;
 
     const textNodeFull = new TextNodeFull();

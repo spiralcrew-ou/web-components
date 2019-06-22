@@ -1,0 +1,16 @@
+@import '../../globals/style.css';
+
+.form {
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr
+}
+
+input:focus{
+    outline: none;
+}
+
+button:focus{
+    outline: none;
+}
+
+
