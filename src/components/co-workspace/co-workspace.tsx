@@ -1,7 +1,6 @@
 import { Component, State, Prop } from '@stencil/core';
 import {
-  uprtclMultiplatform,
-  c1ServiceProvider as serviceProvider
+  uprtclMultiplatform
 } from '../../services';
 import { Store } from '@stencil/redux';
 import { configureStore } from '../../store.js';
@@ -40,7 +39,7 @@ export class COWorkspace {
     if (rootPerspective.draft.links.length === 0) {
       documentPerspectiveId = 
         await this.uprtclData.initContextUnder(
-          serviceProvider, this.rootPerspectiveId, -1, 'Untitled Document');
+          this.defaultService, this.rootPerspectiveId, -1, 'Untitled Document');
     } else {
       documentPerspectiveId = rootPerspective.draft.links[0].link.id;
     }
@@ -51,7 +50,7 @@ export class COWorkspace {
 
     if (document.draft.links.length === 0) {
       await this.uprtclData.initContextUnder(
-        serviceProvider, documentPerspectiveId, -1, '');
+        this.defaultService, documentPerspectiveId, -1, '');
     }
 
     /** no commits are done. So everything is a draft */
