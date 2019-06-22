@@ -1,5 +1,5 @@
 import { UprtclData } from "./services/uprtcl-data";
-import { PerspectiveFull, TextNodeFull } from "./types";
+import { PerspectiveFull, TextNodeFull, TextNode } from "./types";
 
 const uprtclData = new UprtclData();
 
@@ -179,7 +179,7 @@ export const commitAll = (serviceProvider) => {
 export const updateContentFromUser = (block, newContent) => {
   return async (dispatch,getState) => {
     const tree = getState().workpad.tree
-    const _draft = await uprtclData.data.getDraft(block.serviceProvider,block.id)
+    const _draft = await uprtclData.data.getDraft<TextNode>(block.serviceProvider,block.id)
     _draft.text = newContent
     uprtclData.data.setDraft(block.serviceProvider,block.id,_draft)
     tree[block.id].contentUser = newContent

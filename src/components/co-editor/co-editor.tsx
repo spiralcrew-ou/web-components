@@ -141,7 +141,7 @@ export class CoEditor {
   }
 
   render() {
-    /*return (
+    return (
       <div>
         {this.loading ? (
           <span>Loading...</span>
@@ -156,12 +156,7 @@ export class CoEditor {
           </div>
         )}
       </div>
-    );*/
-
-    return (
-      <div>
-        <co-workpad />
-      </div>
     );
+
   }
 }
