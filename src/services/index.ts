@@ -16,7 +16,7 @@ import { UprtclEthereum } from './eth/uprtcl.eth';
 import { DataIpfs } from './data.ipfs';
 
 export const holochainEnabled = false;
-export const c1Enabled = false;
+export const c1Enabled = true;
 export const ethEnabled = true;
 
 export const holochainServiceProvider =
@@ -29,6 +29,11 @@ export const ethServiceProvider =
   'eth://smartContract';
 
 const ethLocation = 'ws://127.0.0.1:8545';
+const ipfsConfig ={
+  host: 'ipfs.infura.io',
+  port: 5001,
+  protocol: 'https'
+};
 
 let uprtclConfig = {};
 let dataConfig = {};
@@ -59,25 +64,17 @@ if (holochainEnabled) {
       draft: new DraftHolochain()
     }
   };
-
-  dataConfig['ipfs'] = {
-    discovery: null,
-    service: {
-      data: new DataIpfs(),
-      draft: null
-    }
-  };
 }
 
 if (ethEnabled) {
   uprtclConfig[ethServiceProvider] = {
-    service: new UprtclEthereum(ethLocation),
+    service: new UprtclEthereum(ethLocation, ipfsConfig),
     discovery: new DiscoveryCollectiveOne(),
   };
   dataConfig[ethServiceProvider] = {
     discovery: new DiscoveryCollectiveOne(),
     service: {
-      data: new DataIpfs(),
+      data: new DataIpfs(ipfsConfig),
       draft: new DraftCollectiveOne()
     }
   };

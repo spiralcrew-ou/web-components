@@ -5,17 +5,26 @@ import { DraftService } from '../draft.service';
 import { CachedMultiplatform } from './cached.multiplatform';
 import { DataLocal } from '../local/data.local';
 import { DraftLocal } from '../local/draft.local';
+import { CidCompatible } from '../cid.service';
+import { CidConfig } from '../cid.config';
 
-export interface DataProvider<T> {
+export interface DataProvider<T> extends CidCompatible {
   data: DataService<T>;
   draft: DraftService;
+  getCidConfig(): CidConfig;
+  setCidConfig(config: CidConfig);
 }
 
 export class DataMultiplatform extends CachedMultiplatform<DataProvider<any>> {
   linksFromTextNode = node => node.links.map(link => link.link);
 
   constructor(serviceProviders: Dictionary<DiscoveryProvider<DataProvider<any>>>) {
-    super(serviceProviders, { data: new DataLocal(), draft: new DraftLocal<TextNode>() });
+    super(serviceProviders, { 
+      data: new DataLocal(), 
+      draft: new DraftLocal<TextNode>(),
+      setCidConfig: () => {},
+      getCidConfig: ():CidConfig => {return null}
+    });
   }
 
   getData<T>(dataId: string): Promise<T> {

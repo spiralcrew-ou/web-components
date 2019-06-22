@@ -8,8 +8,10 @@ export class DiscoveryCollectiveOne implements DiscoveryService {
     return http.get('/discovery/you');
   }
 
-  getKnownSources(hash: string): Promise<string[]> {
-    return http.get(`/discovery/${hash}`);
+  async getKnownSources(hash: string): Promise<string[]> {
+    let sources = await http.get<string[]>(`/discovery/${hash}`);
+    console.log(`[DISCOVER-C1]: getting known sources for ${hash}`, sources);      
+    return sources;
   }
   async addKnownSources(hash: string, sources: string[]): Promise<void> {
     
@@ -23,6 +25,7 @@ export class DiscoveryCollectiveOne implements DiscoveryService {
       console.error('[C1 DISCOVER]: Warning, known source null');
     }
 
+    console.log(`[DISCOVER-C1]: adding known sources for ${hash}`, sources);      
     await http.put(`/discovery/${hash}`, sources);
   }
   removeKnownSource(_hash: string, _source: string): Promise<void> {

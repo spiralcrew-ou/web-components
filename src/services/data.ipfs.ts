@@ -14,7 +14,7 @@ export class DataIpfs implements DataService {
     this.cidConfig = cidConfig;
   }
 
-  constructor(options?: any) {
+  constructor(options: object) {
     this.ipfsClient = new IpfsClient(options);
     this.cidConfig = new CidConfig(
       'base58btc', 1, 'raw', 'sha2-256');

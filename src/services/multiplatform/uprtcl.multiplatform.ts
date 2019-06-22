@@ -11,7 +11,7 @@ import { CachedMultiplatform } from './cached.multiplatform';
 import { UprtclLocal } from '../local/uprtcl.local';
 import { ipldService } from '../ipld';
 
-const currentAuthorId = 'anonymous:30';
+const currentAuthorId = 'anonymous:12';
 
 export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
   linksFromPerspective(perspective: Perspective) {

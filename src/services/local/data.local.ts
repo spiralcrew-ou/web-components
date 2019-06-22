@@ -21,6 +21,10 @@ export class DataLocal<T> implements DataService<T> {
   }
 
   async createData(data: T): Promise<string> {
+    if (!this.currentConfig) {
+      console.log(`[LOCAL DATA] CidConfig null when creating object`, data)
+      throw new Error('[LOCAL DATA] CidConfig null when creating object')
+    }
     const dataId = await ipldService.generateCidOrdered(
       data,
       this.currentConfig,

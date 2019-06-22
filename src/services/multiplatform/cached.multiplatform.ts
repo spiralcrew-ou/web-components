@@ -1,8 +1,9 @@
-import { Multiplatform, DiscoveryProvider } from './multiplatform';
+import { Multiplatform, DiscoveryProvider, ObjectAndCidConfig } from './multiplatform';
 import { Dictionary } from '../../types';
 import { TaskQueue } from './task.queue';
+import { CidCompatible } from '../cid.service';
 
-export class CachedMultiplatform<T> extends Multiplatform<T> {
+export class CachedMultiplatform<T extends CidCompatible> extends Multiplatform<T> {
   cacheService: T;
 
   taskQueue = new TaskQueue();
@@ -23,7 +24,7 @@ export class CachedMultiplatform<T> extends Multiplatform<T> {
    */
   protected async cached<O>(
     getter: (service: T) => Promise<O>,
-    discover: () => Promise<O>,
+    discover: () => Promise<ObjectAndCidConfig<O>>,
     cloner: (service: T, object: O) => Promise<any>
   ): Promise<O> {
     // If we have the object already cached, return it
@@ -33,11 +34,15 @@ export class CachedMultiplatform<T> extends Multiplatform<T> {
     }
     
     // If not on cache, discover it
-    const object = await discover();
+    const objectAndCidConfig = await discover();
 
     // And store it in cache
-    await cloner(this.cacheService, object);
-    return object;
+    /** @Guillem, the cloner must know the CidConfig, the discovery service is the only one
+     * who knows it, as it knows the service provider. So discover must return the object and
+     * the CidConfig. This is why I had to change all the interfaces.
+     */
+    await cloner(this.cacheService, objectAndCidConfig.object);
+    return objectAndCidConfig.object;
   }
 
   /**
@@ -65,19 +70,20 @@ export class CachedMultiplatform<T> extends Multiplatform<T> {
    * else return the object from cache
    */
   protected async fallback<O>(
-    sourceGetter: () => Promise<O>,
+    sourceGetter: () => Promise<ObjectAndCidConfig<O>>,
     cloner: (service: T, object: O) => Promise<any>,
     cacheGetter: (service: T) => Promise<O>
   ) {
     try {
       // Try to get object from source
-      const object = await sourceGetter();
+      const objectAndCidConfig = await sourceGetter();
 
       // Clone the object into the cache
-      await cloner(this.cacheService, object);
+      this.cacheService.setCidConfig(objectAndCidConfig.cidConfig);
+      await cloner(this.cacheService, objectAndCidConfig.object);
 
       // And return it
-      return object;
+      return objectAndCidConfig.object;
     } catch (e) {
       // Otherwise, return object from cache
       return cacheGetter(this.cacheService);

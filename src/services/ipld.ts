@@ -1,12 +1,10 @@
 import CID from 'cids';
 import multihashing from 'multihashing-async';
 import Buffer from 'buffer/';
-import { IpfsClient } from './eth/ipfs.client';
 import { CidConfig } from './cid.config';
 
 export class IpldService {
-  ipfsClient = new IpfsClient();
-
+  
   async generateCidOrdered(
     object: any,
     cidConfig: CidConfig,

@@ -18,8 +18,8 @@ export class UprtclEthereum implements UprtclService {
   ethereum: EthereumConnection;
   cidConfig: CidConfig;
 
-  constructor(host: string) {
-    this.ipfsClient = new IpfsClient();
+  constructor(host: string, ipfsConfig: object) {
+    this.ipfsClient = new IpfsClient(ipfsConfig);
     this.ethereum = new EthereumConnection(host);
     this.cidConfig = new CidConfig(
       'base58btc', 1, 'raw', 'sha2-256');

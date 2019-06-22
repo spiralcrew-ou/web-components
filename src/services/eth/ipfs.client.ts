@@ -1,16 +1,10 @@
 import { CidConfig } from "../cid.config";
 
-const defaultOptions: any = {
-  host: 'ipfs.infura.io',
-  port: 5001,
-  protocol: 'https'
-};
-
 export class IpfsClient {
   client: any;
   connectionReady: any;
 
-  constructor(options = defaultOptions) {
+  constructor(options: object) {
     this.connectionReady = new Promise((resolve) => {
       let interval = setInterval(() => {
         let ipfsClient = window['IpfsHttpClient']
@@ -33,18 +27,90 @@ export class IpfsClient {
     return Buffer.from(JSON.stringify(object));
   }
 
+  private tryPut(buffer: Buffer, putConfig: object, wait: number, attempt: number): Promise<any> {
+    return new Promise((resolve, reject) => {
+      console.log(`[IPFS] try put. Attempt: ${attempt}`);
+      
+      if (attempt > 10) {
+        reject();
+      }
+
+      /** retry recursively with twice as much the wait time setting */
+      let timeout = setTimeout(() => {
+        this.tryPut(buffer, putConfig, wait * 2, attempt + 1)
+          .then((result:any) => resolve(result))
+          .catch(e => reject(e));        
+      }, wait)
+
+      this.client.dag.put(buffer, putConfig)
+        .then((result: object) => {
+          clearTimeout(timeout);
+          resolve(result);
+        })
+    });
+  }
+
   public async addObject(object: object, cidConfig: CidConfig): Promise<string> {
     await this.ready();
 
-    const result = await this.client.dag.put(
-      this.getObjectBuffer(object), { format: cidConfig.codec, hashAlg: cidConfig.type, cidVersion: cidConfig.version });
-    return result.toString(cidConfig.base)
+    let putConfig = { 
+      format: cidConfig.codec, 
+      hashAlg: cidConfig.type, 
+      cidVersion: 
+      cidConfig.version 
+    }
+
+    let buffer = this.getObjectBuffer(object);
+
+    /** recursively try */
+    return this.tryPut(buffer, putConfig, 100, 0)
+      .then((result: any)=> {
+        let hashString = result.toString(cidConfig.base)
+        console.log(`[IPFS] Object stored`, object, { hashString });
+        return hashString;
+      })
+      .catch(e => {
+        console.error('[IPFS] error', e);
+        throw new Error('Sorry but it seems impossible to store this on IPFS') 
+      });
+  }
+
+  private tryGet(hash: string, wait: number, attempt: number): Promise<any> {
+    return new Promise((resolve, reject) => {
+      console.log(`[IPFS] trying to get ${hash}. Attempt: ${attempt}`);
+      
+      if (attempt > 10) {
+        reject();
+      }
+
+      /** retry recursively with twice as much the wait time setting */
+      let timeout = setTimeout(() => {
+        this.tryGet(hash, wait * 2, attempt + 1)
+          .then((result) => resolve(result))
+          .catch(e => reject(e));        
+      }, wait)
+
+      this.client.dag.get(hash).then((result) => {
+        clearTimeout(timeout);
+        resolve(result);
+      })
+        
+    });
   }
 
   public async get<T>(hash: string): Promise<T> {
     await this.ready();
 
-    const raw = await this.client.get(hash);
-    return JSON.parse(Buffer.from(raw[0].content).toString());
+    /** recursively try */
+    return this.tryGet(hash, 100, 0)
+      .then((raw)=> {
+        let object = JSON.parse(Buffer.from(raw.value).toString());
+        console.log(`[IPFS] Object retrieved ${hash}`, object);
+        return object;
+      })
+      .catch(e => {
+        console.error('[IPFS] error', e);
+        throw new Error(`Sorry, but it seems impossible to get ${hash} from IPFS`) 
+      });
   }
 }
