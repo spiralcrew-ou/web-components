@@ -35,7 +35,7 @@ export class COWorkspace {
 
     /** rootPerspective draft is forced to have one single link pointing 
      * to the single document perspective */
-    let documentPerspectiveId;
+    let documentPerspectiveId: string;
 
     if (rootPerspective.draft.links.length === 0) {
       documentPerspectiveId = 
@@ -47,7 +47,7 @@ export class COWorkspace {
       
     /** document is forced to have one empty paragraph */
     let document = await this.uprtclData.getPerspectiveFull(
-      documentPerspectiveId, 0);
+      documentPerspectiveId, 1);
 
     if (document.draft.links.length === 0) {
       await this.uprtclData.initContextUnder(

@@ -53,19 +53,21 @@ export class DataMultiplatform extends CachedMultiplatform<DataProvider<any>> {
   }
 
   async getDraft<T>(serviceProvider: string, objectId: string): Promise<T> {
-    
+    return this.serviceProviders[serviceProvider].service.draft.getDraft(objectId);
+    /*
     const objectAndCidConfig = await this.getFromSource(
-        serviceProvider,
-        service => service.draft.getDraft(objectId),
-        this.linksFromTextNode
-      );
+      serviceProvider,
+      service => service.draft.getDraft(objectId),
+      this.linksFromTextNode
+    );
 
     if (objectAndCidConfig.object) {
       this.cacheService.setCidConfig(objectAndCidConfig.cidConfig);
       this.cacheService.draft.setDraft(objectId, objectAndCidConfig.object);
     }
-    
+  
     return objectAndCidConfig.object;
+    */
   }
 
   setDraft(
@@ -73,10 +75,10 @@ export class DataMultiplatform extends CachedMultiplatform<DataProvider<any>> {
     objectId: string,
     draft: any
   ): Promise<any> {
-    
+    /** without the fallback for the get draft, the set should not be optimistic */
     return this.serviceProviders[serviceProvider].service.draft.setDraft(objectId, draft);
     
-    /** without the fallback for the get draft, the set should not be optimistic 
+    /*
     return this.optimisticUpdate(
       serviceProvider,
       service => service.draft.setDraft(objectId, draft),

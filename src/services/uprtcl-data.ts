@@ -41,17 +41,18 @@ export class UprtclData {
     perspectiveId: string,
     levels: number
   ): Promise<PerspectiveFull> {
-    const perspective = await this.uprtcl.getPerspective(perspectiveId);
     
+    const perspective = await this.uprtcl.getPerspective(perspectiveId);
+    const context = await this.uprtcl.getContext(
+      perspective.contextId
+    );
     /** plain data */
     const perspectiveFull = new PerspectiveFull();
     perspectiveFull.id = perspective.id;
     perspectiveFull.origin = perspective.origin;
     perspectiveFull.creatorId = perspective.creatorId;
     perspectiveFull.timestamp = perspective.timestamp;
-    perspectiveFull.context = await this.uprtcl.getContext(
-      perspective.contextId
-    );
+    perspectiveFull.context = context;
     perspectiveFull.name = perspective.name;
 
     /** additional data */
@@ -59,12 +60,8 @@ export class UprtclData {
     perspectiveFull.draft = await this.getTextNodeFull(draft, levels);
 
     const headId = await this.uprtcl.getHead(perspectiveId);
-    if (headId) {
-      perspectiveFull.head = await this.getCommitFull(headId, levels);
-    } else {
-      perspectiveFull.head = null;
-    }
-
+    perspectiveFull.head = await this.getCommitFull(headId, levels);
+    
     return perspectiveFull;
   }
 
