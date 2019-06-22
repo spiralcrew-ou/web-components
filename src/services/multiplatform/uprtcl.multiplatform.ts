@@ -173,7 +173,7 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
       return null;
     }
 
-    /** head the special guy. It is always retreived from 
+    /** head is the special guy. It is always retreived from 
      * the perspective origin to prevent attacks. */
     const origin = perspective.origin;
     

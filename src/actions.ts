@@ -1,5 +1,5 @@
 import { UprtclData } from "./services/uprtcl-data";
-import { PerspectiveFull, TextNodeFull, TextNode } from "./types";
+import { PerspectiveFull, TextNodeFull } from "./types";
 
 const uprtclData = new UprtclData();
 
@@ -168,7 +168,7 @@ export const setView = (block,newView) => {
  */
 export const removeBlock = block => {
   return async(dispatch, getState) => {
-    await uprtclData.removePerspective(block.serviceProvider,block.parentPerspectiveID,block.id)
+    await uprtclData.removePerspective(block.parentPerspectiveID, block.id)
     const perspectiveFull =  await getMasterTree(getState) 
     dispatch({ type: "REMOVE BLOCK", tree: readBlockRec(perspectiveFull, getState().workpad.tree, getState().workpad.rootId)});
   };
@@ -188,7 +188,6 @@ export const commitAll = (serviceProvider) => {
     const rootDocument = getState().workpad.tree[getState().workpad.rootId]
     
     await uprtclData.commitGlobal(
-      rootDocument.serviceProvider,
       serviceProvider ? serviceProvider : rootDocument.serviceProvider,
       getState().workpad.rootId,'Commit', new Date().getTime())
 
@@ -204,9 +203,9 @@ export const commitAll = (serviceProvider) => {
 export const updateContentFromUser = (block, newContent) => {
   return async (dispatch,getState) => {
     const tree = getState().workpad.tree
-    const _draft = await uprtclData.data.getDraft<TextNode>(block.serviceProvider,block.id)
+    const _draft = await uprtclData.draft.getDraft(block.id)
     _draft.text = newContent
-    uprtclData.data.setDraft(block.serviceProvider,block.id,_draft)
+    uprtclData.draft.setDraft(block.id,_draft)
     tree[block.id].contentUser = newContent
     dispatch({type: 'UPDATE CONTENT FROM USER', tree})
   }

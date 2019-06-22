@@ -9,7 +9,7 @@ import {
   Method
 } from '@stencil/core';
 import { TextNode, Perspective, Commit, Context } from '../../types';
-import { uprtclMultiplatform, dataMultiplatform } from '../../services';
+import { uprtclMultiplatform, dataMultiplatform, draftService } from '../../services';
 import { uprtclData } from '../../services/uprtcl-data';
 
 @Component({
@@ -42,6 +42,7 @@ export class TextNodeElement {
 
   uprtclService = uprtclMultiplatform;
   dataService = dataMultiplatform;
+  draftService = draftService;
 
   async loadPerspective() {
     this.perspective = await this.uprtclService.getPerspective(
@@ -49,8 +50,7 @@ export class TextNodeElement {
     );
     this.headId = await this.uprtclService.getHead(this.perspectiveId);
 
-    this.draft = await this.dataService.getDraft(
-      this.perspective.origin,
+    this.draft = await this.draftService.getDraft(
       this.perspectiveId
     );
 
@@ -197,8 +197,7 @@ export class TextNodeElement {
     );
 
     // Create a new draft to the said perspective
-    await this.dataService.setDraft(
-      this.perspective.origin,
+    await this.draftService.setDraft(
       newPerspectiveId,
       this.newNode()
     );
@@ -213,8 +212,7 @@ export class TextNodeElement {
     if (this.draft == null) this.draft = { ...this.node };
     this.draft.links.push({ link: newPerspectiveId });
     this.draft = { ...this.draft };
-    await this.dataService.setDraft(
-      this.perspective.origin,
+    await this.draftService.setDraft(
       this.perspectiveId,
       this.draft
     );
@@ -227,8 +225,7 @@ export class TextNodeElement {
     if (this.draft == null) this.draft = { ...this.node };
     this.draft.text = event.detail;
     this.draft = { ...this.draft };
-    this.dataService.setDraft(
-      this.perspective.origin,
+    this.draftService.setDraft(
       this.perspectiveId,
       this.draft
     );

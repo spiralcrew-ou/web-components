@@ -93,16 +93,8 @@ export class Multiplatform<T extends CidCompatible> {
     idSelector: (object: O) => string = o => o['id']
   ): Promise<ObjectAndCidConfig<O>> {
     // Try to retrieve the object
-    /** @Guillem, there is an issue here beacuse the data provide has data and draf, but the
-     * uprtcl provider is a provider itself.... ugly path being added
-     */
-    let cidConfig;
-    if (this.serviceProviders[source].service['data']) {
-      cidConfig = this.serviceProviders[source].service['data'].getCidConfig();  
-    } else {
-      cidConfig = this.serviceProviders[source].service.getCidConfig();  
-    }
-
+    let cidConfig = this.serviceProviders[source].service.getCidConfig();  
+    
     const object = await getter(this.serviceProviders[source].service);
 
     if (object) {

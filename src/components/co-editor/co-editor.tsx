@@ -2,6 +2,7 @@ import { Component, State, Prop } from '@stencil/core';
 import {
   uprtclMultiplatform,
   dataMultiplatform,
+  draftService,
   c1ServiceProvider as serviceProvider,
   // ethServiceProvider as serviceProvider
 } from '../../services';
@@ -28,6 +29,7 @@ export class CoEditor {
   // Multiplatform service is already instantiated, get a reference to it
   uprtcl = uprtclMultiplatform;
   dataService = dataMultiplatform;
+  draft = draftService;
 
   async componentWillLoad() {
     this.loading = true;
@@ -57,8 +59,7 @@ export class CoEditor {
       this.rootPerspectiveId = rootPerspectives[0].id;
     }
 
-    const draft = await this.dataService.getDraft<TextNode>(
-      this.defaultService,
+    const draft = await this.draft.getDraft(
       this.rootPerspectiveId
     );
 
@@ -99,21 +100,19 @@ export class CoEditor {
       perspective
     );
     // head commit is left as null, only draft data is created. head commit is created at first commit
-    await this.dataService.setDraft(serviceProvider, perspectiveId, data);
+    await this.draft.setDraft(perspectiveId, data);
     return perspectiveId;
   }
 
   async addLinkToPerspective(_link: string, perspectiveId: string) {
-    let newDraft = await this.dataService.getDraft<TextNode>(
-      this.defaultService,
+    let newDraft = await this.draft.getDraft(
       perspectiveId
     );
     if (!newDraft) {
       newDraft = { text: '', type: 'paragraph', links: [] };
     }
     newDraft.links.push({ link: _link });
-    await this.dataService.setDraft(
-      this.defaultService,
+    await this.draft.setDraft(
       perspectiveId,
       newDraft
     );

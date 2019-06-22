@@ -49,6 +49,7 @@ export class UprtclCollectiveOne implements UprtclService {
 
   async getHead(perspectiveId: string): Promise<string> {
     const perspective = await http.get(`/persp/${perspectiveId}`);
+    if (!perspective) return null;
     return perspective['headId'];
   }
 

@@ -2,22 +2,24 @@ import { UprtclMultiplatform } from './multiplatform/uprtcl.multiplatform';
 import { DataMultiplatform } from './multiplatform/data.multiplatform';
 
 import { DataHolochain } from './holochain/data.holochain';
-import { DraftHolochain } from './holochain/draft.holochain';
+// import { DraftHolochain } from './holochain/draft.holochain';
 import { UprtclHolochain } from './holochain/uprtcl.holochain';
 import { DiscoveryHolochain } from './holochain/discovery.holochain';
 
 import { DataCollectiveOne } from './c1/data.c1';
-import { DraftCollectiveOne } from './c1/draft.c1';
+// import { DraftCollectiveOne } from './c1/draft.c1';
 import { UprtclCollectiveOne } from './c1/uprtcl.c1';
 import { DiscoveryCollectiveOne } from './c1/discovery.c1';
 
 import { UprtclEthereum } from './eth/uprtcl.eth';
 
 import { DataIpfs } from './data.ipfs';
+import { DraftLocal } from './local/draft.local';
+import { TextNode } from './../types';
 
 export const holochainEnabled = false;
 export const c1Enabled = true;
-export const ethEnabled = true;
+export const ethEnabled = false;
 
 export const holochainServiceProvider =
   'holochain://Qmag7yGbYSMhkzDZLnSJkc4pzNWpHLtfP5o2jL8jGF4W5w';
@@ -45,10 +47,7 @@ if (c1Enabled) {
   };
   dataConfig[c1ServiceProvider] = {
     discovery: new DiscoveryCollectiveOne(),
-    service: {
-      data: new DataCollectiveOne(),
-      draft: new DraftCollectiveOne()
-    }
+    service: new DataCollectiveOne()
   };
 }
 
@@ -59,10 +58,7 @@ if (holochainEnabled) {
   };
   dataConfig[holochainServiceProvider] = {
     discovery: new DiscoveryHolochain(),
-    service: {
-      data: new DataHolochain(),
-      draft: new DraftHolochain()
-    }
+    service: new DataHolochain()
   };
 }
 
@@ -73,13 +69,10 @@ if (ethEnabled) {
   };
   dataConfig[ethServiceProvider] = {
     discovery: new DiscoveryCollectiveOne(),
-    service: {
-      data: new DataIpfs(ipfsConfig),
-      draft: new DraftCollectiveOne()
-    }
+    service: new DataIpfs(ipfsConfig)
   };
 }
 
 export const uprtclMultiplatform = new UprtclMultiplatform(uprtclConfig);
-
 export const dataMultiplatform = new DataMultiplatform(dataConfig);
+export const draftService = new DraftLocal<TextNode>();

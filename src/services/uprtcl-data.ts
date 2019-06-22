@@ -1,4 +1,4 @@
-import { uprtclMultiplatform, dataMultiplatform } from './index';
+import { uprtclMultiplatform, dataMultiplatform, draftService } from './index';
 import {
   PerspectiveFull,
   CommitFull,
@@ -12,6 +12,7 @@ import {
 export class UprtclData {
   uprtcl = uprtclMultiplatform;
   data = dataMultiplatform;
+  draft = draftService;
 
   /** Single point to initialize empty text nodes
    * 
@@ -56,7 +57,7 @@ export class UprtclData {
     perspectiveFull.name = perspective.name;
 
     /** additional data */
-    const draft = await this.data.getDraft<TextNode>(perspective.origin, perspectiveId);
+    const draft = await this.draft.getDraft(perspectiveId);
     perspectiveFull.draft = await this.getTextNodeFull(draft, levels);
 
     const headId = await this.uprtcl.getHead(perspectiveId);
@@ -272,8 +273,7 @@ export class UprtclData {
       perspective
     );
 
-    await this.data.setDraft(
-      serviceProvider,
+    await this.draft.setDraft(
       perspectiveId,
       this.initEmptyTextNode(content)
     );
@@ -305,7 +305,6 @@ export class UprtclData {
   ): Promise<string> {
     const newPerspectiveId = await this.initContext(serviceProvider, content);
     await this.insertPerspective(
-      serviceProvider,
       perspectiveId,
       newPerspectiveId,
       index
@@ -314,10 +313,8 @@ export class UprtclData {
   }
 
   /** Inserts an existing perspective (the child) as a child of another existing
-   * perspective (the parent) on a given position.
-   *
-   * @param serviceProvider The service provider storing the draft of the parent
-   * perspective. (The child perspective can come from another provider).
+   * perspective (the parent) on a given position. It only modifies the curren
+   * draft of the parent.
    *
    * @param onPerspectiveId The parent perspective id.
    *
@@ -330,12 +327,12 @@ export class UprtclData {
    * @returns The id of the new child **perspective**.
    */
   async insertPerspective(
-    serviceProvider: string,
     onPerspectiveId: string,
     perspectiveId: string,
     index: number
   ): Promise<void> {
-    let draft = await this.getOrCreateDraft(serviceProvider, onPerspectiveId);
+
+    let draft = await this.getOrCreateDraft(onPerspectiveId);
 
     if (index != -1) {
       if (0 < index && index < draft.links.length) {
@@ -348,7 +345,7 @@ export class UprtclData {
       draft.links.push({ link: perspectiveId });
     }
 
-    await this.data.setDraft(serviceProvider, onPerspectiveId, draft);
+    await this.draft.setDraft(onPerspectiveId, draft);
 
     return;
   }
@@ -366,11 +363,10 @@ export class UprtclData {
    * @returns The id of the new child **perspective**.
    */
   async removePerspective(
-    serviceProvider: string,
     fromPerspectiveId: string,
     perspectiveId: string
   ): Promise<void> {
-    let draft = await this.data.getDraft<TextNode>(serviceProvider, fromPerspectiveId);
+    let draft = await this.draft.getDraft(fromPerspectiveId);
 
     let index = draft.links.findIndex(link => link.link === perspectiveId);
     if (index == -1)
@@ -382,7 +378,7 @@ export class UprtclData {
     draft.links.splice(index, 1);
 
     /* udpate draft without the link */
-    await this.data.setDraft(serviceProvider, fromPerspectiveId, draft);
+    await this.draft.setDraft(fromPerspectiveId, draft);
   }
 
   /** Getter function to get or create a draft of/on a given perspective.
@@ -394,22 +390,20 @@ export class UprtclData {
    * @returns The draft object.
    */
   async getOrCreateDraft(
-    serviceProvider: string,
     perspectiveId: string
   ): Promise<TextNode> {
-    let draft = await this.data.getDraft<TextNode>(serviceProvider, perspectiveId);
+    let draft = await this.draft.getDraft(perspectiveId);
 
     if (draft != null) {
       return draft;
     }
 
-    await this.data.setDraft(
-      serviceProvider,
+    await this.draft.setDraft(
       perspectiveId,
       this.initEmptyTextNode('')
     );
 
-    return this.data.getDraft(serviceProvider, perspectiveId);
+    return this.draft.getDraft(perspectiveId);
   }
 
   /** Commits the current draft as the head of the perspective and sets the draft
@@ -424,7 +418,6 @@ export class UprtclData {
    * @param perspectiveId The perspective id.
    */
   async commitGlobal(
-    draftServiceProvider: string,
     serviceProvider: string,
     perspectiveId: string,
     message: string,
@@ -433,10 +426,8 @@ export class UprtclData {
     timestamp = timestamp ? timestamp : Date.now();
     message = message ? message : '';
 
-    const draft = await this.data.getDraft(
-      draftServiceProvider,
-      draftServiceProvider
-    );
+    const draft = await this.draft.getDraft(perspectiveId);
+
     const dataId = await this.data.createData(serviceProvider, draft);
 
     const headId = await this.uprtcl.getHead(perspectiveId);
