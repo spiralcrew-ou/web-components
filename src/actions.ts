@@ -99,7 +99,7 @@ export const newBlock = (block, initiatorId) => {
 
     switch (initNode.style) {
       case "title":
-        this.uprtclData.initContextUnder(
+        uprtclData.initContextUnder(
           initNode.serviceProvider,
           initNode.id,
           0,

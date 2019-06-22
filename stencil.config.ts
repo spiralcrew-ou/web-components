@@ -28,5 +28,9 @@ export const config: Config = {
   nodeResolve: {
     browser: true,
     preferBuiltins: true
+  },
+  devServer: {
+    openBrowser: false,
+    port: 3333
   }
 };

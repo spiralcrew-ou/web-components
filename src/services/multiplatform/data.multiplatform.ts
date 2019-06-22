@@ -73,11 +73,16 @@ export class DataMultiplatform extends CachedMultiplatform<DataProvider<any>> {
     objectId: string,
     draft: any
   ): Promise<any> {
+    
+    return this.serviceProviders[serviceProvider].service.draft.setDraft(objectId, draft);
+    
+    /** without the fallback for the get draft, the set should not be optimistic 
     return this.optimisticUpdate(
       serviceProvider,
       service => service.draft.setDraft(objectId, draft),
       this.linksFromTextNode(draft),
       `Draft of ${objectId}`
     );
+    */
   }
 }

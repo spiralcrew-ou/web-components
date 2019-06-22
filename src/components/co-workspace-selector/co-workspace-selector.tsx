@@ -1,5 +1,6 @@
 import { Component, State, Listen } from '@stencil/core';
-import { c1ServiceProvider } from '../../services';
+import { c1ServiceProvider as serviceProvider } from '../../services';
+// import { ethServiceProvider as serviceProvider } from '../../services';
 
 
 @Component({
@@ -23,6 +24,10 @@ import { c1ServiceProvider } from '../../services';
         this.isStarting = true
     }
 
+    componentWillLoad() {
+        this.selectWorkspaceType(serviceProvider);
+    }
+
     renderWorkpad() {
         return <div>
         {this.isStarting ? <co-waiting-app></co-waiting-app> : ''}
@@ -32,7 +37,7 @@ import { c1ServiceProvider } from '../../services';
 
     renderWelcome() {
         return <div>Please select a workspace type
-            <button onClick={() => this.selectWorkspaceType(c1ServiceProvider)}>Local</button>
+            <button onClick={() => this.selectWorkspaceType(serviceProvider)}>{serviceProvider}</button>
         </div>
     }
 

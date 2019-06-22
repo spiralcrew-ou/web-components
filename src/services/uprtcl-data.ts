@@ -42,10 +42,9 @@ export class UprtclData {
     levels: number
   ): Promise<PerspectiveFull> {
     const perspective = await this.uprtcl.getPerspective(perspectiveId);
-    const headId = await this.uprtcl.getHead(perspectiveId);
+    
+    /** plain data */
     const perspectiveFull = new PerspectiveFull();
-
-    const draft = await this.data.getDraft<TextNode>(perspective.origin, perspectiveId);
     perspectiveFull.id = perspective.id;
     perspectiveFull.origin = perspective.origin;
     perspectiveFull.creatorId = perspective.creatorId;
@@ -54,8 +53,17 @@ export class UprtclData {
       perspective.contextId
     );
     perspectiveFull.name = perspective.name;
+
+    /** additional data */
+    const draft = await this.data.getDraft<TextNode>(perspective.origin, perspectiveId);
     perspectiveFull.draft = await this.getTextNodeFull(draft, levels);
-    perspectiveFull.head = await this.getCommitFull(headId, levels);
+
+    const headId = await this.uprtcl.getHead(perspectiveId);
+    if (headId) {
+      perspectiveFull.head = await this.getCommitFull(headId, levels);
+    } else {
+      perspectiveFull.head = null;
+    }
 
     return perspectiveFull;
   }
@@ -238,7 +246,7 @@ export class UprtclData {
     return this.initPerspective(serviceProvider, contextId, content);
   }
 
-  /** Creates a new context, perspective, and a draft combo
+  /** Creates a new perspective, and a draft combo
    *
    * @param serviceProvider The service provider in which all the new objects
    * will be created.
