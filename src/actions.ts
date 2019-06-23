@@ -148,8 +148,6 @@ export const setContent = (blockId, content) => {
 export const newBlock = (blockId: string, _content) => {
   return async (dispatch, getState) => {
     
-    debugger;
-
     const tree = getState().workpad.tree;
     const initNode = tree[blockId];
 
