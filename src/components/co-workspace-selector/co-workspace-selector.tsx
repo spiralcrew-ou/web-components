@@ -33,12 +33,16 @@ import { c1ServiceProvider, ethServiceProvider } from '../../services';
     }
 
     componentWillLoad() {
+        console.log(`[WORSPACE SELECTOR] Avaliable services:`, this.availableServiceProviders);
     }
 
     renderWorkpad() {
         return <div>
         {this.isStarting ? <co-waiting-app></co-waiting-app> : ''}
-        <co-workspace default-service={this.defaultServiceProvider}></co-workspace>
+        <co-workspace 
+            default-service={this.defaultServiceProvider}
+            avaialable-services={this.availableServiceProviders}>
+        </co-workspace>
     </div>
     }
 
