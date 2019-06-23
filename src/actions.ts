@@ -186,13 +186,12 @@ export const newBlock = (blockId: string, _content: string) => {
   };
 };
 
-export const setStyle = async (blockId: string, newStyle: NodeType) => {
+export const setStyle =  (blockId: string, newStyle: NodeType) => {
   return async (dispatch, getState) => {
     
     const tree = getState().workpad.tree;
     const block: Block = tree[blockId];
     const index = block.children.findIndex(pId => pId === blockId)
-
     /** set the new style */
     block.style = newStyle;
     await uprtclData.draft.setDraft(blockId, mapBlockToTextNode(block));
@@ -224,7 +223,6 @@ export const setStyle = async (blockId: string, newStyle: NodeType) => {
                 childId,
                 index + childIx + 1);
             }
-
           break;
         }
       break;
@@ -267,7 +265,7 @@ export const setStyle = async (blockId: string, newStyle: NodeType) => {
 
     /** force update */
     dispatch({ type: 'SET_STYLE', block });
-    dispatch(reloadTree());
+    dispatch(reloadTree())
   }
 }
 

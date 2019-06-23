@@ -23,7 +23,7 @@ export class COMenu {
     })
     this.store.mapStateToProps(this,(state) => {
       return {
-        block: Object.assign({}, state.workpad.tree[state.menu.blockId])
+        block: state.workpad.tree[state.menu.blockId]
       }
     })
   }
