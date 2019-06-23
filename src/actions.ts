@@ -1,5 +1,18 @@
 import { UprtclData } from "./services/uprtcl-data";
-import { PerspectiveFull, TextNodeFull } from "./types";
+import { PerspectiveFull, TextNodeFull, TextNode } from "./types";
+
+export enum NodeType {
+  "title",
+  "paragraph"
+}
+export interface Block {
+  id: string,
+  children: string[],
+  status: "DRAFT" | "COMMITED",
+  content: string,
+  style: NodeType,
+  parentId: string
+}
 
 const uprtclData = new UprtclData();
 
@@ -61,25 +74,33 @@ const getPerspectiveData = (perspective: PerspectiveFull): TextNodeFull => {
   }
 };
 
-const readBlockRec = (
+const mapBlockToTextNode = (block: Block): TextNode => {
+  let textNode: TextNode = {
+    text: block.content,
+    type: NodeType[block.style],
+    links: block.children.map(childId => { return { link: childId } })
+  }
+  return textNode;
+}
+
+const mapPerspectiveToBlockRec = (
   perspectiveFull: PerspectiveFull,
   tree,
   parentId: string
 ): void => {
   let data = getPerspectiveData(perspectiveFull);
 
-  const block = {
+  const block: Block = {
     id: perspectiveFull.id,
     children: [],
     status: hasChanges(perspectiveFull) ? "DRAFT" : "COMMITED",
     content: data.text,
-    style: "paragraph",
-    parentPerspectiveID: parentId,
-    serviceProvider: perspectiveFull.origin
+    style: NodeType[data.type],
+    parentId: parentId
   };
 
   data.links.map(link => {
-    readBlockRec(link.link, tree, parentId);
+    mapPerspectiveToBlockRec(link.link, tree, parentId);
     block.children.push(link.link.id);
   });
 
@@ -88,7 +109,7 @@ const readBlockRec = (
   return;
 };
 
-const getMasterTree = async(getState) =>  { 
+const getMasterTree = async (getState): Promise<PerspectiveFull> =>  { 
   return await uprtclData.getPerspectiveFull(
     getState().workpad.rootId,
     -1
@@ -101,7 +122,7 @@ export const reloadTree = () => {
     const t = getState().workpad.tree;
     dispatch({
       type: "RELOAD TREE",
-      tree: readBlockRec(perspectiveFull, t, getState().workpad.rootId)
+      tree: mapPerspectiveToBlockRec(perspectiveFull, t, getState().workpad.rootId)
     });
   };
 };
@@ -117,24 +138,29 @@ export const newDraft = block => {
   };
 };
 
-export const newBlock = (block, initiatorId) => {
+export const newBlock = (block: Block, initiatorId: string) => {
   return async (dispatch, getState) => {
+    
     const tree = getState().workpad.tree;
     const initNode = tree[initiatorId];
 
     switch (initNode.style) {
       case "title":
+        /** An enter on a title will create an empty subcontext *
+         *  as the first subcontext of the title context.       */
         uprtclData.initContextUnder(
           initNode.serviceProvider,
           initNode.id,
           0,
           block.content
         );
-        break;
+      break;
 
-      default:
+      case "paragraph":
+        /** An enter on a paragraph will create an empty context *
+         *  as the next-sibling of that paragraph.               */
         const parentnode = tree[initNode.parentPerspectiveID];
-        const index = tree[initNode.parentPerspectiveID].children.findIndex(pId => pId === initiatorId)
+        const index = parentnode.children.findIndex(pId => pId === initiatorId)
 
         await uprtclData.initContextUnder(
           parentnode.serviceProvider,
@@ -142,20 +168,67 @@ export const newBlock = (block, initiatorId) => {
           index + 1,
           ''
         );
-        const perspectiveFull =  await getMasterTree(getState) 
-        const newTree =Object.assign({},readBlockRec(perspectiveFull, getState().workpad.tree, getState().workpad.rootId))
-        dispatch({ type: "NEW BLOCK", tree:newTree});
-        break;
+      break;
     }
+
+    /** force tree update */
+    const perspectiveFull = await getMasterTree(getState);
+
+    const newTree = Object.assign({},mapPerspectiveToBlockRec(perspectiveFull, getState().workpad.tree, getState().workpad.rootId))
+    dispatch({ type: "NEW BLOCK", tree: newTree});
   };
 };
 
-export const setView = (block,newView) => {
-  //TODO: Change view from perspective and re-calculate node if apply
-  return (dispatch,getState) => {
-    const tree = Object.assign({},getState().workpad.tree)
-    tree[block.id].style=newView
-    dispatch({type:'SET VIEW', tree})
+export const setView = async (blockId: string, newStyle: NodeType) => {
+  return async (dispatch, getState) => {
+    
+    const tree = getState().workpad.tree;
+    const block: Block = tree[blockId];
+    const index = block.children.findIndex(pId => pId === blockId)
+
+    switch (block.style) {
+      case NodeType.title: 
+        switch (newStyle) {
+          
+          /** title to title: setting the same view changes nothing */
+          case NodeType.title: 
+            return;
+          
+          /** title to paragraph: changing the type of a title to a paragraph 
+           *  will move all its subcontexts as younger siblings of the new typed 
+           *  paragraph */            
+          case NodeType.paragraph:
+            let removeChildren = block.children.map( async (childId) => {
+              return uprtclData.removePerspective(blockId, childId);
+            })
+
+            /** removing in parallel */
+            await Promise.all(removeChildren);
+
+            /** adding in sequence */
+            for (let childIx = 0; childIx < block.children.length; childIx++) {
+              let childId = block.children[childIx];
+              await uprtclData.insertPerspective(
+                block.parentId,
+                childId,
+                index + childIx + 1);
+            }
+
+          break;
+        }
+
+      break;
+    }
+
+    block.style = newStyle;
+    await uprtclData.draft.setDraft(blockId, mapBlockToTextNode(block));
+
+    /** force update */
+    const perspectiveFull =  await getMasterTree(getState) 
+    dispatch({ 
+      type: "SET VIEW", 
+      tree: mapPerspectiveToBlockRec(perspectiveFull, getState().workpad.tree, getState().workpad.rootId)
+    });
   }
 }
 
@@ -170,7 +243,7 @@ export const removeBlock = block => {
   return async(dispatch, getState) => {
     await uprtclData.removePerspective(block.parentPerspectiveID, block.id)
     const perspectiveFull =  await getMasterTree(getState) 
-    dispatch({ type: "REMOVE BLOCK", tree: readBlockRec(perspectiveFull, getState().workpad.tree, getState().workpad.rootId)});
+    dispatch({ type: "REMOVE BLOCK", tree: mapPerspectiveToBlockRec(perspectiveFull, getState().workpad.tree, getState().workpad.rootId)});
   };
 };
 
@@ -237,7 +310,7 @@ export const closeMenu = () => {
 export const changePerspective = (_oldPerspective, _newPerspective) => {
   return async(dispatch,getState) => {
     const perspectiveFull =  await getMasterTree(getState) 
-    dispatch({ type: "CHANGE PERSPECTIVE", tree: readBlockRec(perspectiveFull, getState().workpad.tree, getState().workpad.rootId)});
+    dispatch({ type: "CHANGE PERSPECTIVE", tree: mapPerspectiveToBlockRec(perspectiveFull, getState().workpad.tree, getState().workpad.rootId)});
   }
 }
 
@@ -250,7 +323,7 @@ export const changePerspective = (_oldPerspective, _newPerspective) => {
 export const newPerspective = (_perspectiveToClone, _message) => {
   return async(dispatch,getState) => {
     const perspectiveFull =  await getMasterTree(getState) 
-    dispatch({ type: "NEW PERSPECTIVE", tree: readBlockRec(perspectiveFull, getState().workpad.tree, getState().workpad.rootId)});
+    dispatch({ type: "NEW PERSPECTIVE", tree: mapPerspectiveToBlockRec(perspectiveFull, getState().workpad.tree, getState().workpad.rootId)});
   }
 }
 
@@ -262,6 +335,6 @@ export const newPerspective = (_perspectiveToClone, _message) => {
 export const mergePerspectives = (_origin, _destination) => {
   return async(dispatch,getState) => {
     const perspectiveFull =  await getMasterTree(getState) 
-    dispatch({ type: "MERGE", tree: readBlockRec(perspectiveFull, getState().workpad.tree, getState().workpad.rootId)});
+    dispatch({ type: "MERGE", tree: mapPerspectiveToBlockRec(perspectiveFull, getState().workpad.tree, getState().workpad.rootId)});
   }
 }

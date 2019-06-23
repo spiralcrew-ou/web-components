@@ -352,9 +352,6 @@ export class UprtclData {
 
   /** Remove one child perspective from its parent perspective.
    *
-   * @param serviceProvider The service provider storing the draft of the parent
-   * perspective.
-   *
    * @param fromPerspectiveId The parent perspective id.
    *
    * @param perspectiveId The child perspective id to be removed (must be a current child

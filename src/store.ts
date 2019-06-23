@@ -5,7 +5,6 @@ import logger from 'redux-logger'; // Add-on you might want
 
 const composeEnhancer = window['__REDUX_DEVTOOLS_EXTENSION_COMPOSE__'] || compose;
 
-
 const initialState = {
   workpad: {
     // tree: {id -> {}},
