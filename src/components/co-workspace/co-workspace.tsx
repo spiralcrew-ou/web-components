@@ -27,21 +27,20 @@ export class COWorkspace {
   }
 
   async checkInitDocAndParagraph(rootPerspectiveId: string): Promise<string> {
-    let rootPerspective = await this.uprtclData.getPerspectiveFull(
-      rootPerspectiveId,
-      1
-    );
-
     /** rootPerspective draft is forced to have one single link pointing 
      * to the single document perspective */
+
     let documentPerspectiveId: string;
 
-    if (rootPerspective.draft.links.length === 0) {
+    /** get or create draft */
+    let draft = await this.uprtclData.getOrCreateDraft(rootPerspectiveId);
+
+    if (draft.links.length === 0) {
       documentPerspectiveId = 
         await this.uprtclData.initContextUnder(
           this.defaultService, this.rootPerspectiveId, -1, 'Untitled Document');
     } else {
-      documentPerspectiveId = rootPerspective.draft.links[0].link.id;
+      documentPerspectiveId = draft.links[0].link;
     }
       
     /** document is forced to have one empty paragraph */
