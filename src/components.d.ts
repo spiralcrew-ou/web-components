@@ -77,7 +77,10 @@ export namespace Components {
     'onShowInputNewPerspective'?: (event: CustomEvent) => void;
   }
 
-  interface CoWorkspaceSelector {}
+  interface CoWorkspaceSelector {
+    'providerSelected': (e: any) => void;
+    'selectWorkspaceType': (type: string) => void;
+  }
   interface CoWorkspaceSelectorAttributes extends StencilHTMLAttributes {}
 
   interface CoWorkspace {

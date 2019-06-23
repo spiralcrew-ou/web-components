@@ -1,7 +1,5 @@
-import { Component, State, Listen } from '@stencil/core';
-import { c1ServiceProvider as serviceProvider } from '../../services';
-//import { ethServiceProvider as serviceProvider } from '../../services';
-
+import { Component, State, Listen, Method } from '@stencil/core';
+import { c1ServiceProvider, ethServiceProvider } from '../../services';
 
 @Component({
     tag: 'co-workspace-selector',
@@ -12,6 +10,10 @@ import { c1ServiceProvider as serviceProvider } from '../../services';
 
     @State() isStarting: boolean
     @State() defaultServiceProvider: string 
+    @State() availableServiceProviders: string[] = [
+        c1ServiceProvider,
+        ethServiceProvider
+    ]
 
     @Listen('isStarting')
     handleLoding(event:CustomEvent) {
@@ -19,13 +21,18 @@ import { c1ServiceProvider as serviceProvider } from '../../services';
         console.log(event.detail)
     }
 
+    @Method()
     selectWorkspaceType(type:string):void { 
         this.defaultServiceProvider=type
         this.isStarting = true
     }
 
+    @Method()
+    providerSelected(e: any) {
+        this.selectWorkspaceType(e.target['selectedOptions'][0].value);
+    }
+
     componentWillLoad() {
-        this.selectWorkspaceType(serviceProvider);
     }
 
     renderWorkpad() {
@@ -37,7 +44,13 @@ import { c1ServiceProvider as serviceProvider } from '../../services';
 
     renderWelcome() {
         return <div>Please select a workspace type
-            <button onClick={() => this.selectWorkspaceType(serviceProvider)}>{serviceProvider}</button>
+            <select id="select-provider" 
+                onInput={e => this.providerSelected(e)}>
+              <option>select provider</option>
+              {this.availableServiceProviders.map(service => (
+                <option value={service}>{service}</option>
+              ))}
+            </select>
         </div>
     }
 
