@@ -51,7 +51,7 @@ export class Workpad {
     await this.reloadTree();
     this.store.mapStateToProps(this, state => {
       return {
-        tree: Object.assign({}, state.workpad.tree),
+        tree: state.workpad.tree,
         rootDocumentId: state.workpad.rootId,
         showMenuOption: !state.menu.isClose
       }

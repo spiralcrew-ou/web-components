@@ -31,11 +31,11 @@ export class COMenu {
   render() {
     return <div class='container m-4 w-1/4 border-2 shadow-md p-2 rounded-lg font-thin z-10 fixed bg-white' >
       <div class= 'block my-2 pl-2' onClick={ () => {
-        this.setStyle(this.block,'title')
+        this.setStyle(this.block.id, 'title')
         this.closeMenu()
       }}> This is a title</div>
       <div  class= 'block my-2 pl-2 '  onClick={ () => {
-        this.setStyle(this.block,'paragraph')
+        this.setStyle(this.block.id, 'paragraph')
         this.closeMenu()
       }}>this is a paragraph</div>
     </div>

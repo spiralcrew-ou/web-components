@@ -7,12 +7,16 @@ const composeEnhancer = window['__REDUX_DEVTOOLS_EXTENSION_COMPOSE__'] || compos
 
 const initialState = {
   workpad: {
-    // tree: {id -> {}},
     rootId: '',
-    tree: {}
+    tree: {},
+    block: {}
   },
   menu: {
     isClose: true
+  },
+  support: {
+    availableProviders: [],
+    selectedProvider: []
   }
 }
 
@@ -30,7 +34,7 @@ export const workpadReducer = (state = { ...initialState.workpad }, action) => {
       return { ...state, ...action }    
     case 'REMOVE_BLOCK':
       return { ...state, ...action }
-    case 'COMMIT_ALL':
+    case 'COMMIT_GLOBAL':
       return { ...state, ...action }
     case 'NEW_PERSPECTIVE':
         return {...state,...action}
@@ -52,9 +56,21 @@ export const menuReducer = (state ={...initialState.menu}, action) => {
   }
 }
 
+export const supportReducer = (state ={...initialState.menu}, action) => {
+  switch (action.type) {
+    case 'SET_AVAILABLE_PROVIDERS':
+      return {...state,...action}
+    case 'SET_SELECTED_PROVIDER':
+        return {...state,...action}
+    default:
+      return state 
+  }
+}
+
 const reducers = combineReducers({
   workpad: workpadReducer,
-  menu: menuReducer
+  menu: menuReducer,
+  support: supportReducer
 })
 
 export const configureStore = () =>

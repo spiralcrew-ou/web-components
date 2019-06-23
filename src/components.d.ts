@@ -52,14 +52,10 @@ export namespace Components {
   }
 
   interface CoNode {
-    'index': string;
     'nodeId': string;
-    'parentId': string;
   }
   interface CoNodeAttributes extends StencilHTMLAttributes {
-    'index'?: string;
     'nodeId'?: string;
-    'parentId'?: string;
   }
 
   interface CoWaitingApp {}

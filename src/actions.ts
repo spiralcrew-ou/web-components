@@ -137,15 +137,14 @@ export const setContent = (blockId, content) => {
 
     uprtclData.setDraftText(blockId, content);
 
-    let _tree = await reloadMasterTree(getState);
-    dispatch({ 
-      type: "SET_CONTENT", 
-      tree: _tree
-    });
+    let block = getState().workpad.tree[blockId];
+
+    dispatch({ type: 'SET_CONTENT', block });
+    dispatch(reloadTree());
   };
 };
 
-export const newBlock = (blockId: string, _content) => {
+export const newBlock = (blockId: string, _content: string) => {
   return async (dispatch, getState) => {
     
     const tree = getState().workpad.tree;
@@ -182,11 +181,8 @@ export const newBlock = (blockId: string, _content) => {
     }
 
     /** force tree update */
-    let _tree = await reloadMasterTree(getState);
-    dispatch({ 
-      type: "NEW_BLOCK", 
-      tree: _tree
-    });
+    dispatch({ type: 'NEW_BLOCK', initNode });
+    dispatch(reloadTree());
   };
 };
 
@@ -270,11 +266,8 @@ export const setStyle = async (blockId: string, newStyle: NodeType) => {
     }
 
     /** force update */
-    let _tree = await reloadMasterTree(getState);
-    dispatch({ 
-      type: "SET_STYLE", 
-      tree: _tree
-    });
+    dispatch({ type: 'SET_STYLE', block });
+    dispatch(reloadTree());
   }
 }
 
@@ -285,13 +278,9 @@ export const setStyle = async (blockId: string, newStyle: NodeType) => {
  * @returns dispatch a reloadTree event
  */
 export const removeBlock = block => {
-  return async(dispatch, getState) => {
+  return async(dispatch) => {
     await uprtclData.removePerspective(block.parentPerspectiveID, block.id)
-    let _tree = await reloadMasterTree(getState);
-    dispatch({ 
-      type: "REMOVE_BLOCK", 
-      tree: _tree
-    });
+    dispatch(reloadTree());
   }
 };
 
@@ -309,33 +298,13 @@ export const commitGlobal = (blockId: string, message: string = '') => {
       blockId,
       message, 
       new Date().getTime())
-
-    let _tree = await reloadMasterTree(getState);
-    dispatch({ 
-      type: "COMMIT_ALL",
-      tree: _tree
-    });
+    
+    let block = getState().workpad.tree[blockId];
+    
+    dispatch({ type: 'COMMIT_GLOBAL', block });
+    dispatch(reloadTree());
   };
 };
-
-/**
- * This function open the contextual menu
- */
-export const openMenu = (blockId) => {
-  return (dispatch) => {
-    dispatch({type: 'OPEN_MENU', isClose:false,blockId})
-  }
-}
-
-/**
- * This function close the contextual menu
- */
-export const closeMenu = () => {
-  return (dispatch) => {
-    dispatch({type: 'CLOSE_MENU', isClose:true})
-  }
-}
-
 
 /**
  * 
@@ -357,3 +326,31 @@ export const newPerspective = (
     });
   }
 }
+
+/**
+ * This function open the contextual menu
+ */
+export const openMenu = (blockId) => {
+  return (dispatch) => {
+    dispatch({type: 'OPEN_MENU', isClose:false,blockId})
+  }
+}
+
+/**
+ * This function close the contextual menu
+ */
+export const closeMenu = () => {
+  return (dispatch) => {
+    dispatch({type: 'CLOSE_MENU', isClose:true})
+  }
+}
+
+/**
+ * This function open the contextual menu
+ */
+export const setAvailableProviders = (availableProviders: string[]) => {
+  return (dispatch) => {
+    dispatch({type: 'SET_AVAILABLE_PROVIDERS', availableProviders})
+  }
+}
+

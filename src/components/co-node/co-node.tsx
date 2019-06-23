@@ -2,7 +2,7 @@ import {
   Component, State, Prop, Element, Listen
 } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
-import { newBlock, removeBlock, reloadTree, setContent, openMenu } from '../../actions';
+import { newBlock, removeBlock, reloadTree, setContent, openMenu, Block } from '../../actions';
 
 @Component({
   tag: 'co-node',
@@ -13,11 +13,9 @@ export class CONode {
   @Element() _element: HTMLElement;
   @Prop({ context: 'store' }) store: Store;
   @Prop() nodeId: string;
-  @Prop() parentId: string;
-  @Prop() index: string;
   @State() hasUIChanges: boolean = false
-  @State() block;
-  @State() tree; 
+  @State() block : Block;
+  @State() rootId; 
   @State() showMenuOption: boolean
   
   newBlock: Action
@@ -36,8 +34,8 @@ export class CONode {
     })
     this.store.mapStateToProps(this,(state) => {
       return {
-        tree: Object.assign({}, state.workpad.tree), 
-        block: Object.assign({}, state.workpad.tree[this.nodeId]),
+        rootId: state.workpad.rooId,
+        block: state.workpad.tree[this.nodeId],
         showMenuOption: !state.menu.isClose
       }
     })
@@ -63,10 +61,6 @@ export class CONode {
       }
     }
 
-    if (!['Backspace', 'Enter'].find(e => e === event.key)){
-      this.hasUIChanges = (this.tree[this.nodeId]['content'] !=event['path'][0].innerText)
-    }
-
     if(event.key === '/'){
       this.openMenu(this.nodeId)
     }
@@ -79,7 +73,7 @@ export class CONode {
 
 
   render() {
-    const isDocTitle = this.block.id === this.block.parentPerspectiveID 
+    const isDocTitle = this.block.id === this.block.parentId 
     const blockClasses = 'text-gray-800 p-2 leading-relaxed'
     const draftClasses = this.hasUIChanges  ?  'bg-red-100'  :  '' 
     const titleClasses = this.block.style ==='title' ? 'text-5xl' : ''
@@ -88,7 +82,7 @@ export class CONode {
     const classes = [blockClasses, draftClasses, commitedClasses,titleClasses,paragraphClasses].join(" ")
 
     const contentBlock = <div 
-                          onBlur={event => {if (this.hasUIChanges && !this.showMenuOption) this.updateBlockContent(event,event['path'][0].innerText)}}
+                          onBlur={event => {this.updateBlockContent(event,event['path'][0].innerText)}}
                           class= {classes} 
                           data-placeholder = {'More options, press "/" '}
                           id={this.nodeId} 
@@ -99,12 +93,9 @@ export class CONode {
     return ( 
       <div class='container'>
         {!isDocTitle ? contentBlock : ''}        
-        {this.block.children.map((childId, index) => {
+        {this.block.children.map((childId) => {
            return(
-            <co-node
-              node-id={childId} 
-                parent-id={this.nodeId}
-              index={index}>
+            <co-node node-id={childId}>
             </co-node>
           )
         })}
