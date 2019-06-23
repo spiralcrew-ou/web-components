@@ -96,6 +96,7 @@ const reloadMasterTree = async (getState): Promise<any> =>  {
 
   let _tree = {}
   mapPerspectiveToBlockRec(perspectiveFull, _tree, getState().workpad.rootId)
+  console.log('[REDUX] Reload master tree.', { perspectiveFull, _tree });
   return _tree;
 }
 
@@ -142,11 +143,11 @@ export const setContent = (blockId, content) => {
   };
 };
 
-export const newBlock = (_content, initiatorId: string) => {
+export const newBlock = (blockId: string, _content) => {
   return async (dispatch, getState) => {
     
     const tree = getState().workpad.tree;
-    const initNode = tree[initiatorId];
+    const initNode = tree[blockId];
 
     switch (initNode.style) {
       case "title":
@@ -164,7 +165,7 @@ export const newBlock = (_content, initiatorId: string) => {
         /** An enter on a paragraph will create an empty context *
          *  as the next-sibling of that paragraph.               */
         const parentnode = tree[initNode.parentPerspectiveID];
-        const index = parentnode.children.findIndex(pId => pId === initiatorId)
+        const index = parentnode.children.findIndex(pId => pId === blockId)
 
         await uprtclData.initContextUnder(
           parentnode.serviceProvider,

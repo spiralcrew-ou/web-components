@@ -48,7 +48,7 @@ export class CONode {
     if (event.key === 'Enter') {
       event.preventDefault();
       event.stopPropagation();
-      this.newBlock(this.nodeId);
+      this.newBlock(this.nodeId, '');
     }
   }
 
@@ -74,7 +74,7 @@ export class CONode {
 
   updateBlockContent(event:FocusEvent, newContent) { 
     event.stopPropagation()
-    this.setContent(this.block,newContent)
+    this.setContent(this.block.id, newContent)
   }
 
 
