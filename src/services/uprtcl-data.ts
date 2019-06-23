@@ -403,26 +403,44 @@ export class UprtclData {
     return this.draft.getDraft(perspectiveId);
   }
 
+   /** A simple function to safely update the text of a draft without
+   * risking to change its type or links.
+   *
+   * @param perspectiveId The perspective id.
+   * 
+   * @param text The new text.
+   *
+   * @returns The draft object.
+   */
+  async setDraftText(
+    perspectiveId: string,
+    _text: string
+  ): Promise<TextNode> {
+    let draft = await this.getOrCreateDraft(perspectiveId);
+
+    draft.text = _text;
+
+    await this.draft.setDraft(perspectiveId, draft);
+    return this.draft.getDraft(perspectiveId);
+  }
+
   /** Commits the current draft as the head of the perspective and sets the draft
    * as null. Do the same, recursively, for all the children perspectives.
    *
-   * @param draftServiceProvider The service provider from which the draft to be commited
-   * is to be read (can be a different provider than the one in which the commit is going to
-   * be created).
-   *
-   * @param serviceProvider The service provider
+   * @param serviceProvider The service provider in which the data is going to be
+   * stored.
    *
    * @param perspectiveId The perspective id.
+   * 
+   * @param message The perspective id.
    */
   async commitGlobal(
     serviceProvider: string,
     perspectiveId: string,
-    message: string,
-    timestamp: number
+    message: string = '',
+    timestamp: number = Date.now()
   ) {
-    timestamp = timestamp ? timestamp : Date.now();
-    message = message ? message : '';
-
+    
     const draft = await this.draft.getDraft(perspectiveId);
 
     const dataId = await this.data.createData(serviceProvider, draft);
@@ -435,7 +453,7 @@ export class UprtclData {
       dataId: dataId,
       message: message,
       parentsIds: parentsIds,
-      timestamp: Date.now()
+      timestamp: timestamp
     };
     const commitId = await this.uprtcl.createCommit(serviceProvider, commit);
 

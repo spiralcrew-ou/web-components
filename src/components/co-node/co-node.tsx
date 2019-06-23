@@ -2,7 +2,7 @@ import {
   Component, State, Prop, Element, Listen
 } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
-import { newBlock, removeBlock,reloadTree, updateContentFromUser, openMenu } from '../../actions';
+import { newBlock, removeBlock, reloadTree, setContent, openMenu } from '../../actions';
 
 @Component({
   tag: 'co-node',
@@ -23,7 +23,7 @@ export class CONode {
   newBlock: Action
   removeBlock: Action
   reloadTree: Action
-  updateContentFromUser: Action
+  setContent: Action
   openMenu: Action
 
   componentWillLoad() {
@@ -31,7 +31,7 @@ export class CONode {
       newBlock,
       removeBlock,
       reloadTree,
-      updateContentFromUser,
+      setContent,
       openMenu
     })
     this.store.mapStateToProps(this,(state) => {
@@ -48,13 +48,7 @@ export class CONode {
     if (event.key === 'Enter') {
       event.preventDefault();
       event.stopPropagation();
-
-      if ((this.block.style == 'title') || (this.block.style == 'bullet_list')) {
-        this.newBlock({ status: 'DRAFT', content: '', type: 'paragraph' }, this.nodeId)
-      } else {
-        this.newBlock({ status: 'DRAFT', content: '', type: 'paragraph' }, this.nodeId)
-      }
-      this.updateContentFromUser(this.block,event['path'][0].innerText)
+      this.newBlock(this.nodeId);
     }
   }
 
@@ -78,17 +72,9 @@ export class CONode {
     }
   }
 
-  
-  /*
-  componentWillUpdate() {
-    const element = this._element.shadowRoot.getElementById(this.nodeId);
-    if (element) element.innerHTML = this.block.content;
-  }*/
-
-
   updateBlockContent(event:FocusEvent, newContent) { 
     event.stopPropagation()
-    this.updateContentFromUser(this.block,newContent)
+    this.setContent(this.block,newContent)
   }
 
 

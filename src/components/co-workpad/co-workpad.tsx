@@ -2,12 +2,10 @@ import {
   Component, State, Prop, Element, Listen, Event, EventEmitter
 } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
-import { initWorkPad, reloadTree, commitAll, updateContentFromUser } from '../../actions';
+import { initTree, reloadTree, commitGlobal, setContent } from '../../actions';
 
 // const commited = 'text-gray-800 p-2 mx-8 font-light bg-red-100 break-words'
 // const unCommited = 'text-gray-800 p-2 mx-8 font-light break-words'
-
-
 @Component({
   tag: 'co-workpad',
   styleUrl: 'co-workpad.scss',
@@ -37,21 +35,19 @@ export class Workpad {
   @State() openInputMerge: boolean
 
 
-  initWorkPad: Action
+  initTree: Action
   reloadTree: Action
-  commitAll: Action
-  updateContentFromUser: Action
-
-
+  commitGlobal: Action
+  setContent: Action
 
   async componentWillLoad() {
     this.store.mapDispatchToProps(this, {
-      initWorkPad,
+      initTree,
       reloadTree,
-      commitAll,
-      updateContentFromUser
+      commitGlobal,
+      setContent
     })
-    await this.initWorkPad(this.documentId);
+    await this.initTree(this.documentId);
     await this.reloadTree();
     this.store.mapStateToProps(this, state => {
       return {
@@ -92,7 +88,7 @@ export class Workpad {
 
 
   updateDocumentTitle(newContent) {
-    this.updateContentFromUser(this.tree[this.rootDocumentId], newContent)
+    this.setContent(this.tree[this.rootDocumentId], newContent)
   }
 
   render() {

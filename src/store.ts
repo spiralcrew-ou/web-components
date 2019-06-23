@@ -18,25 +18,21 @@ const initialState = {
 
 export const workpadReducer = (state = { ...initialState.workpad }, action) => {
   switch (action.type) {
+    case 'INIT_TREE':
+      return { ...state, ...action }
+    case 'RELOAD_TREE':
+      return { ...state, ...action }
+    case 'SET_CONTENT':
+      return { ...state, ...action }
     case 'NEW_BLOCK':
       return { ...state, ...action }
-    case 'REMOVE BLOCK':
-      return { ...state, ...action }
-    case 'NEW DRAFT':
-      return { ...state, ...action }
-    case 'SAVE DRAFT':
+    case 'SET_STYLE':
       return { ...state, ...action }    
-    case 'INIT WORKPAD':
+    case 'REMOVE_BLOCK':
       return { ...state, ...action }
-    case 'COMMIT ALL':
+    case 'COMMIT_ALL':
       return { ...state, ...action }
-    case 'UPDATE CONTENT FROM USER':
-        return {...state,...action}
-    case 'SET VIEW':
-        return {...state,...action}
-    case 'NEW PERSPECTIVE':
-        return {...state,...action}
-    case 'CHANGE PERSPECTIVE':
+    case 'NEW_PERSPECTIVE':
         return {...state,...action}
     case 'MERGE':
       return {...state,...action}
@@ -47,9 +43,9 @@ export const workpadReducer = (state = { ...initialState.workpad }, action) => {
 
 export const menuReducer = (state ={...initialState.menu},action) => {
   switch (action.type) {
-    case 'OPEN MENU':
+    case 'OPEN_MENU':
       return {...state,...action}
-    case 'CLOSE MENU':
+    case 'CLOSE_MENU':
         return {...state,...action}
     default:
       return state 
