@@ -172,10 +172,11 @@ export const newBlock = (block: Block, initiatorId: string) => {
     }
 
     /** force tree update */
-    const perspectiveFull = await getMasterTree(getState);
-
-    const newTree = Object.assign({},mapPerspectiveToBlockRec(perspectiveFull, getState().workpad.tree, getState().workpad.rootId))
-    dispatch({ type: "NEW BLOCK", tree: newTree});
+    const perspectiveFull =  await getMasterTree(getState) 
+    dispatch({ 
+      type: "NEW BLOCK", 
+      tree: mapPerspectiveToBlockRec(perspectiveFull, getState().workpad.tree, getState().workpad.rootId)
+    });
   };
 };
 
@@ -216,7 +217,22 @@ export const setView = async (blockId: string, newStyle: NodeType) => {
 
           break;
         }
+      break;
 
+      case NodeType.paragraph:
+
+        switch (newStyle) {
+
+          /** paragraph to paragraph: setting the same view changes nothing */
+          case (NodeType.paragraph):
+            return;
+          
+          /** paragraph to title: Changing the type of a paragraph to a title 
+           * will move all the younger sibling contexts of the paragraph as 
+           * subcontexts of the new title. */
+          case (NodeType.title):
+
+        }
       break;
     }
 
