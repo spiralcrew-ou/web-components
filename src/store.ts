@@ -41,7 +41,7 @@ export const workpadReducer = (state = { ...initialState.workpad }, action) => {
   }
 }
 
-export const menuReducer = (state ={...initialState.menu},action) => {
+export const menuReducer = (state ={...initialState.menu}, action) => {
   switch (action.type) {
     case 'OPEN_MENU':
       return {...state,...action}
@@ -56,10 +56,6 @@ const reducers = combineReducers({
   workpad: workpadReducer,
   menu: menuReducer
 })
-
-
-
-
 
 export const configureStore = () =>
   createStore(reducers, composeEnhancer(applyMiddleware(thunk, logger)))

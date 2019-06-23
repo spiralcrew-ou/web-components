@@ -2,8 +2,8 @@ import { UprtclData } from "./services/uprtcl-data";
 import { PerspectiveFull, TextNodeFull, TextNode } from "./types";
 
 export enum NodeType {
-  "title",
-  "paragraph"
+  title = "title",
+  paragraph = "paragraph"
 }
 export interface Block {
   id: string,
@@ -11,7 +11,8 @@ export interface Block {
   status: "DRAFT" | "COMMITED",
   content: string,
   style: NodeType,
-  parentId: string
+  parentId: string,
+  serviceProvider: string
 }
 
 const uprtclData = new UprtclData();
@@ -77,7 +78,8 @@ const mapPerspectiveToBlockRec = (
     status: hasChanges(perspectiveFull) ? "DRAFT" : "COMMITED",
     content: data.text,
     style: NodeType[data.type],
-    parentId: parentId
+    parentId: parentId,
+    serviceProvider: perspectiveFull.origin
   };
 
   data.links.map(link => {
@@ -146,6 +148,8 @@ export const setContent = (blockId, content) => {
 export const newBlock = (blockId: string, _content) => {
   return async (dispatch, getState) => {
     
+    debugger;
+
     const tree = getState().workpad.tree;
     const initNode = tree[blockId];
 
@@ -164,7 +168,7 @@ export const newBlock = (blockId: string, _content) => {
       case "paragraph":
         /** An enter on a paragraph will create an empty context *
          *  as the next-sibling of that paragraph.               */
-        const parentnode = tree[initNode.parentPerspectiveID];
+        const parentnode = tree[initNode.parentId];
         const index = parentnode.children.findIndex(pId => pId === blockId)
 
         await uprtclData.initContextUnder(
@@ -174,6 +178,9 @@ export const newBlock = (blockId: string, _content) => {
           ''
         );
       break;
+
+      default:
+        throw new Error(`'Unexpected style value ${initNode.style}`);
     }
 
     /** force tree update */
