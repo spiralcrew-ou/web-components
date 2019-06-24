@@ -1,5 +1,5 @@
 import { UprtclData } from "./services/uprtcl-data";
-import { PerspectiveFull, TextNodeFull, TextNode } from "./types";
+import { PerspectiveFull, TextNodeFull } from "./types";
 
 export enum NodeType {
   title = "title",
@@ -54,15 +54,6 @@ const getPerspectiveData = (perspective: PerspectiveFull): TextNodeFull => {
     return perspective.head.data;
   }
 };
-
-const mapBlockToTextNode = (block: Block): TextNode => {
-  let textNode: TextNode = {
-    text: block.content,
-    type: NodeType[block.style],
-    links: block.children.map(childId => { return { link: childId } })
-  }
-  return textNode;
-}
 
 const mapPerspectiveToBlock = (
   perspectiveFull: PerspectiveFull
@@ -198,7 +189,7 @@ export const newBlock = (blockId: string, _content: string, parentId: string, in
 
 export const setStyle =  (blockId: string, newStyle: NodeType, parentId: string, index: number) => {
   return async (dispatch, getState) => {
-
+    
     const tree = getState().workpad.tree;
     const block: Block = tree[blockId];
     const parent: Block = tree[parentId];
@@ -207,7 +198,7 @@ export const setStyle =  (blockId: string, newStyle: NodeType, parentId: string,
     /** set the new style */
     let oldStyle = block.style;
     block.style = newStyle;
-    await uprtclData.draft.setDraft(blockId, mapBlockToTextNode(block));
+    await uprtclData.setDraftType(blockId, newStyle);
 
     switch(oldStyle) {
       case NodeType.title: 

@@ -8,6 +8,7 @@ import {
   Context,
   Commit
 } from './../types';
+import { NodeType } from './../actions';
 
 export class UprtclData {
   uprtcl = uprtclMultiplatform;
@@ -345,6 +346,29 @@ export class UprtclData {
     await this.draft.setDraft(perspectiveId, draft);
     return this.draft.getDraft(perspectiveId);
   }
+
+  /** A simple function to safely update the type of a draft without
+   * risking to change its text or links.
+   *
+   * @param perspectiveId The perspective id.
+   * 
+   * @param type The new text.
+   *
+   * @returns The draft object.
+   */
+  async setDraftType(
+    perspectiveId: string,
+    _type: NodeType
+  ): Promise<TextNode> {
+    let draft = await this.getOrCreateDraft(perspectiveId);
+
+    draft.type = _type;
+
+    await this.draft.setDraft(perspectiveId, draft);
+    return this.draft.getDraft(perspectiveId);
+  }
+
+  
 
   /** Recursively creates a new perspective out of an existing perspective
    * and of all its children, adding a new commit to each parent to
