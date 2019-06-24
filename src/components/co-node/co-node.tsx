@@ -66,6 +66,13 @@ export class CONode {
     }
   }
 
+  /*
+  componentDidUpdate() {
+    const element = this._element.shadowRoot.getElementById(this.block.id);
+    if (element) element.innerHTML = this.block.content
+  }*/
+
+
   updateBlockContent(event:FocusEvent, newContent) { 
     event.stopPropagation()
     this.setContent(this.block.id, newContent)
@@ -73,6 +80,20 @@ export class CONode {
 
 
   render() {
+
+    let _content = ''
+    const element = this._element.shadowRoot.getElementById(this.block.id);
+
+    if (element){
+      _content = element.innerHTML != this.block.content ? this.block.content : ''
+    } else {
+      _content = this.block.content
+    }
+    
+    
+    console.log(element && element.innerHTML != this.block.content ?  this.block.content : '')
+    
+
     const isDocTitle = this.block.id === this.block.parentId 
     const blockClasses = 'text-gray-800 p-2 leading-relaxed'
     const draftClasses = this.hasUIChanges  ?  'bg-red-100'  :  '' 
@@ -87,8 +108,9 @@ export class CONode {
                           data-placeholder = {'More options, press "/" '}
                           id={this.nodeId} 
                           contentEditable>
-                          {this.block.content}
+                          {_content}
                         </div>
+    
 
     return ( 
       <div class='container'>
