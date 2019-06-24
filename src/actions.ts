@@ -313,7 +313,8 @@ export const commitGlobal = (blockId: string, message: string = '') => {
       provider,
       blockId,
       message, 
-      new Date().getTime())
+      new Date().getTime(),
+      true)
     
     dispatch({ type: 'COMMIT_GLOBAL', block });
     dispatch(reloadTree());
