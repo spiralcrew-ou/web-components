@@ -13,10 +13,10 @@ export class CONode {
   @Element() _element: HTMLElement;
   @Prop({ context: 'store' }) store: Store;
   @Prop() nodeId: string;
-  @State() hasUIChanges: boolean = false
   @State() block : Block;
   @State() rootId; 
-  @State() showMenuOption: boolean
+  @State() showMenuOption: boolean;
+  @State() isFocused: boolean = false;
   
   newBlock: Action
   removeBlock: Action
@@ -39,6 +39,11 @@ export class CONode {
         showMenuOption: !state.menu.isClose
       }
     })
+  }
+
+  componentDidLoad() {
+    const conode = this._element.shadowRoot.getElementById(this.block.id);
+    if (conode) conode.focus();
   }
 
   @Listen('keydown')
@@ -96,14 +101,26 @@ export class CONode {
 
     const isDocTitle = this.block.id === this.block.parentId 
     const blockClasses = 'text-gray-800 p-2 leading-relaxed'
-    const draftClasses = this.hasUIChanges  ?  'bg-red-100'  :  '' 
-    const titleClasses = this.block.style ==='title' ? 'text-5xl' : ''
+    const draftClasses = this.block.status === 'DRAFT'  ?  'has-changes'  :  '' 
+    const focusClasses = this.isFocused ? 'bg-gray-200' :  ''
+    const titleClasses = this.block.style === 'title' ? 'text-2xl' : ''
     const paragraphClasses =  this.block.style ==='paragraph' ? 'font-light px-2 py-2 ' : ''
     const commitedClasses = ''
-    const classes = [blockClasses, draftClasses, commitedClasses,titleClasses,paragraphClasses].join(" ")
+    const classes = [
+      blockClasses, 
+      draftClasses, 
+      commitedClasses,
+      titleClasses,
+      paragraphClasses].join(" ")
+
+    const containerClasses = [focusClasses, 'container'].join(" ")
 
     const contentBlock = <div 
-                          onBlur={event => {this.updateBlockContent(event,event['path'][0].innerText)}}
+                          onBlur={event => {
+                            this.isFocused = false;
+                            this.updateBlockContent(event,event['path'][0].innerText)
+                          }}
+                          onFocus={() => {this.isFocused = true}}
                           class= {classes} 
                           data-placeholder = {'More options, press "/" '}
                           id={this.nodeId} 
@@ -113,7 +130,7 @@ export class CONode {
     
 
     return ( 
-      <div class='container'>
+      <div class={containerClasses}>
         {!isDocTitle ? contentBlock : ''}        
         {this.block.children.map((childId) => {
            return(
