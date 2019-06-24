@@ -14,8 +14,12 @@ import { newBlock, removeBlock, reloadTree, setContent, openMenu, Block, renderi
 })
 export class CONode {
   @Element() _element: HTMLElement;
+
   @Prop({ context: 'store' }) store: Store;
   @Prop() nodeId: string;
+  @Prop() parentId: string;
+  @Prop() indexInParent: number;
+
   @State() block : Block;
   rootId; 
   @State() showMenuOption: boolean;
@@ -104,8 +108,7 @@ export class CONode {
   }*/
 
   render() {
-    console.log('Renderizamos node')
-    const isDocTitle = this.block.id === this.block.parentId 
+    const isDocTitle = this.block.id === this.rootId
     const blockClasses = 'text-gray-800 p-2 leading-relaxed'
     const draftClasses = this.block.status === 'DRAFT'  ?  'has-changes'  :  '' 
     const focusClasses = this.isFocused ? 'bg-gray-200' :  ''
@@ -138,9 +141,12 @@ export class CONode {
     return ( 
       <div class={containerClasses}>
         {!isDocTitle ? contentBlock : ''}        
-        {this.block.children.map((childId) => {
+        {this.block.children.map((childId, index) => {
            return(
-            <co-node node-id={childId}>
+            <co-node 
+              node-id={childId} 
+              parent-id={this.block.id} 
+              index-in-parent={index}>
             </co-node>
           )
         })}

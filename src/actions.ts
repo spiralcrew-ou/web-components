@@ -11,7 +11,6 @@ export interface Block {
   status: "DRAFT" | "COMMITED",
   content: string,
   style: NodeType,
-  parentId: string,
   serviceProvider: string
 }
 
@@ -65,14 +64,9 @@ const mapBlockToTextNode = (block: Block): TextNode => {
   return textNode;
 }
 
-
-const mapPerspectiveToBlockRec = (
-  perspectiveFull: PerspectiveFull,
-  tree,
-  parentId: string, 
-  recurse: boolean
+const mapPerspectiveToBlock = (
+  perspectiveFull: PerspectiveFull
 ): Block => {
-
   let data = getPerspectiveData(perspectiveFull);
 
   const block: Block = {
@@ -81,28 +75,35 @@ const mapPerspectiveToBlockRec = (
     status: hasChanges(perspectiveFull) ? "DRAFT" : "COMMITED",
     content: data ? data.text : '',
     style: data ? NodeType[data.type] : NodeType.paragraph,
-    parentId: parentId,
     serviceProvider: perspectiveFull.origin
   };
 
-  if (recurse && data) {
+  return block;
+};
+
+const setTreeWithPerspectiveRec = (
+  perspectiveFull: PerspectiveFull,
+  tree) => {
+  
+  let block = mapPerspectiveToBlock(perspectiveFull);
+  let data = getPerspectiveData(perspectiveFull);
+  
+  if (data) {
     data.links.map(link => {
-      mapPerspectiveToBlockRec(link.link, tree, parentId,recurse);
+      setTreeWithPerspectiveRec(link.link, tree);
       block.children.push(link.link.id);
     });
   }
   
   tree[perspectiveFull.id] = block;
-
-  return block
-};
+}
 
 const reloadMasterTree = async (getState): Promise<any> => {
   let perspectiveFull = await uprtclData.getPerspectiveFull(
     getState().workpad.rootId, -1);
 
   let _tree = {}
-  mapPerspectiveToBlockRec(perspectiveFull, _tree, getState().workpad.rootId,true)
+  setTreeWithPerspectiveRec(perspectiveFull, _tree);
   console.log('[REDUX] Reload master tree.', { perspectiveFull, _tree });
   return _tree;
 }
@@ -138,28 +139,26 @@ export const reloadTree = () => {
  * @param block
  *
  */
-export const setContent = (blockId, content) => {
+export const setContent = (blockId: string, content: string) => {
   return async (dispatch, getState) => {
 
     await uprtclData.setDraftText(blockId, content);
-    const perspectiveFull = await uprtclData.getPerspectiveFull(blockId,0)
+    const perspectiveFull = await uprtclData.getPerspectiveFull(blockId, 0);
 
     let block = getState().workpad.tree[blockId];
-    block = mapPerspectiveToBlockRec(perspectiveFull,{},blockId.parentId,false)
+    block = mapPerspectiveToBlock(perspectiveFull);
     const tree = Object.assign({}, getState().workpad.tree)
     tree[blockId] = block
+
     dispatch({ type: 'SET_CONTENT', tree });
-
-
-    //dispatch(reloadTree());
   };
 };
 
-export const newBlock = (blockId: string, _content: string) => {
+export const newBlock = (blockId: string, _content: string, parentId: string, index: number) => {
   return async (dispatch, getState) => {
 
     const tree = getState().workpad.tree;
-    const initNode = tree[blockId];
+    const initNode: Block = tree[blockId];
 
     switch (initNode.style) {
       case "title":
@@ -176,12 +175,12 @@ export const newBlock = (blockId: string, _content: string) => {
       case "paragraph":
         /** An enter on a paragraph will create an empty context *
          *  as the next-sibling of that paragraph.               */
-        const parentnode = tree[initNode.parentId];
-        const index = parentnode.children.findIndex(pId => pId === blockId)
+        const parent: Block = tree[parentId];
+        if (!parent) throw new Error(`Parent perspective ${parentId} not found in the tree`);
 
         await uprtclData.initContextUnder(
-          parentnode.serviceProvider,
-          parentnode.id,
+          parent.serviceProvider,
+          parent.id,
           index + 1,
           ''
         );
@@ -197,13 +196,13 @@ export const newBlock = (blockId: string, _content: string) => {
   };
 };
 
-export const setStyle = (blockId: string, newStyle: NodeType) => {
+export const setStyle =  (blockId: string, newStyle: NodeType, parentId: string, index: number) => {
   return async (dispatch, getState) => {
 
     const tree = getState().workpad.tree;
     const block: Block = tree[blockId];
-    const parent: Block = tree[block.parentId];
-    const index = parent.children.findIndex(pId => pId === blockId)
+    const parent: Block = tree[parentId];
+    if (!parent) throw new Error(`Parent perspective ${parentId} not found in the tree`);
 
     /** set the new style */
     let oldStyle = block.style;
@@ -232,7 +231,7 @@ export const setStyle = (blockId: string, newStyle: NodeType) => {
             for (let childIx = 0; childIx < block.children.length; childIx++) {
               let childId = block.children[childIx];
               await uprtclData.insertPerspective(
-                block.parentId,
+                parentId,
                 childId,
                   index + childIx + 1);
             }
@@ -292,9 +291,10 @@ export const setStyle = (blockId: string, newStyle: NodeType) => {
  * @param {*} block
  * @returns dispatch a reloadTree event
  */
-export const removeBlock = block => {
+export const removeBlock = (blockId, parentId) => {
   return async(dispatch) => {
-    await uprtclData.removePerspective(block.parentPerspectiveID, block.id)
+
+    await uprtclData.removePerspective(parentId, blockId)
     dispatch(reloadTree());
   }
 };
@@ -313,8 +313,7 @@ export const commitGlobal = (blockId: string, message: string = '') => {
       provider,
       blockId,
       message, 
-      new Date().getTime(),
-      true)
+      new Date().getTime())
     
     dispatch({ type: 'COMMIT_GLOBAL', block });
     dispatch(reloadTree());
