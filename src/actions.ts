@@ -55,15 +55,6 @@ const getPerspectiveData = (perspective: PerspectiveFull): TextNodeFull => {
   }
 };
 
-const mapBlockToTextNode = (block: Block): TextNode => {
-  let textNode: TextNode = {
-    text: block.content,
-    type: NodeType[block.style],
-    links: block.children.map(childId => { return { link: childId } })
-  }
-  return textNode;
-}
-
 const mapPerspectiveToBlock = (
   perspectiveFull: PerspectiveFull
 ): Block => {
