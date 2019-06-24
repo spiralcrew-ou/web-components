@@ -100,4 +100,25 @@ describe('Merge service tests', () => {
     expect(result).toEqual(expectedResult);
   });
 
+  it('Diff two strings', async () => {
+    const str1 = 'some sentence that be merged carefully';
+    const str2 = 'firstly, some sentence that should be merged carefully';
+    const str3 = 'some sentence that anonimously be merged ';
+
+    let result = MergeService.word_diff(str1, str2);
+    console.log(result);
+    result = MergeService.word_diff(str1, str3);
+    console.log(result);
+    result = MergeService.word_diff(str2, str3);
+    console.log(result);
+  });
+
+  it('Merge two strings', async () => {
+    const str1 = 'some sentence that be merged carefully';
+    const str2 = 'some long sentence that should be merged carefully';
+    const str3 = 'some sentence that anonimously be merged carefully';
+
+    let result = MergeService.mergeContent(str1, [str2, str3]);
+    console.log(result);
+  });
 });

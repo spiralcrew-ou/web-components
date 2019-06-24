@@ -24,14 +24,12 @@ export const ethEnabled = false;
 export const holochainServiceProvider =
   'holochain://Qmag7yGbYSMhkzDZLnSJkc4pzNWpHLtfP5o2jL8jGF4W5w';
 
-export const c1ServiceProvider = 
-  'https://www.collectiveone.org/uprtcl/1';
+export const c1ServiceProvider = 'https://www.collectiveone.org/uprtcl/1';
 
-export const ethServiceProvider = 
-  'eth://smartContract';
+export const ethServiceProvider = 'eth://smartContract';
 
 const ethLocation = 'ws://127.0.0.1:8545';
-const ipfsConfig ={
+const ipfsConfig = {
   host: 'ipfs.infura.io',
   port: 5001,
   protocol: 'https'
@@ -65,7 +63,7 @@ if (holochainEnabled) {
 if (ethEnabled) {
   uprtclConfig[ethServiceProvider] = {
     service: new UprtclEthereum(ethLocation, ipfsConfig),
-    discovery: new DiscoveryCollectiveOne(),
+    discovery: new DiscoveryCollectiveOne()
   };
   dataConfig[ethServiceProvider] = {
     discovery: new DiscoveryCollectiveOne(),
@@ -75,4 +73,7 @@ if (ethEnabled) {
 
 export const uprtclMultiplatform = new UprtclMultiplatform(uprtclConfig);
 export const dataMultiplatform = new DataMultiplatform(dataConfig);
-export const draftService = new DraftLocal<TextNode>();
+export const draftService = new DraftLocal<{
+  commitId: string;
+  draft: TextNode;
+}>();

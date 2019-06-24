@@ -207,7 +207,7 @@ export const setStyle =  (blockId: string, newStyle: NodeType, parentId: string,
     /** set the new style */
     let oldStyle = block.style;
     block.style = newStyle;
-    await uprtclData.draft.setDraft(blockId, mapBlockToTextNode(block));
+    await uprtclData.setDraft(blockId, mapBlockToTextNode(block));
 
     switch(oldStyle) {
       case NodeType.title: 

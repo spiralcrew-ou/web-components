@@ -2,10 +2,13 @@ import { TextNode } from '../../types';
 import { Commit } from '../local/db.objects';
 import { UprtclService } from '../uprtcl.service';
 import { DataService } from '../data.service';
-// import { DiffMatchPatch } from 'diff-match-patch-ts';
+import { Diff, DiffMatchPatch } from 'diff-match-patch-ts';
 
 import * as _ from 'lodash';
 import findMostRecentCommonAncestor from './common.ancestor';
+
+const diff = new DiffMatchPatch();
+
 export class MergeService {
   static mergePerspectives(
     uprtcl: UprtclService,
@@ -129,12 +132,25 @@ export class MergeService {
       type: resultType
     };
   }
-/* 
-  static mergeContent(str1: string, str2: string) {
-    const diff = new DiffMatchPatch();
-    diff.
-    return diff.diff_main(str1, str2);
-  } */
+
+  static mergeContent(originalString: string, newStrings: string[]): String {
+    return originalString + newStrings[''];
+  }
+
+  static to_words(diffs: Diff[]): Diff[] {
+    let result: Diff[] = [];
+    for (const diff of diffs) {
+      const wordDiff = diff[1].split(' ').map(word => <Diff>[diff[0], word]).filter(d => d[1] !== '');
+      result = result.concat(wordDiff);
+    }
+    return result;
+  }
+
+  static word_diff(str1: string, str2: string): Diff[] {
+    const diffs = diff.diff_main(str1, str2);
+    diff.diff_cleanupSemantic(diffs);
+    return this.to_words(diffs);
+  }
 
   static mergeResult<T>(original: T, modifications: Array<T>): T {
     const changes = modifications.filter(
