@@ -69,7 +69,8 @@ const mapBlockToTextNode = (block: Block): TextNode => {
 const mapPerspectiveToBlockRec = (
   perspectiveFull: PerspectiveFull,
   tree,
-  parentId: string, recurse: boolean
+  parentId: string, 
+  recurse: boolean
 ): Block => {
 
   let data = getPerspectiveData(perspectiveFull);
@@ -78,18 +79,17 @@ const mapPerspectiveToBlockRec = (
     id: perspectiveFull.id,
     children: [],
     status: hasChanges(perspectiveFull) ? "DRAFT" : "COMMITED",
-    content: data.text ? data.text : '',
-    style: NodeType[data.type],
+    content: data ? data.text : '',
+    style: data ? NodeType[data.type] : NodeType.paragraph,
     parentId: parentId,
     serviceProvider: perspectiveFull.origin
   };
 
-  if (recurse ) {
+  if (recurse && data) {
     data.links.map(link => {
       mapPerspectiveToBlockRec(link.link, tree, parentId,recurse);
       block.children.push(link.link.id);
     });
-  
   }
   
   tree[perspectiveFull.id] = block;
