@@ -1,6 +1,6 @@
 import { Component, Element, Prop, State } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
-import { setStyle, closeMenu } from '../../actions';
+import { setStyle, closeMenu,renderingWorkpad } from '../../actions';
 
 @Component({
   tag: 'co-menu',
@@ -15,11 +15,13 @@ export class COMenu {
 
   setStyle: Action
   closeMenu: Action
+  renderingWorkpad: Action
 
   componentWillLoad() {
     this.store.mapDispatchToProps(this, {
       setStyle,
-      closeMenu
+      closeMenu,
+      renderingWorkpad
     })
     this.store.mapStateToProps(this,(state) => {
       return {
@@ -28,15 +30,19 @@ export class COMenu {
     })
   }
 
+  changeStyle(style:string) {
+    this.renderingWorkpad(true)
+    this.setStyle(this.block.id, style)
+    this.closeMenu()
+  }
+
   render() {
     return <div class='container m-4 w-1/4 border-2 shadow-md p-2 rounded-lg font-thin z-10 fixed bg-white' >
       <div class= 'block my-2 pl-2' onClick={ () => {
-        this.setStyle(this.block.id, 'title')
-        this.closeMenu()
+       this.setStyle('title')
       }}> This is a title</div>
       <div  class= 'block my-2 pl-2 '  onClick={ () => {
-        this.setStyle(this.block.id, 'paragraph')
-        this.closeMenu()
+       this.setStyle('paragraph')
       }}>this is a paragraph</div>
     </div>
   }
