@@ -56,6 +56,7 @@ export namespace Components {
   }
   interface CoNodeAttributes extends StencilHTMLAttributes {
     'nodeId'?: string;
+    'onIsRunning'?: (event: CustomEvent) => void;
   }
 
   interface CoWaitingApp {}

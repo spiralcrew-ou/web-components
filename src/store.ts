@@ -9,7 +9,8 @@ const initialState = {
   workpad: {
     rootId: '',
     tree: {},
-    block: {}
+    block: {},
+    isRendering: false
   },
   menu: {
     isClose: true
@@ -40,6 +41,8 @@ export const workpadReducer = (state = { ...initialState.workpad }, action) => {
         return {...state,...action}
     case 'MERGE':
       return {...state,...action}
+    case 'RENDERING_WORKPAD':
+        return {...state,...action}
     default:
       return state
   }
@@ -66,6 +69,7 @@ export const supportReducer = (state ={...initialState.support}, action) => {
       return state 
   }
 }
+
 
 const reducers = combineReducers({
   workpad: workpadReducer,

@@ -2,7 +2,7 @@ import {
   Component, State, Prop, Element, Listen, Event, EventEmitter
 } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
-import { initTree, reloadTree, commitGlobal, setContent } from '../../actions';
+import {  commitGlobal, setContent } from '../../actions';
 
 // const commited = 'text-gray-800 p-2 mx-8 font-light bg-red-100 break-words'
 // const unCommited = 'text-gray-800 p-2 mx-8 font-light break-words'
@@ -19,6 +19,7 @@ export class Workpad {
   @State() titleHasChange: boolean
   @Prop() documentId: string
   @State() showMenuOption: boolean
+  @State() isRunning: boolean = false
 
   @Event({ eventName: 'isStarting', bubbles: true }) isStarting: EventEmitter
 
@@ -35,31 +36,28 @@ export class Workpad {
   @State() openInputMerge: boolean
 
 
-  initTree: Action
-  reloadTree: Action
+  
   commitGlobal: Action
   setContent: Action
 
   async componentWillLoad() {
     this.store.mapDispatchToProps(this, {
-      initTree,
-      reloadTree,
+      
       commitGlobal,
       setContent,
       
     })
-    await this.initTree(this.documentId);
    
-    await this.reloadTree();
     this.store.mapStateToProps(this, state => {
       return {
         tree: state.workpad.tree,
         rootDocumentId: state.workpad.rootId,
-        showMenuOption: !state.menu.isClose
+        showMenuOption: !state.menu.isClose,
+        isRunning: state.workpad.isRendering
       }
     })
     this.isStarting.emit(false)
-
+    
   }
 
   @Listen('keyup')
@@ -90,10 +88,14 @@ export class Workpad {
 
 
   updateDocumentTitle(newContent) {
-    this.setContent(this.tree[this.rootDocumentId], newContent)
+    this.setContent(this.tree[this.rootDocumentId].id, newContent)
   }
 
   render() {
+
+    if (this.isRunning)
+      return (<co-loading></co-loading>)
+
     return (
       <div class='workpad container'>
 
@@ -131,7 +133,6 @@ export class Workpad {
             class='m-2 p-2 border border-red-700 text-red-700 uppercase text-base font-thin'
           > Merge</button>
         </footer>
-
       </div>
     )
   }

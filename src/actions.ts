@@ -20,11 +20,11 @@ const uprtclData = new UprtclData();
 /** ----- SUPPORT FUNCTIONS ------ */
 
 const hasChanges = (_perspective: PerspectiveFull): boolean => {
-  
+
   if (!_perspective.head) {
     return true;
   }
-  
+
   let node = _perspective.head.data;
   let draft = _perspective.draft;
 
@@ -65,11 +65,13 @@ const mapBlockToTextNode = (block: Block): TextNode => {
   return textNode;
 }
 
+
 const mapPerspectiveToBlockRec = (
   perspectiveFull: PerspectiveFull,
   tree,
-  parentId: string
-): void => {
+  parentId: string, recurse: boolean
+): Block => {
+
   let data = getPerspectiveData(perspectiveFull);
 
   const block: Block = {
@@ -82,22 +84,25 @@ const mapPerspectiveToBlockRec = (
     serviceProvider: perspectiveFull.origin
   };
 
-  data.links.map(link => {
-    mapPerspectiveToBlockRec(link.link, tree, parentId);
-    block.children.push(link.link.id);
-  });
-
+  if (recurse ) {
+    data.links.map(link => {
+      mapPerspectiveToBlockRec(link.link, tree, parentId,recurse);
+      block.children.push(link.link.id);
+    });
+  
+  }
+  
   tree[perspectiveFull.id] = block;
 
-  return;
+  return block
 };
 
-const reloadMasterTree = async (getState): Promise<any> =>  { 
+const reloadMasterTree = async (getState): Promise<any> => {
   let perspectiveFull = await uprtclData.getPerspectiveFull(
     getState().workpad.rootId, -1);
 
   let _tree = {}
-  mapPerspectiveToBlockRec(perspectiveFull, _tree, getState().workpad.rootId)
+  mapPerspectiveToBlockRec(perspectiveFull, _tree, getState().workpad.rootId,true)
   console.log('[REDUX] Reload master tree.', { perspectiveFull, _tree });
   return _tree;
 }
@@ -109,10 +114,10 @@ const reloadMasterTree = async (getState): Promise<any> =>  {
  */
 export const initTree = (_rootId) => {
   return (dispatch) => {
-    dispatch({ 
-      type: "INIT_TREE", 
-      rootId: _rootId, 
-      tree: {} 
+    dispatch({
+      type: "INIT_TREE",
+      rootId: _rootId,
+      tree: {}
     })
   };
 };
@@ -124,6 +129,7 @@ export const reloadTree = () => {
       type: "RELOAD_TREE",
       tree: _tree
     });
+    dispatch(renderingWorkpad(false))
   };
 };
 
@@ -135,12 +141,17 @@ export const reloadTree = () => {
 export const setContent = (blockId, content) => {
   return async (dispatch, getState) => {
 
-    uprtclData.setDraftText(blockId, content);
+    await uprtclData.setDraftText(blockId, content);
+    const perspectiveFull = await uprtclData.getPerspectiveFull(blockId,0)
 
     let block = getState().workpad.tree[blockId];
+    block = mapPerspectiveToBlockRec(perspectiveFull,{},blockId.parentId,false)
+    const tree = Object.assign({}, getState().workpad.tree)
+    tree[blockId] = block
+    dispatch({ type: 'SET_CONTENT', tree });
 
-    dispatch({ type: 'SET_CONTENT', block });
-    dispatch(reloadTree());
+
+    //dispatch(reloadTree());
   };
 };
 
@@ -160,7 +171,7 @@ export const newBlock = (blockId: string, _content: string) => {
           0,
           _content
         );
-      break;
+        break;
 
       case "paragraph":
         /** An enter on a paragraph will create an empty context *
@@ -174,7 +185,7 @@ export const newBlock = (blockId: string, _content: string) => {
           index + 1,
           ''
         );
-      break;
+        break;
 
       default:
         throw new Error(`'Unexpected style value ${initNode.style}`);
@@ -186,9 +197,9 @@ export const newBlock = (blockId: string, _content: string) => {
   };
 };
 
-export const setStyle =  (blockId: string, newStyle: NodeType) => {
+export const setStyle = (blockId: string, newStyle: NodeType) => {
   return async (dispatch, getState) => {
-    
+
     const tree = getState().workpad.tree;
     const block: Block = tree[blockId];
     const parent: Block = tree[block.parentId];
@@ -199,7 +210,7 @@ export const setStyle =  (blockId: string, newStyle: NodeType) => {
     block.style = newStyle;
     await uprtclData.draft.setDraft(blockId, mapBlockToTextNode(block));
 
-    switch (oldStyle) {
+    switch(oldStyle) {
       case NodeType.title: 
         switch (newStyle) {
           
@@ -208,7 +219,7 @@ export const setStyle =  (blockId: string, newStyle: NodeType) => {
             return;
           
           /** title to paragraph: changing the type of a title to a paragraph 
-           *  will move all its subcontexts as younger siblings of the new typed 
+           *  will move all its subcontexts as youngr siblings of the new typed 
            *  paragraph */            
           case NodeType.paragraph:
             /** removing in sequence (parallel wont work due to index finding) */
@@ -223,9 +234,9 @@ export const setStyle =  (blockId: string, newStyle: NodeType) => {
               await uprtclData.insertPerspective(
                 block.parentId,
                 childId,
-                index + childIx + 1);
+                  index + childIx + 1);
             }
-          break;
+            break;
         }
       break;
 
@@ -240,9 +251,9 @@ export const setStyle =  (blockId: string, newStyle: NodeType) => {
           /** paragraph to title: Changing the type of a paragraph to a title 
            * will move all the younger sibling contexts of the paragraph as 
            * subcontexts of the new title. */
-          case (NodeType.title):
+            case (NodeType.title):
             let youngerSyblings = parent.children.splice(index + 1);
-            
+
             /** just move the syblings up to the first one which is a title */
             let indexOfTitleSybling = youngerSyblings.findIndex(syblingId => {
               let sybling: Block = tree[syblingId];
@@ -258,7 +269,7 @@ export const setStyle =  (blockId: string, newStyle: NodeType) => {
               let sybId = youngerSyblings[sybIx];
               await uprtclData.removePerspective(parent.id, sybId);
             }
-
+            
             /** adding in sequence */
             for (let sybIx = 0; sybIx < youngerSyblings.length; sybIx++) {
               let sybId = youngerSyblings[sybIx];
@@ -276,7 +287,7 @@ export const setStyle =  (blockId: string, newStyle: NodeType) => {
 }
 
 
-/**
+/**   
  * This method remove a block (perspective indeed) from tree.
  * @param {*} block
  * @returns dispatch a reloadTree event
@@ -288,17 +299,17 @@ export const removeBlock = block => {
   }
 };
 
-/**
- * Commits the draft of the block specified by blockId and recursively
- * of all its children. Send the rootId to commit the entire document.
+
+ /** Commits the draft of the block specified by blockId and recursively
+f all its children. Send the rootId to commit the entire document.
  */
 export const commitGlobal = (blockId: string, message: string = '') => {
   return async (dispatch, getState) => {
     
     let provider = getState().support.selectedProvider;
-    
+
     await uprtclData.commitGlobal(
-      provider,
+  provider,
       blockId,
       message, 
       new Date().getTime())
@@ -318,7 +329,7 @@ export const newPerspective = (
   name: string, 
   serviceProvider: string) => {
 
-  return async (dispatch) => {
+  return async(dispatch) => {
 
     let newPerspectiveId = await uprtclData.createGlobalPerspective(
       serviceProvider, blockId, name
@@ -330,7 +341,7 @@ export const newPerspective = (
     });
   }
 }
-
+        
 /**
  * This function open the contextual menu
  */
@@ -339,25 +350,33 @@ export const openMenu = (blockId) => {
     dispatch({type: 'OPEN_MENU', isClose:false,blockId})
   }
 }
-
+       
 /**
  * This function close the contextual menu
  */
 export const closeMenu = () => {
   return (dispatch) => {
-    dispatch({type: 'CLOSE_MENU', isClose:true})
+    dispatch({ type: 'CLOSE_MENU', isClose:true})   
   }
 }
 
 export const setAvailableProviders = (availableProviders: string[]) => {
   return (dispatch) => {
-    dispatch({type: 'SET_AVAILABLE_PROVIDERS', availableProviders})
+    dispatch({ type: 'SET_AVAILABLE_PROVIDERS', availableProviders})
   }
 }
 
 export const setSelectedProvider = (selectedProvider: string) => {
-  return (dispatch) => {
-    dispatch({type: 'SET_SELECTED_PROVIDER', selectedProvider})
-  }
+  return (dispatch) => {         
+  dispatch({type: 'SET_SELECTED_PROVIDER', selectedProvider})
+ }
 }
 
+  
+
+       
+export const renderingWorkpad = (value: boolean) => {
+  return (dispatch) => {
+      dispatch({type: 'RENDERING_WORKPAD', isRendering:value})
+    }
+}
