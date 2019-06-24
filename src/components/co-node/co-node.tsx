@@ -1,8 +1,11 @@
 import {
-  Component, State, Prop, Element, Listen
+  Component, State, Prop, Element, Listen, Event, EventEmitter
 } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
-import { newBlock, removeBlock, reloadTree, setContent, openMenu, Block } from '../../actions';
+import { newBlock, removeBlock, reloadTree, setContent, openMenu, Block, renderingWorkpad } from '../../actions';
+
+
+
 
 @Component({
   tag: 'co-node',
@@ -14,15 +17,17 @@ export class CONode {
   @Prop({ context: 'store' }) store: Store;
   @Prop() nodeId: string;
   @State() block : Block;
-  @State() rootId; 
+  rootId; 
   @State() showMenuOption: boolean;
   @State() isFocused: boolean = false;
+  @Event({ eventName: 'isRunning', bubbles: true }) isRunning: EventEmitter
   
   newBlock: Action
   removeBlock: Action
   reloadTree: Action
   setContent: Action
   openMenu: Action
+  renderingWorkpad: Action
 
   componentWillLoad() {
     this.store.mapDispatchToProps(this, {
@@ -30,10 +35,12 @@ export class CONode {
       removeBlock,
       reloadTree,
       setContent,
-      openMenu
+      openMenu,
+      renderingWorkpad
     })
     this.store.mapStateToProps(this,(state) => {
       return {
+        tree: state.workpad.tree,
         rootId: state.workpad.rootId,
         block: state.workpad.tree[this.nodeId],
         showMenuOption: !state.menu.isClose
@@ -51,7 +58,8 @@ export class CONode {
     if (event.key === 'Enter') {
       event.preventDefault();
       event.stopPropagation();
-      this.newBlock(this.nodeId, '');
+      this.renderingWorkpad(true)
+      this.newBlock(this.nodeId, '');  
     }
   }
 
@@ -71,13 +79,32 @@ export class CONode {
     }
   }
 
-  updateBlockContent(event:FocusEvent, newContent) { 
-    event.stopPropagation()
-    this.setContent(this.block.id, newContent)
+  /*
+  componentDidUpdate() {
+    const element = this._element.shadowRoot.getElementById(this.block.id);
+    if (element) element.innerHTML = this.block.content
+  }*/
+
+
+  async updateBlockContent(_event:FocusEvent, _newContent) { 
+    //console.log('entro al update')
+    _event.stopPropagation()   
+    //console.log(_newContent, this.block.content)
+    
+    //await this.renderingWorkpad(true)
+    //console.log(_event  )
+    if (_newContent!=this.block.content)
+      await this.setContent(this.block.id, _newContent)
   }
 
+  /*
+  componentWillUpdate() {
+    const element = this._element.shadowRoot.getElementById(this.nodeId);
+    if (element) element.innerHTML = this.block.content;
+  }*/
 
   render() {
+    console.log('Renderizamos node')
     const isDocTitle = this.block.id === this.block.parentId 
     const blockClasses = 'text-gray-800 p-2 leading-relaxed'
     const draftClasses = this.block.status === 'DRAFT'  ?  'has-changes'  :  '' 
@@ -106,6 +133,7 @@ export class CONode {
                           contentEditable>
                           {this.block.content}
                         </div>
+    
 
     return ( 
       <div class={containerClasses}>

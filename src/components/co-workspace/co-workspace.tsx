@@ -5,7 +5,7 @@ import {
 import { Store, Action } from '@stencil/redux';
 import { configureStore } from '../../store.js';
 import { UprtclData } from '../../services/uprtcl-data';
-import {setSelectedProvider} from '../../actions';
+import {setSelectedProvider,initTree,reloadTree} from '../../actions';
 
 @Component({
   tag: 'co-workspace',
@@ -24,6 +24,8 @@ export class COWorkspace {
   uprtclData = new UprtclData();
 
   setSelectedProvider: Action
+  initTree: Action
+  reloadTree: Action
 
   constructor(_defaultServiceId: string) {
     this.defaultService = _defaultServiceId;
@@ -35,8 +37,9 @@ export class COWorkspace {
     this.store.setStore(configureStore());
     this.store.mapDispatchToProps(this, {
       setSelectedProvider,
+      initTree,
+      reloadTree,
     })
-
     await this.setSelectedProvider(this.defaultService)
 
     /**TODO: Pepo, here you got perspectiveId parameter if you want to browse an perspective
@@ -82,6 +85,9 @@ export class COWorkspace {
       await this.uprtclData.initContextUnder(
         this.defaultService, this.documentPerspectiveId, -1, '');
     }
+
+    await this.initTree(this.documentPerspectiveId);
+    await this.reloadTree();
   }
 
   render() {
