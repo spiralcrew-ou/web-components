@@ -11,7 +11,7 @@ import { CachedMultiplatform } from './cached.multiplatform';
 import { UprtclLocal } from '../local/uprtcl.local';
 import { ipldService } from '../ipld';
 
-const currentAuthorId = 'anonymous:1';
+const currentAuthorId = 'guillem:1';
 
 export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
   linksFromPerspective(perspective: Perspective) {
@@ -91,7 +91,14 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
   async getCachedContextsPerspectives(
     contextId: string
   ): Promise<Perspective[]> {
-    return this.cacheService.getContextPerspectives(contextId);
+    const perspectives = await this.cacheService.getContextPerspectives(
+      contextId
+    );
+    if (perspectives) {
+      return perspectives;
+    } else {
+      return this.getContextPerspectives(contextId);
+    }
   }
 
   async getContextPerspectives(contextId: string): Promise<Perspective[]> {
@@ -157,7 +164,12 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
   }
 
   async getCachedHead(perspectiveId: string): Promise<string> {
-    return this.cacheService.getHead(perspectiveId);
+    const headId = await this.cacheService.getHead(perspectiveId);
+    if (headId) {
+      return headId;
+    } else {
+      return this.getHead(perspectiveId);
+    }
   }
 
   async getHead(perspectiveId: string): Promise<string> {
