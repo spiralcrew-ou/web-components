@@ -60,7 +60,7 @@ export class UprtclData {
     const draft = await this.draft.getDraft(perspectiveId);
     perspectiveFull.draft = await this.getTextNodeFull(draft, levels);
 
-    const headId = await this.uprtcl.getHead(perspectiveId);
+    const headId = await this.uprtcl.getCachedHead(perspectiveId);
     perspectiveFull.head = await this.getCommitFull(headId, levels);
     
     return perspectiveFull;
