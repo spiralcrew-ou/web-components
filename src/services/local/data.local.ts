@@ -5,42 +5,42 @@ import { ExtensionsLocal } from './extensions.local';
 import { PropertyOrder } from './../../types';
 
 export class DataLocal<T> implements DataService<T> {
-
   currentConfig: CidConfig;
   uprtclExtensions = new ExtensionsLocal<T>();
-  
-  constructor() {
-  }
+
+  constructor() {}
 
   getCidConfig(): CidConfig {
     return this.currentConfig;
   }
 
-  setCidConfig(config: CidConfig)  {
+  setCidConfig(config: CidConfig) {
     this.currentConfig = config;
   }
 
   async createData(data: T): Promise<string> {
-    if (!this.currentConfig) {
-      console.log(`[LOCAL DATA] CidConfig null when creating object`, data)
-      throw new Error('[LOCAL DATA] CidConfig null when creating object')
+    if (data['id']) {
+      let valid = await ipldService.validateCid(
+        data['id'],
+        <object>(<unknown>data),
+        PropertyOrder.TextNode
+      );
+      if (!valid) {
+        throw new Error(`Invalid cid ${data['id']}`);
+      }
+    } else {
+      data['id'] = await ipldService.generateCidOrdered(
+        data,
+        this.currentConfig,
+        PropertyOrder.TextNode
+      );
     }
-    const dataId = await ipldService.generateCidOrdered(
-      data,
-      this.currentConfig,
-      PropertyOrder.TextNode
-    );
-    data['id'] = dataId;
-    this.uprtclExtensions.data.put(data);
-    return dataId;
+    await this.uprtclExtensions.data.put(data);
+    return data['id'];
   }
 
   getData(dataId: string): Promise<T> {
     return this.uprtclExtensions.data.get(dataId);
   }
 
-  async existData(_dataId: string): Promise<Boolean> {
-    const dataId = await this.getData(_dataId);
-    return dataId != null;
-  }
 }

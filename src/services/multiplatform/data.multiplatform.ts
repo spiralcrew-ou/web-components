@@ -12,14 +12,10 @@ export class DataMultiplatform extends CachedMultiplatform<DataService> {
   }
 
   getData<T>(dataId: string): Promise<T> {
-    let clonner = (service, objectAndCidConfig):Promise<any> => {
-      service.setCidConfig(objectAndCidConfig.cidConfig);
-      return service.createData(objectAndCidConfig.object);
-    }
     return this.cachedDiscover(
       dataId,
       service => service.getData(dataId),
-      clonner,
+      (service, data) => service.createData(data),
       this.linksFromTextNode
     );
   }

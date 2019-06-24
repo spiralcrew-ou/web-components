@@ -1,17 +1,11 @@
 import { Dictionary } from '../../types';
 import { DiscoveryService } from '../discovery.service';
 import { DiscoveryLocal } from '../local/discovery.local';
-import { CidConfig } from '../cid.config';
 import { CidCompatible } from '../cid.service';
 
 export interface DiscoveryProvider<T> {
   discovery: DiscoveryService;
   service: T;
-}
-
-export interface ObjectAndCidConfig<O> {
-  object: O,
-  cidConfig: CidConfig
 }
 
 export class Multiplatform<T extends CidCompatible> {
@@ -91,10 +85,8 @@ export class Multiplatform<T extends CidCompatible> {
     getter: (service: T) => Promise<O>,
     linksSelector: (object: O) => string[] = () => [],
     idSelector: (object: O) => string = o => o['id']
-  ): Promise<ObjectAndCidConfig<O>> {
-    // Try to retrieve the object
-    let cidConfig = this.serviceProviders[source].service.getCidConfig();  
-    
+  ): Promise<O> {
+    // Try to retrieve the object  
     const object = await getter(this.serviceProviders[source].service);
 
     if (object) {
@@ -120,7 +112,7 @@ export class Multiplatform<T extends CidCompatible> {
         await Promise.all(discoveryPromises);
       }
     }
-    return { object, cidConfig }
+    return object;
   }
 
   /**
@@ -132,15 +124,15 @@ export class Multiplatform<T extends CidCompatible> {
     hash: string,
     getter: (service: T) => Promise<O>,
     linksSelector: (object: O) => string[] = () => []
-  ): Promise<ObjectAndCidConfig<O>> {
+  ): Promise<O> {
     try {
-      const objectAndCid = await this.getFromSource(source, getter, linksSelector);
+      const object = await this.getFromSource(source, getter, linksSelector);
 
-      if (!objectAndCid.object) {
+      if (!object) {
         // The get call succeeded but didn't return the object, remove the source from the known sources
         await this.removeKnownSource(source, hash);
       }
-      return objectAndCid;
+      return object;
     } catch (e) {
       // The get call failed, don't remove the known source as it could be a network error
       console.error(e);
@@ -160,7 +152,7 @@ export class Multiplatform<T extends CidCompatible> {
     hash: string,
     getter: (service: T) => Promise<O>,
     linksSelector: (object: O) => string[] = () => []
-  ): Promise<ObjectAndCidConfig<O>> {
+  ): Promise<O> {
     if (typeof hash !== 'string') {
       console.log('[MULTIPLATFORM] Trying to discover null object')
       return null;
@@ -172,13 +164,13 @@ export class Multiplatform<T extends CidCompatible> {
 
     // Iterate through the known sources until a source successfully returns the object
     for (const source of knownSources) {
-      const objectAndCidConfig = await this.tryGetFromSource(
+      const object = await this.tryGetFromSource(
         source,
         hash,
         getter,
         linksSelector
       );
-      if (objectAndCidConfig.object) return objectAndCidConfig;
+      if (object) return object;
     }
 
     // All known sources failed, throw error
@@ -199,22 +191,22 @@ export class Multiplatform<T extends CidCompatible> {
     hash: string,
     getter: (service: T) => Promise<O>,
     linksSelector: (object: O) => string[] = () => []
-  ): Promise<Array<ObjectAndCidConfig<O>>> {
+  ): Promise<Array<O>> {
     if (typeof hash !== 'string') {
       return null;
     }
 
     const promises = this.getServiceProviders().map(async serviceProvider => {
-      const objectAndCidConfig = await this.tryGetFromSource(
+      const object = await this.tryGetFromSource(
         serviceProvider,
         hash,
         getter,
         linksSelector
       );
-      if (objectAndCidConfig.object && !(objectAndCidConfig.object instanceof Array)) {
+      if (object && !(object instanceof Array)) {
         await this.knownSources.addKnownSources(hash, [serviceProvider]);
       }
-      return objectAndCidConfig;
+      return object;
     });
 
     return Promise.all(promises);
