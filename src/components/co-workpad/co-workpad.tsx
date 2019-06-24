@@ -45,9 +45,11 @@ export class Workpad {
       initTree,
       reloadTree,
       commitGlobal,
-      setContent
+      setContent,
+      
     })
     await this.initTree(this.documentId);
+   
     await this.reloadTree();
     this.store.mapStateToProps(this, state => {
       return {

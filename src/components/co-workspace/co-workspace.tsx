@@ -2,9 +2,10 @@ import { Component, State, Prop } from '@stencil/core';
 import {
   uprtclMultiplatform
 } from '../../services';
-import { Store } from '@stencil/redux';
+import { Store, Action } from '@stencil/redux';
 import { configureStore } from '../../store.js';
 import { UprtclData } from '../../services/uprtcl-data';
+import {setSelectedProvider} from '../../actions';
 
 @Component({
   tag: 'co-workspace',
@@ -21,6 +22,8 @@ export class COWorkspace {
   // Multiplatform service is already instantiated, get a reference to it
   uprtcl = uprtclMultiplatform;
   uprtclData = new UprtclData();
+
+  setSelectedProvider: Action
 
   constructor(_defaultServiceId: string) {
     this.defaultService = _defaultServiceId;
@@ -57,8 +60,19 @@ export class COWorkspace {
   }
 
   async componentWillLoad() {
-    
     this.store.setStore(configureStore());
+    this.store.mapDispatchToProps(this, {
+      setSelectedProvider,
+    })
+
+
+    await this.setSelectedProvider(this.defaultService)
+
+    /**TODO: Pepo, here you got perspectiveId parameter if you want to browse an perspective
+     * 
+     *  new URLSearchParams(window.location.search).get("pid")
+     */
+
     const rootContextId = await this.uprtcl.getRootContextId(
       this.defaultService
     );
@@ -75,7 +89,6 @@ export class COWorkspace {
     } else {
       this.rootPerspectiveId = rootPerspectives[0].id;
     }
-
     this.documentPerspectiveId = await this.checkInitDocAndParagraph(this.rootPerspectiveId)
   }
 

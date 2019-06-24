@@ -56,7 +56,7 @@ export const menuReducer = (state ={...initialState.menu}, action) => {
   }
 }
 
-export const supportReducer = (state ={...initialState.menu}, action) => {
+export const supportReducer = (state ={...initialState.support}, action) => {
   switch (action.type) {
     case 'SET_AVAILABLE_PROVIDERS':
       return {...state,...action}

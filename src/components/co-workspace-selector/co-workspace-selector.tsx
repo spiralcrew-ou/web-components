@@ -10,7 +10,8 @@ import { c1ServiceProvider, ethServiceProvider } from '../../services';
 
     @State() isStarting: boolean
     @State() defaultServiceProvider: string 
-    @State() availableServiceProviders: string[] = [
+
+    availableServiceProviders: string[] = [
         c1ServiceProvider,
         ethServiceProvider
     ]

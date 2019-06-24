@@ -343,12 +343,15 @@ export const closeMenu = () => {
   }
 }
 
-/**
- * This function open the contextual menu
- */
 export const setAvailableProviders = (availableProviders: string[]) => {
   return (dispatch) => {
     dispatch({type: 'SET_AVAILABLE_PROVIDERS', availableProviders})
+  }
+}
+
+export const setSelectedProvider = (selectedProvider: string) => {
+  return (dispatch) => {
+    dispatch({type: 'SET_SELECTED_PROVIDER', selectedProvider})
   }
 }
 
