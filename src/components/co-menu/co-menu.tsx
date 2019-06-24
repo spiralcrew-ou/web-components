@@ -40,12 +40,15 @@ export class COMenu {
 
   render() {
     return <div class='container m-4 w-1/4 border-2 shadow-md p-2 rounded-lg font-thin z-10 fixed bg-white' >
+      <div class='row'>
       <div class= 'block my-2 pl-2' onClick={ () => {
         this.setBlockStyle(NodeType.title)
       }}> This is a title</div>
+      </div>
       <div  class= 'block my-2 pl-2 '  onClick={ () => {
         this.setBlockStyle(NodeType.paragraph)
       }}>this is a paragraph</div>
+
     </div>
   }
 }
