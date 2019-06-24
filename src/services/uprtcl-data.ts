@@ -455,8 +455,6 @@ export class UprtclData {
     recurse: boolean = false
   ) : Promise<void> {
 
-    debugger
-    
     const draft = await this.draft.getDraft(perspectiveId);
     if (draft == null) {
       return
