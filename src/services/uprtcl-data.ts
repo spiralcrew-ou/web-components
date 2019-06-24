@@ -268,23 +268,18 @@ export class UprtclData {
    *
    * @param fromPerspectiveId The parent perspective id.
    *
-   * @param perspectiveId The child perspective id to be removed (must be a current child
-   * of the parent).
+   * @param index The index of the child to be removed.
    *
    * @returns The id of the new child **perspective**.
    */
   async removePerspective(
     fromPerspectiveId: string,
-    perspectiveId: string
+    index: number
   ): Promise<void> {
-    let draft = await this.draft.getDraft(fromPerspectiveId);
+    let draft = await this.getOrCreateDraft(fromPerspectiveId);
 
-    let index = draft.links.findIndex(link => link.link === perspectiveId);
-    if (index == -1)
-      throw new Error(
-        `perspective ${perspectiveId} not found under ${fromPerspectiveId}`
-      );
-
+    if (draft.links.length < index) throw new Error(`parent dont have a children at index ${index}`);
+    
     /** remove the link */
     draft.links.splice(index, 1);
 

@@ -223,8 +223,7 @@ export const setStyle =  (blockId: string, newStyle: NodeType, parentId: string,
           case NodeType.paragraph:
             /** removing in sequence (parallel wont work due to index finding) */
             for (let childIx = 0; childIx < block.children.length; childIx++) {
-              let childId = block.children[childIx];
-              await uprtclData.removePerspective(blockId, childId);
+              await uprtclData.removePerspective(blockId, childIx);
             }
 
             /** adding in sequence */
@@ -265,8 +264,7 @@ export const setStyle =  (blockId: string, newStyle: NodeType, parentId: string,
 
             /** removing in sequence (parallel wont work due to index finding) */
             for (let sybIx = 0; sybIx < youngerSyblings.length; sybIx++) {
-              let sybId = youngerSyblings[sybIx];
-              await uprtclData.removePerspective(parent.id, sybId);
+              await uprtclData.removePerspective(parent.id, sybIx);
             }
             
             /** adding in sequence */
@@ -287,14 +285,12 @@ export const setStyle =  (blockId: string, newStyle: NodeType, parentId: string,
 
 
 /**   
- * This method remove a block (perspective indeed) from tree.
- * @param {*} block
- * @returns dispatch a reloadTree event
+ * This method removes a block (perspective indeed) from tree. It removes
+ * all its children automatically, se beware!
  */
-export const removeBlock = (blockId, parentId) => {
+export const removeBlock = (parentId: string, index: number) => {
   return async(dispatch) => {
-
-    await uprtclData.removePerspective(parentId, blockId)
+    await uprtclData.removePerspective(parentId, index);
     dispatch(reloadTree());
   }
 };
