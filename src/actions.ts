@@ -83,7 +83,7 @@ const mapPerspectiveToBlockRec = (
   };
 
   data.links.map(link => {
-    mapPerspectiveToBlockRec(link.link, tree, parentId);
+    mapPerspectiveToBlockRec(link.link, tree, perspectiveFull.id);
     block.children.push(link.link.id);
   });
 
@@ -146,6 +146,8 @@ export const setContent = (blockId, content) => {
 
 export const newBlock = (blockId: string, _content: string) => {
   return async (dispatch, getState) => {
+
+    debugger
     
     const tree = getState().workpad.tree;
     const initNode = tree[blockId];
@@ -189,14 +191,19 @@ export const newBlock = (blockId: string, _content: string) => {
 export const setStyle =  (blockId: string, newStyle: NodeType) => {
   return async (dispatch, getState) => {
     
+    debugger
+
     const tree = getState().workpad.tree;
     const block: Block = tree[blockId];
-    const index = block.children.findIndex(pId => pId === blockId)
+    const parent: Block = tree[block.parentId];
+    const index = parent.children.findIndex(pId => pId === blockId)
+
     /** set the new style */
+    let oldStyle = block.style;
     block.style = newStyle;
     await uprtclData.draft.setDraft(blockId, mapBlockToTextNode(block));
 
-    switch (block.style) {
+    switch (oldStyle) {
       case NodeType.title: 
         switch (newStyle) {
           
@@ -208,12 +215,11 @@ export const setStyle =  (blockId: string, newStyle: NodeType) => {
            *  will move all its subcontexts as younger siblings of the new typed 
            *  paragraph */            
           case NodeType.paragraph:
-            let removeChildren = block.children.map( async (childId) => {
-              return uprtclData.removePerspective(blockId, childId);
-            })
-
-            /** removing in parallel */
-            await Promise.all(removeChildren);
+            /** removing in sequence (parallel wont work due to index finding) */
+            for (let childIx = 0; childIx < block.children.length; childIx++) {
+              let childId = block.children[childIx];
+              await uprtclData.removePerspective(blockId, childId);
+            }
 
             /** adding in sequence */
             for (let childIx = 0; childIx < block.children.length; childIx++) {
@@ -239,8 +245,6 @@ export const setStyle =  (blockId: string, newStyle: NodeType) => {
            * will move all the younger sibling contexts of the paragraph as 
            * subcontexts of the new title. */
           case (NodeType.title):
-            const parent: Block = tree[block.parentId];
-            
             let youngerSyblings = parent.children.splice(index + 1);
             
             /** just move the syblings up to the first one which is a title */
@@ -251,6 +255,12 @@ export const setStyle =  (blockId: string, newStyle: NodeType) => {
             /** there is a title younger sybling */
             if (indexOfTitleSybling !== -1) {
               youngerSyblings = youngerSyblings.slice(0, indexOfTitleSybling);
+            }
+
+            /** removing in sequence (parallel wont work due to index finding) */
+            for (let sybIx = 0; sybIx < youngerSyblings.length; sybIx++) {
+              let sybId = youngerSyblings[sybIx];
+              await uprtclData.removePerspective(parent.id, sybId);
             }
 
             /** adding in sequence */
