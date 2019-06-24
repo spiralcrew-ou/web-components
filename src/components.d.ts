@@ -44,19 +44,19 @@ export namespace Components {
   interface CoLogin {}
   interface CoLoginAttributes extends StencilHTMLAttributes {}
 
-  interface CoMenu {
-    'nodeId': string;
-  }
-  interface CoMenuAttributes extends StencilHTMLAttributes {
-    'nodeId'?: string;
-  }
+  interface CoMenu {}
+  interface CoMenuAttributes extends StencilHTMLAttributes {}
 
   interface CoNode {
+    'indexInParent': number;
     'nodeId': string;
+    'parentId': string;
   }
   interface CoNodeAttributes extends StencilHTMLAttributes {
+    'indexInParent'?: number;
     'nodeId'?: string;
     'onIsRunning'?: (event: CustomEvent) => void;
+    'parentId'?: string;
   }
 
   interface CoWaitingApp {}

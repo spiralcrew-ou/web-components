@@ -32,8 +32,6 @@ export class COWorkspace {
   }
 
   async componentWillLoad() {
-    debugger;
-    
     this.store.setStore(configureStore());
     this.store.mapDispatchToProps(this, {
       setSelectedProvider,

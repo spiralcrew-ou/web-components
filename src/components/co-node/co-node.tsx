@@ -14,8 +14,12 @@ import { newBlock, removeBlock, reloadTree, setContent, openMenu, Block, renderi
 })
 export class CONode {
   @Element() _element: HTMLElement;
+
   @Prop({ context: 'store' }) store: Store;
   @Prop() nodeId: string;
+  @Prop() parentId: string;
+  @Prop() indexInParent: number;
+
   @State() block : Block;
   rootId; 
   @State() showMenuOption: boolean;
@@ -59,7 +63,11 @@ export class CONode {
       event.preventDefault();
       event.stopPropagation();
       this.renderingWorkpad(true)
-      this.newBlock(this.nodeId, '');  
+      this.newBlock(
+        this.nodeId, 
+        '', 
+        this.parentId, 
+        this.indexInParent);  
     }
   }
 
@@ -75,37 +83,18 @@ export class CONode {
     }
 
     if(event.key === '/'){
-      this.openMenu(this.nodeId)
+      this.openMenu(this.nodeId, this.parentId, this.indexInParent);
     }
   }
 
-  /*
-  componentDidUpdate() {
-    const element = this._element.shadowRoot.getElementById(this.block.id);
-    if (element) element.innerHTML = this.block.content
-  }*/
-
-
   async updateBlockContent(_event:FocusEvent, _newContent) { 
-    //console.log('entro al update')
     _event.stopPropagation()   
-    //console.log(_newContent, this.block.content)
-    
-    //await this.renderingWorkpad(true)
-    //console.log(_event  )
-    if (_newContent!=this.block.content)
+    if (_newContent != this.block.content)
       await this.setContent(this.block.id, _newContent)
   }
 
-  /*
-  componentWillUpdate() {
-    const element = this._element.shadowRoot.getElementById(this.nodeId);
-    if (element) element.innerHTML = this.block.content;
-  }*/
-
   render() {
-    console.log('Renderizamos node')
-    const isDocTitle = this.block.id === this.block.parentId 
+    const isDocTitle = this.block.id === this.rootId
     const blockClasses = 'text-gray-800 p-2 leading-relaxed'
     const draftClasses = this.block.status === 'DRAFT'  ?  'has-changes'  :  '' 
     const focusClasses = this.isFocused ? 'bg-gray-200' :  ''
@@ -138,9 +127,12 @@ export class CONode {
     return ( 
       <div class={containerClasses}>
         {!isDocTitle ? contentBlock : ''}        
-        {this.block.children.map((childId) => {
+        {this.block.children.map((childId, index) => {
            return(
-            <co-node node-id={childId}>
+            <co-node 
+              node-id={childId} 
+              parent-id={this.block.id} 
+              index-in-parent={index}>
             </co-node>
           )
         })}
