@@ -149,9 +149,6 @@ export const setContent = (blockId, content) => {
     const tree = Object.assign({}, getState().workpad.tree)
     tree[blockId] = block
     dispatch({ type: 'SET_CONTENT', tree });
-
-
-    //dispatch(reloadTree());
   };
 };
 
