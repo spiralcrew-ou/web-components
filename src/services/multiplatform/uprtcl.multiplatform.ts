@@ -11,7 +11,7 @@ import { CachedMultiplatform } from './cached.multiplatform';
 import { UprtclLocal } from '../local/uprtcl.local';
 import { ipldService } from '../ipld';
 
-const currentAuthorId = 'anonymous:101';
+const currentAuthorId = 'anonymous:07';
 
 export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
   linksFromPerspective(perspective: Perspective) {
@@ -183,7 +183,7 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
       headId => [headId])
 
     if (objectAndCidConfig.object) {
-      await this.updateHead(perspectiveId, objectAndCidConfig.object);
+      await this.cacheService.updateHead(perspectiveId, objectAndCidConfig.object);
     }
 
     return objectAndCidConfig.object;
