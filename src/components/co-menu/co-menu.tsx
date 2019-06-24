@@ -1,6 +1,6 @@
 import { Component, Element, Prop, State } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
-import { setStyle, closeMenu, Block, NodeType } from '../../actions';
+import { setStyle, closeMenu, Block, renderingWorkpad, NodeType } from '../../actions';
 
 @Component({
   tag: 'co-menu',
@@ -16,11 +16,13 @@ export class COMenu {
 
   setStyle: Action
   closeMenu: Action
+  renderingWorkpad: Action
 
   componentWillLoad() {
     this.store.mapDispatchToProps(this, {
       setStyle,
-      closeMenu
+      closeMenu,
+      renderingWorkpad
     })
     this.store.mapStateToProps(this,(state) => {
       return {
