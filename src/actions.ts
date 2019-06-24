@@ -197,7 +197,7 @@ export const newBlock = (blockId: string, _content: string, parentId: string, in
 
 export const setStyle =  (blockId: string, newStyle: NodeType, parentId: string, index: number) => {
   return async (dispatch, getState) => {
-
+    
     const tree = getState().workpad.tree;
     const block: Block = tree[blockId];
     const parent: Block = tree[parentId];
@@ -206,7 +206,7 @@ export const setStyle =  (blockId: string, newStyle: NodeType, parentId: string,
     /** set the new style */
     let oldStyle = block.style;
     block.style = newStyle;
-    await uprtclData.draft.setDraft(blockId, mapBlockToTextNode(block));
+    await uprtclData.setDraftType(blockId, newStyle);
 
     switch(oldStyle) {
       case NodeType.title: 
