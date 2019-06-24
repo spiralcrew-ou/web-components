@@ -164,7 +164,11 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
   }
 
   async getCachedHead(perspectiveId: string): Promise<string> {
-    return this.cacheService.getHead(perspectiveId);
+    if (await (<UprtclLocal>this.cacheService).headExists(perspectiveId)) {
+      return this.cacheService.getHead(perspectiveId);
+    } else {
+      return this.getHead(perspectiveId);
+    }
   }
 
   async getHead(perspectiveId: string): Promise<string> {
@@ -198,7 +202,8 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
       origin,
       service => service.updateHead(perspectiveId, headId),
       [headId],
-      `Update head of ${perspectiveId}`
+      `Update head of ${perspectiveId}`,
+      perspectiveId
     );
   }
 }

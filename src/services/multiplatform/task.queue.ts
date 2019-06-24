@@ -1,6 +1,7 @@
 export interface Task {
   id?: string;
   task: () => Promise<any>;
+  dependsOn?: string;
 }
 
 export class TaskQueue {
@@ -10,6 +11,7 @@ export class TaskQueue {
 
   tasksIds: { [key: string]: Task } = {};
   queue: Task[] = [];
+  dependenciesQueue: Task[] = [];
 
   constructor(retryEnabled: boolean = true, retryInterval: number = 100) {
     this.retryEnabled = retryEnabled;
@@ -53,7 +55,14 @@ export class TaskQueue {
       this.interval = null;
 
       for (const task of queue) {
-        this.runTask(task);
+        if (
+          task.dependsOn &&
+          queue.find(dependency => dependency.id === task.dependsOn)
+        ) {
+          this.dependenciesQueue.push(task);
+        } else {
+          this.runTask(task);
+        }
       }
     }
   }
@@ -65,6 +74,18 @@ export class TaskQueue {
       // Task succeeded, delete the task from the dictionary
       this.tasksIds[task.id] = null;
       delete this.tasksIds[task.id];
+
+      const dependantTasks = this.dependenciesQueue.filter(
+        dependantTask => dependantTask.dependsOn === task.id
+      );
+      this.dependenciesQueue = this.dependenciesQueue.filter(
+        dependantTask => dependantTask.dependsOn !== task.id
+      );
+
+      this.queue = this.queue.concat(dependantTasks);
+      
+      this.scheduleTasksRun();
+
     } catch (e) {
       if (this.retryEnabled && !navigator.onLine) {
         console.log(`Task failed, retrying when online`, task);

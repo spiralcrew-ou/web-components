@@ -3,7 +3,9 @@ import { Dictionary } from '../../types';
 import { TaskQueue } from './task.queue';
 import { CidCompatible } from '../cid.service';
 
-export class CachedMultiplatform<T extends CidCompatible> extends Multiplatform<T> {
+export class CachedMultiplatform<T extends CidCompatible> extends Multiplatform<
+  T
+> {
   cacheService: T;
 
   taskQueue = new TaskQueue();
@@ -32,17 +34,13 @@ export class CachedMultiplatform<T extends CidCompatible> extends Multiplatform<
     if (cachedObject) {
       return cachedObject;
     }
-    
+
     // If not on cache, discover it
     const object = await discover();
 
     // And store it in cache
-    /** @Guillem, the cloner must know the CidConfig, the discovery service is the only one
-     * who knows it, as it knows the service provider. So discover must return the object and
-     * the CidConfig. This is why I had to change all the interfaces.
-     */
     await cloner(this.cacheService, object);
-    
+
     return object;
   }
 
@@ -118,7 +116,7 @@ export class CachedMultiplatform<T extends CidCompatible> extends Multiplatform<
         );
       } catch (e) {
         // If failed, remove the source from the known sources
-        console.error('[CACHE] creator call failed', e)
+        console.error('[CACHE] creator call failed', e);
         await this.knownSources.removeKnownSource(objectId, serviceProvider);
       }
     };
@@ -136,12 +134,13 @@ export class CachedMultiplatform<T extends CidCompatible> extends Multiplatform<
     serviceProvider: string,
     updater: (service: T) => Promise<void>,
     linksToObjects: string[],
-    taskId: string = null
+    taskId: string = null,
+    dependsOn: string = null
   ): Promise<void> {
     await updater(this.cacheService);
 
     const task = () => this.update(serviceProvider, updater, linksToObjects);
 
-    this.taskQueue.queueTask({ task, id: taskId });
+    this.taskQueue.queueTask({ task, id: taskId, dependsOn: dependsOn });
   }
 }
