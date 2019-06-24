@@ -83,7 +83,7 @@ const mapPerspectiveToBlockRec = (
   };
 
   data.links.map(link => {
-    mapPerspectiveToBlockRec(link.link, tree, perspectiveFull.id);
+    mapPerspectiveToBlockRec(link.link, tree, parentId);
     block.children.push(link.link.id);
   });
 
@@ -147,8 +147,6 @@ export const setContent = (blockId, content) => {
 export const newBlock = (blockId: string, _content: string) => {
   return async (dispatch, getState) => {
 
-    debugger
-    
     const tree = getState().workpad.tree;
     const initNode = tree[blockId];
 
@@ -191,8 +189,6 @@ export const newBlock = (blockId: string, _content: string) => {
 export const setStyle =  (blockId: string, newStyle: NodeType) => {
   return async (dispatch, getState) => {
     
-    debugger
-
     const tree = getState().workpad.tree;
     const block: Block = tree[blockId];
     const parent: Block = tree[block.parentId];
