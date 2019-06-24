@@ -223,7 +223,8 @@ export const setStyle =  (blockId: string, newStyle: NodeType, parentId: string,
           case NodeType.paragraph:
             /** removing in sequence (parallel wont work due to index finding) */
             for (let childIx = 0; childIx < block.children.length; childIx++) {
-              await uprtclData.removePerspective(blockId, childIx);
+              /** remove n times the first element */
+              await uprtclData.removePerspective(blockId, 0);
             }
 
             /** adding in sequence */
@@ -264,7 +265,8 @@ export const setStyle =  (blockId: string, newStyle: NodeType, parentId: string,
 
             /** removing in sequence (parallel wont work due to index finding) */
             for (let sybIx = 0; sybIx < youngerSyblings.length; sybIx++) {
-              await uprtclData.removePerspective(parent.id, sybIx);
+              /** remove n times the next block */
+              await uprtclData.removePerspective(parent.id, index + 1);
             }
             
             /** adding in sequence */
