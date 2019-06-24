@@ -37,12 +37,6 @@ export class COInputChangePerspective {
                     class='ml-2 px-2 w-11/12 my-2 py-2 border-gray-600 border-b' 
                     placeholder='Please, drop a message'>
                 </input>
-                <select onChange={event => this.handleProviderSelected(event)}>
-                    <option value={''}>Default</option>
-                    <option value={'C1'}>CollectiveOne</option>
-                    <option value={'HOLOCHAIN'}>HoloChain</option>
-                    <option value={'IPFS'}>IPFS</option>
-                </select>
             </content>
             <footer class='flex text-red-700 justify-end'>
                 <button class='uppercase m-2 font-thin object-none ' onClick={() => this.showInputChangePerspective.emit(false)}>Cancel</button>

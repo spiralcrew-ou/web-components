@@ -39,12 +39,6 @@ export class COWorkspaceSelector {
                     placeholder='Please, drop a message'>
                 </input>
                 
-                <select onChange={event => this.handleProviderSelected(event)}>
-                    <option value={''}>Default</option>
-                    <option value={'C1'}>CollectiveOne</option>
-                    <option value={'HOLOCHAIN'}>HoloChain</option>
-                    <option value={'IPFS'}>IPFS</option>
-                </select>
                 
             </content>
             <footer class='flex text-red-700 justify-end'>
