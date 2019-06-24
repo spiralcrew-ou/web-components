@@ -41,7 +41,7 @@ export class CONode {
     this.store.mapStateToProps(this,(state) => {
       return {
         tree: state.workpad.tree,
-        rootId: state.workpad.rooId,
+        rootId: state.workpad.rootId,
         block: state.workpad.tree[this.nodeId],
         showMenuOption: !state.menu.isClose
       }
