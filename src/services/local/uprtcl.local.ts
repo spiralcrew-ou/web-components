@@ -132,6 +132,11 @@ export class UprtclLocal extends Dexie implements UprtclService, CidCompatible {
     await this.heads.put(headId, perspectiveId);
   }
 
+  async headExists(perspectiveId: string): Promise<boolean> {
+    const keys = await this.heads.toCollection().primaryKeys();
+    return keys.includes(perspectiveId);
+  }
+
   getHead(perspectiveId: string): Promise<string> {
     return this.heads.get(perspectiveId);
   }
