@@ -344,9 +344,15 @@ export const newPerspective = (
 /**
  * This function open the contextual menu
  */
-export const openMenu = (blockId) => {
+export const openMenu = (blockId: string, parentId: string, index: number) => {
   return (dispatch) => {
-    dispatch({type: 'OPEN_MENU', isClose:false,blockId})
+    dispatch({
+      type: 'OPEN_MENU', 
+      isClose: false, 
+      inBlockData: {
+        blockId, parentId, index
+      }
+    })
   }
 }
        
@@ -370,9 +376,6 @@ export const setSelectedProvider = (selectedProvider: string) => {
   dispatch({type: 'SET_SELECTED_PROVIDER', selectedProvider})
  }
 }
-
-  
-
        
 export const renderingWorkpad = (value: boolean) => {
   return (dispatch) => {

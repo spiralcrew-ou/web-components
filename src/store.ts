@@ -13,7 +13,12 @@ const initialState = {
     isRendering: false
   },
   menu: {
-    isClose: true
+    isClose: true,
+    inBlockData: {
+      blockId: '',
+      parentId: '',
+      index: 0
+    }
   },
   support: {
     availableProviders: [],

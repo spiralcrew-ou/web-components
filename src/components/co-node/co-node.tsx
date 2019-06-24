@@ -63,7 +63,11 @@ export class CONode {
       event.preventDefault();
       event.stopPropagation();
       this.renderingWorkpad(true)
-      this.newBlock(this.nodeId, '');  
+      this.newBlock(
+        this.nodeId, 
+        '', 
+        this.parentId, 
+        this.indexInParent);  
     }
   }
 
@@ -79,33 +83,15 @@ export class CONode {
     }
 
     if(event.key === '/'){
-      this.openMenu(this.nodeId)
+      this.openMenu(this.nodeId, this.parentId, this.indexInParent);
     }
   }
 
-  /*
-  componentDidUpdate() {
-    const element = this._element.shadowRoot.getElementById(this.block.id);
-    if (element) element.innerHTML = this.block.content
-  }*/
-
-
   async updateBlockContent(_event:FocusEvent, _newContent) { 
-    //console.log('entro al update')
     _event.stopPropagation()   
-    //console.log(_newContent, this.block.content)
-    
-    //await this.renderingWorkpad(true)
-    //console.log(_event  )
-    if (_newContent!=this.block.content)
+    if (_newContent != this.block.content)
       await this.setContent(this.block.id, _newContent)
   }
-
-  /*
-  componentWillUpdate() {
-    const element = this._element.shadowRoot.getElementById(this.nodeId);
-    if (element) element.innerHTML = this.block.content;
-  }*/
 
   render() {
     const isDocTitle = this.block.id === this.rootId
