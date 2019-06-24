@@ -294,16 +294,18 @@ export const removeBlock = block => {
  */
 export const commitGlobal = (blockId: string, message: string = '') => {
   return async (dispatch, getState) => {
+
+    debugger
     
-    let provider = getState().support.selectedProvider;
+    let block:Block = getState().workpad.tree[blockId]
+    let provider = block.serviceProvider;
     
-    await uprtclData.commitGlobal(
+    await uprtclData.commit(
       provider,
       blockId,
       message, 
-      new Date().getTime())
-    
-    let block = getState().workpad.tree[blockId];
+      new Date().getTime(),
+      true)
     
     dispatch({ type: 'COMMIT_GLOBAL', block });
     dispatch(reloadTree());

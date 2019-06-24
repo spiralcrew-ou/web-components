@@ -138,92 +138,6 @@ export class UprtclData {
     return textNodeFull;
   }
 
-  /** Recursively creates a new perspective out of an existing perspective
-   * and of all its children, adding a new commit to each parent to
-   * update its links to point to the new perspectives of its children contexts
-   *
-   * @param serviceProvider The service provider in which all the new objects
-   * will be created (new perspectives and commits).
-   *
-   * @param perspectiveId The Id of the root perspective that will be branched.
-   *
-   * @param name The name used for all the new perspectives of the root and the
-   * children.
-   *
-   * @returns The id of the new perspective of the root perspective. */
-  async createGlobalPerspective(
-    serviceProvider: string,
-    perspectiveId: string,
-    name: string
-  ): Promise<string> {
-    /** get perspective and include first level links */
-    const perspective = await this.uprtcl.getPerspective(perspectiveId);
-    const headId = await this.uprtcl.getHead(perspectiveId);
-    const head = headId ? await this.uprtcl.getCommit(headId) : null;
-    const data = head ? await this.data.getData<TextNode>(head.dataId) : null;
-
-    /** global perspectives are created bottom-up in the tree of
-     * perspectives */
-    const links = data ? data.links : [];
-    let newLinks = JSON.parse(JSON.stringify(links));
-
-    for (let i = 0; i < links.length; i++) {
-      const childPerspectiveId = links[i].link;
-
-      /** recursively create a new global perspective of the child */
-      const childNewPerspectiveId = await this.createGlobalPerspective(
-        serviceProvider,
-        childPerspectiveId,
-        name
-      );
-
-      newLinks[i].link = childNewPerspectiveId;
-    }
-
-    /** a new commit is created to point to the new perspectives
-     * of the children that were just created */
-    let newCommitId = headId;
-
-    if (links.length > 0) {
-      let newNode : TextNode = {
-        text: data.text,
-        type: data.type,
-        links: newLinks
-      };
-
-      const newDataId = await this.data.createData<TextNode>(serviceProvider, newNode);
-
-      const commit: Commit = {
-        creatorId: 'anon',
-        dataId: newDataId,
-        message: `creating new global perspective ${name}`,
-        parentsIds: headId ? [headId] : [],
-        timestamp: Date.now()
-      };
-
-      newCommitId = await this.uprtcl.createCommit(serviceProvider, commit);
-    }
-
-    const newPerspective: Perspective = {
-      contextId: perspective.contextId,
-      name: name,
-      creatorId: 'anon',
-      origin: serviceProvider,
-      timestamp: Date.now()
-    };
-
-    const newPerspectiveId = await this.uprtcl.createPerspective(
-      serviceProvider,
-      newPerspective
-    );
-
-    if (newCommitId) {
-      await this.uprtcl.updateHead(newPerspectiveId, newCommitId);
-    }
-
-    return newPerspectiveId;
-  }
-
   /** Creates a new context, perspective, and a draft combo
    *
    * @param serviceProvider The service provider in which all the new objects
@@ -378,9 +292,19 @@ export class UprtclData {
     await this.draft.setDraft(fromPerspectiveId, draft);
   }
 
-  /** Getter function to get or create a draft of/on a given perspective.
+  /** Wrapper to get the head and the data of a perspective
    *
-   * @param serviceProvider The service provider from which the draft is to be retrieved.
+   * @param perspectiveId The parent perspective id.
+   *
+   * @returns The data object.
+   */
+  async getPerspectiveData(perspectiveId: string) {
+    const headId = await this.uprtcl.getHead(perspectiveId);
+    const head = headId ? await this.uprtcl.getCommit(headId) : null;
+    return head ? this.data.getData<TextNode>(head.dataId) : null;
+  }
+
+  /** Getter function to get or create a draft of/on a given perspective.
    *
    * @param perspectiveId The parent perspective id.
    *
@@ -395,9 +319,12 @@ export class UprtclData {
       return draft;
     }
 
+    /** get perspective latest data to initialize the draft */
+    let data = await this.getPerspectiveData(perspectiveId);
+
     await this.draft.setDraft(
       perspectiveId,
-      this.initEmptyTextNode('')
+      data ? data : this.initEmptyTextNode('')
     );
 
     return this.draft.getDraft(perspectiveId);
@@ -424,26 +351,118 @@ export class UprtclData {
     return this.draft.getDraft(perspectiveId);
   }
 
+  /** Recursively creates a new perspective out of an existing perspective
+   * and of all its children, adding a new commit to each parent to
+   * update its links to point to the new perspectives of its children contexts
+   *
+   * @param serviceProvider The service provider in which all the new objects
+   * will be created (new perspectives and commits).
+   *
+   * @param perspectiveId The Id of the root perspective that will be branched.
+   *
+   * @param name The name used for all the new perspectives of the root and the
+   * children.
+   *
+   * @returns The id of the new perspective of the root perspective. */
+  async createGlobalPerspective(
+    serviceProvider: string,
+    perspectiveId: string,
+    name: string
+  ): Promise<string> {
+    /** get perspective and include first level links */
+    const perspective = await this.uprtcl.getPerspective(perspectiveId);
+    const headId = await this.uprtcl.getHead(perspectiveId);
+    const head = headId ? await this.uprtcl.getCommit(headId) : null;
+    const data = head ? await this.data.getData<TextNode>(head.dataId) : null;
+
+    /** global perspectives are created bottom-up in the tree of
+     * perspectives */
+    const links = data ? data.links : [];
+    let newLinks = JSON.parse(JSON.stringify(links));
+
+    for (let i = 0; i < links.length; i++) {
+      const childPerspectiveId = links[i].link;
+
+      /** recursively create a new global perspective of the child */
+      const childNewPerspectiveId = await this.createGlobalPerspective(
+        serviceProvider,
+        childPerspectiveId,
+        name
+      );
+
+      newLinks[i].link = childNewPerspectiveId;
+    }
+
+    /** a new commit is created to point to the new perspectives
+     * of the children that were just created */
+    let newCommitId = headId;
+
+    if (links.length > 0) {
+      let newNode : TextNode = {
+        text: data.text,
+        type: data.type,
+        links: newLinks
+      };
+
+      const newDataId = await this.data.createData<TextNode>(serviceProvider, newNode);
+
+      const commit: Commit = {
+        creatorId: 'anon',
+        dataId: newDataId,
+        message: `creating new global perspective ${name}`,
+        parentsIds: headId ? [headId] : [],
+        timestamp: Date.now()
+      };
+
+      newCommitId = await this.uprtcl.createCommit(serviceProvider, commit);
+    }
+
+    const newPerspective: Perspective = {
+      contextId: perspective.contextId,
+      name: name,
+      creatorId: 'anon',
+      origin: serviceProvider,
+      timestamp: Date.now()
+    };
+
+    const newPerspectiveId = await this.uprtcl.createPerspective(
+      serviceProvider,
+      newPerspective
+    );
+
+    if (newCommitId) {
+      await this.uprtcl.updateHead(newPerspectiveId, newCommitId);
+    }
+
+    return newPerspectiveId;
+  }
+
   /** Commits the current draft as the head of the perspective and sets the draft
    * as null. Do the same, recursively, for all the children perspectives.
    *
-   * @param serviceProvider The service provider in which the data is going to be
+   * @param serviceProvider The service provider in which **the data** is going to be
    * stored.
    *
    * @param perspectiveId The perspective id.
    * 
    * @param message The perspective id.
    */
-  async commitGlobal(
+  async commit(
     serviceProvider: string,
     perspectiveId: string,
     message: string = '',
-    timestamp: number = Date.now()
-  ) {
+    timestamp: number = Date.now(),
+    recurse: boolean = false
+  ) : Promise<void> {
+
+    debugger
     
     const draft = await this.draft.getDraft(perspectiveId);
-
     const dataId = await this.data.createData(serviceProvider, draft);
+    /** delete draft */
+    await this.draft.removeDraft(perspectiveId);
+    /** links */
+    const links = draft.links;
 
     const headId = await this.uprtcl.getHead(perspectiveId);
     const parentsIds = headId ? [headId] : [];
@@ -458,6 +477,15 @@ export class UprtclData {
     const commitId = await this.uprtcl.createCommit(serviceProvider, commit);
 
     await this.uprtcl.updateHead(perspectiveId, commitId);
+
+    /** recursive call */
+    if (recurse) {
+      let createInLinks = links.map((link) => {
+        this.commit(serviceProvider, link.link, message, timestamp, recurse)
+      })
+
+      await Promise.all(createInLinks);
+    }
   }
 }
 
