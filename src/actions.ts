@@ -295,8 +295,6 @@ export const removeBlock = block => {
 export const commitGlobal = (blockId: string, message: string = '') => {
   return async (dispatch, getState) => {
 
-    debugger
-    
     let block:Block = getState().workpad.tree[blockId]
     let provider = block.serviceProvider;
     
