@@ -458,6 +458,10 @@ export class UprtclData {
     debugger
     
     const draft = await this.draft.getDraft(perspectiveId);
+    if (draft == null) {
+      return
+    }
+    
     const dataId = await this.data.createData(serviceProvider, draft);
     /** delete draft */
     await this.draft.removeDraft(perspectiveId);

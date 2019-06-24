@@ -76,7 +76,7 @@ const mapPerspectiveToBlockRec = (
     id: perspectiveFull.id,
     children: [],
     status: hasChanges(perspectiveFull) ? "DRAFT" : "COMMITED",
-    content: data.text,
+    content: data.text ? data.text : '',
     style: NodeType[data.type],
     parentId: parentId,
     serviceProvider: perspectiveFull.origin
