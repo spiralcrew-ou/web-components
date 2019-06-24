@@ -83,7 +83,7 @@ const mapPerspectiveToBlockRec = (
   };
 
   data.links.map(link => {
-    mapPerspectiveToBlockRec(link.link, tree, perspectiveFull.id);
+    mapPerspectiveToBlockRec(link.link, tree, parentId);
     block.children.push(link.link.id);
   });
 
