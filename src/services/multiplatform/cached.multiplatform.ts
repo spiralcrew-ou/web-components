@@ -1,4 +1,4 @@
-import { Multiplatform, DiscoveryProvider, ObjectAndCidConfig } from './multiplatform';
+import { Multiplatform, DiscoveryProvider } from './multiplatform';
 import { Dictionary } from '../../types';
 import { TaskQueue } from './task.queue';
 import { CidCompatible } from '../cid.service';
@@ -24,8 +24,8 @@ export class CachedMultiplatform<T extends CidCompatible> extends Multiplatform<
    */
   protected async cached<O>(
     getter: (service: T) => Promise<O>,
-    discover: () => Promise<ObjectAndCidConfig<O>>,
-    cloner: (service: T, objectAndCidConfig: ObjectAndCidConfig<O>) => Promise<any>
+    discover: () => Promise<O>,
+    cloner: (service: T, object: O) => Promise<any>
   ): Promise<O> {
     // If we have the object already cached, return it
     const cachedObject = await getter(this.cacheService);
@@ -34,16 +34,16 @@ export class CachedMultiplatform<T extends CidCompatible> extends Multiplatform<
     }
     
     // If not on cache, discover it
-    const objectAndCidConfig = await discover();
+    const object = await discover();
 
     // And store it in cache
     /** @Guillem, the cloner must know the CidConfig, the discovery service is the only one
      * who knows it, as it knows the service provider. So discover must return the object and
      * the CidConfig. This is why I had to change all the interfaces.
      */
-    await cloner(this.cacheService, objectAndCidConfig);
+    await cloner(this.cacheService, object);
     
-    return objectAndCidConfig.object;
+    return object;
   }
 
   /**
@@ -52,7 +52,7 @@ export class CachedMultiplatform<T extends CidCompatible> extends Multiplatform<
   protected async cachedDiscover<O>(
     hash: string,
     getter: (service: T) => Promise<O>,
-    cloner: (service: T, objectAndCidConfig: ObjectAndCidConfig<O>) => Promise<any>,
+    cloner: (service: T, object: O) => Promise<any>,
     linksSelector: (object: O) => string[]
   ): Promise<O> {
     if (typeof hash !== 'string' || hash == null) {
@@ -70,30 +70,25 @@ export class CachedMultiplatform<T extends CidCompatible> extends Multiplatform<
    * Try to get the object from the server and cache the result,
    * else return the object from cache
    */
-  /*
-  @ Guillem, remove this for simplicity. When its working we can bring it back to life
-  And of course offline mode is not working now... :( 
   protected async fallback<O>(
-    sourceGetter: () => Promise<ObjectAndCidConfig<O>>,
+    sourceGetter: () => Promise<O>,
     cloner: (service: T, object: O) => Promise<any>,
     cacheGetter: (service: T) => Promise<O>
   ) {
     try {
       // Try to get object from source
-      const objectAndCidConfig = await sourceGetter();
+      const object = await sourceGetter();
 
       // Clone the object into the cache
-      this.cacheService.setCidConfig(objectAndCidConfig.cidConfig);
-      await cloner(this.cacheService, objectAndCidConfig.object);
+      await cloner(this.cacheService, object);
 
       // And return it
-      return objectAndCidConfig.object;
+      return object;
     } catch (e) {
       // Otherwise, return object from cache
       return cacheGetter(this.cacheService);
     }
   }
-  */
 
   /**
    * Creates the object in cache synchronously and

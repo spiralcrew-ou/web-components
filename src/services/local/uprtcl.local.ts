@@ -68,20 +68,35 @@ export class UprtclLocal extends Dexie implements UprtclService, CidCompatible {
   }
 
   async createContext(context: Context): Promise<string> {
-    context.id = await ipldService.generateCidOrdered(
-      context,
-      this.currentConfig,
-      PropertyOrder.Context
-    );
+    if (context.id) {
+      let valid = await ipldService.validateCid(
+        context.id,
+        context,
+        PropertyOrder.Context
+      );
+      if (!valid) {
+        throw new Error(`Invalid cid ${context.id}`);
+      }
+    } else {
+      context.id = await ipldService.generateCidOrdered(
+        context,
+        this.currentConfig,
+        PropertyOrder.Context
+      );
+    }
     return this.contexts.put(context);
   }
 
   async createPerspective(perspective: Perspective): Promise<string> {
     if (perspective.id) {
-      let valid = await ipldService.validateCid(perspective.id, perspective, PropertyOrder.Perspective);
+      let valid = await ipldService.validateCid(
+        perspective.id,
+        perspective,
+        PropertyOrder.Perspective
+      );
       if (!valid) {
         throw new Error(`Invalid cid ${perspective.id}`);
-      } 
+      }
     } else {
       perspective.id = await ipldService.generateCidOrdered(
         perspective,
@@ -89,17 +104,27 @@ export class UprtclLocal extends Dexie implements UprtclService, CidCompatible {
         PropertyOrder.Perspective
       );
     }
-    
+
     return this.perspectives.put(perspective);
   }
 
   async createCommit(commit: Commit): Promise<string> {
-    const commitId = await ipldService.generateCidOrdered(
-      commit,
-      this.currentConfig,
-      PropertyOrder.Commit
-    );
-    commit.id = commitId;
+    if (commit.id) {
+      let valid = await ipldService.validateCid(
+        commit.id,
+        commit,
+        PropertyOrder.Commit
+      );
+      if (!valid) {
+        throw new Error(`Invalid cid ${commit.id}`);
+      }
+    } else {
+      commit.id = await ipldService.generateCidOrdered(
+        commit,
+        this.currentConfig,
+        PropertyOrder.Commit
+      );
+    }
     return this.commits.put(commit);
   }
 
