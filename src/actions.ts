@@ -1,5 +1,5 @@
 import { UprtclData } from "./services/uprtcl-data";
-import { PerspectiveFull, TextNodeFull, TextNode } from "./types";
+import { PerspectiveFull, TextNodeFull } from "./types";
 
 export enum NodeType {
   title = "title",
