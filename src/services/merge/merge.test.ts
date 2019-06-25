@@ -117,11 +117,11 @@ describe('Merge service tests', () => {
     const str2 =
       'first some long sentenca that should be merged carefully and something more';
     const str3 =
-      'i mean some sentence that anonimously be merged carefully and another else';
+      'i mean some sentencb that anonimously be merged carefully and another else';
 
     let result = MergeService.mergeContent(str1, [str2, str3]);
     expect(result).toBe(
-      'first i mean some long sentenca that should anonimously be merged carefully and something more and another else'
+      'first i mean some long sentencab that should anonimously be merged carefully and something more and another else'
     );
   });
 });

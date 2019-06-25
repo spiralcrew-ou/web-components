@@ -146,12 +146,16 @@ export class MergeService {
       if (
         removalIndex !== -1 &&
         diffs.every(
-          (diff, index) => removalIndex === index || diff[0][0] === DiffOp.Equal
+          (diff, index) =>
+            removalIndex === index ||
+            diff[0][0] === DiffOp.Equal ||
+            (diff[0][0] === DiffOp.Delete &&
+              diff[0][1] === diffs[removalIndex][0][1])
         )
       ) {
         // There has been a removal
         let original = diffs[removalIndex][0];
-        diffs.forEach(diff => (diff.shift()));
+        diffs.forEach(diff => diff.shift());
         chars.original.push(original);
         chars.news.forEach(newChars => newChars.push(original));
       } else {
