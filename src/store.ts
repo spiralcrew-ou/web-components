@@ -10,14 +10,16 @@ const initialState = {
     rootId: '',
     tree: {},
     block: {},
-    isRendering: false
+    isRendering: false,
+    perspectiveId: null
   },
   menu: {
     isClose: true,
     inBlockData: {
       blockId: '',
       parentId: '',
-      index: 0
+      index: 0,
+      calledBy: ''
     }
   },
   support: {
@@ -47,7 +49,16 @@ export const workpadReducer = (state = { ...initialState.workpad }, action) => {
     case 'MERGE':
       return {...state,...action}
     case 'RENDERING_WORKPAD':
+      return {...state,...action}
+    case 'PERSPECTIVE_TO_COMMIT':
+      return {...state,...action}
+    case 'PERSPECTIVE_TO_CREATE':
+      return {...state,...action}
+    case 'PERSPECTIVE_TO_CHANGE':
+      return {...state,...action}
+    case 'PERSPECTIVE_TO_MERGE':
         return {...state,...action}
+
     default:
       return state
   }

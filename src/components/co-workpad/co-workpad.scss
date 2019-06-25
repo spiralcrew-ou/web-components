@@ -14,3 +14,15 @@
 button:focus{
     outline: none;
 }
+
+header {
+    display: grid;
+    grid-template-columns: 95% 5%
+}
+
+header div:first-child {
+    margin: auto
+}
+header div:nth-child(2n) {
+    margin: auto;
+}

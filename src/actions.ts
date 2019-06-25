@@ -334,13 +334,13 @@ export const newPerspective = (
 /**
  * This function open the contextual menu
  */
-export const openMenu = (blockId: string, parentId: string, index: number) => {
+export const openMenu = (blockId: string, parentId: string, index: number, calledBy: string) => {
   return (dispatch) => {
     dispatch({
       type: 'OPEN_MENU', 
       isClose: false, 
       inBlockData: {
-        blockId, parentId, index
+        blockId, parentId, index, calledBy
       }
     })
   }
@@ -352,6 +352,30 @@ export const openMenu = (blockId: string, parentId: string, index: number) => {
 export const closeMenu = () => {
   return (dispatch) => {
     dispatch({ type: 'CLOSE_MENU', isClose:true})   
+  }
+}
+
+export const perspectiveToCommit = (perspectiveId) => {
+  return dispatch => {
+    dispatch({type: 'PERSPECTIVE_TO_CREATE',perspectiveId: perspectiveId})
+  }
+}
+
+export const perspectiveToCreate = (perspectiveOriginId: string) => {
+  return dispatch => {
+    dispatch({type: 'PERSPECTIVE_TO_CREATE',perspectiveId: perspectiveOriginId})
+  }
+}
+
+export const perspectiveToChange = (perspectiveOriginId:string) => {
+  return dispatch => {
+    dispatch({type: 'PERSPECTIVE_TO_CHANGE',perspectiveId:perspectiveOriginId })
+  }
+}
+
+export const perspectiveToMerge = (perspectiveOriginId:string) => {
+  return dispatch => {
+    dispatch({type: 'PERSPECTIVE_TO_MERGE',perspectiveId:perspectiveOriginId })
   }
 }
 

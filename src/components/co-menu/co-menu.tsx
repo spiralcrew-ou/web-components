@@ -1,6 +1,16 @@
-import { Component, Element, Prop, State } from '@stencil/core';
+import { Component, Element, Prop, State, Event, EventEmitter } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
-import { setStyle, closeMenu, Block, renderingWorkpad, NodeType } from '../../actions';
+import { 
+  setStyle, 
+  renderingWorkpad, 
+  NodeType, 
+  Block,
+  perspectiveToCreate, 
+  perspectiveToCommit,
+  perspectiveToChange,
+  perspectiveToMerge } from '../../actions';
+
+import Popper from 'popper.js'
 
 @Component({
   tag: 'co-menu',
@@ -10,36 +20,70 @@ import { setStyle, closeMenu, Block, renderingWorkpad, NodeType } from '../../ac
 export class COMenu {
   @Element() _element: HTMLElement;
   @Prop({ context: 'store' }) store: Store;
-  @State() block: Block;
-  @State() parentId;
+
+  @Prop() reference: string 
+  @State() parentId: string
   @State() index;
+  @State() block: Block
+  @State() calledBy: string
+  @State() isClose: boolean = false
+
+  @Event({ eventName: 'showInputCommit', bubbles: true }) showInputCommit: EventEmitter
+
 
   setStyle: Action
-  closeMenu: Action
+
   renderingWorkpad: Action
+  perspectiveToCreate: Action
+  perspectiveToCommit: Action
+  perspectiveToChange: Action
+  perspectiveToMerge: Action
 
   componentWillLoad() {
     this.store.mapDispatchToProps(this, {
       setStyle,
-      closeMenu,
-      renderingWorkpad
+      renderingWorkpad,
+      perspectiveToCreate, 
+      perspectiveToCommit,
+      perspectiveToChange,
+      perspectiveToMerge
     })
-    this.store.mapStateToProps(this,(state) => {
+
+    this.store.mapStateToProps(this, state => {
       return {
-        block: state.workpad.tree[state.menu.inBlockData.blockId],
-        parentId: state.menu.inBlockData.parentId,
-        index: state.menu.inBlockData.index,
+        block: state.workpad.tree[this.reference]
       }
     })
   }
 
+ 
+
+  open() {
+    const menu = this._element.shadowRoot.getElementById(`${this.block.id}`) as any
+    const caller = this._element.shadowRoot.getElementById(`caller${this.block.id}`)
+    menu.style.display = 'block'
+    new Popper(caller, menu, {
+      placement: 'auto'
+    })
+
+  }
+
+  close() { 
+    const menu =  this._element.shadowRoot.getElementById(this.block.id) as any
+    menu.style.display = 'none'
+  } 
+
+
   setBlockStyle(newStyle: NodeType) {
     this.setStyle(this.block.id, newStyle, this.parentId, this.index)
-    this.closeMenu()
+    this.close()
   }
 
   render() {
-    return <div class='container m-4 w-1/4 border-2 shadow-md p-2 rounded-lg font-thin z-10 fixed bg-white' >
+    
+    return (
+    <div>
+    <div id={this.block.id} class='hidden container m-4 w-auto border-2 shadow-md p-2 rounded-lg font-thin z-10 bg-white'>
       <div class='row'>
       <div class= 'block my-2 pl-2' onClick={ () => {
         this.setBlockStyle(NodeType.title)
@@ -48,7 +92,15 @@ export class COMenu {
       <div  class= 'block my-2 pl-2 '  onClick={ () => {
         this.setBlockStyle(NodeType.paragraph)
       }}>this is a paragraph</div>
-
+      <div onClick={() => this.close()}>{this.reference}</div>
+      <div onClick={() => {
+        this.perspectiveToCommit(this.block.id)
+        this.showInputCommit.emit(true)
+        this.close()
+      }}> Commit</div>
     </div>
+    <img id={`caller${this.reference}`} onClick= {() => this.open()} class='w-6 h-6' src='../../assets/img/menu.svg'></img>
+    </div> 
+    )
   }
 }

@@ -3,6 +3,7 @@ import {
 } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
 import { newBlock, removeBlock, reloadTree, setContent, openMenu, Block, renderingWorkpad } from '../../actions';
+// import Popper from 'popper.js';
 
 @Component({
   tag: 'co-node',
@@ -18,10 +19,10 @@ export class CONode {
   @Prop() indexInParent: number;
 
   @State() block : Block;
-  @State() showMenuOption: boolean;
   @State() isFocused: boolean = false;
   @Event({ eventName: 'isRunning', bubbles: true }) isRunning: EventEmitter
   
+
   rootId; 
   emptyOnce = false;
   
@@ -31,6 +32,7 @@ export class CONode {
   setContent: Action
   openMenu: Action
   renderingWorkpad: Action
+ 
 
   componentWillLoad() {
     this.store.mapDispatchToProps(this, {
@@ -45,10 +47,10 @@ export class CONode {
       return {
         tree: state.workpad.tree,
         rootId: state.workpad.rootId,
-        block: state.workpad.tree[this.nodeId],
-        showMenuOption: !state.menu.isClose
+        block: state.workpad.tree[this.nodeId]
       }
     })
+
   }
 
   componentDidLoad() {
@@ -100,6 +102,9 @@ export class CONode {
     }
   }
 
+  
+
+
   render() {
     const isDocTitle = this.block.id === this.rootId
     const blockClasses = 'text-gray-800 p-2 leading-relaxed'
@@ -117,18 +122,23 @@ export class CONode {
 
     const containerClasses = [focusClasses, 'container'].join(" ")
 
-    const contentBlock = <div 
-                          onBlur={event => {
-                            this.isFocused = false;
-                            this.updateBlockContent(event,event['path'][0].innerText)
-                          }}
-                          onFocus={() => {this.isFocused = true}}
-                          class= {classes} 
-                          data-placeholder = {'More options, press "/" '}
-                          id={this.nodeId} 
-                          contentEditable>
-                          {this.block.content}
-                        </div>
+    const contentBlock = <div class='row'>
+                            <div 
+                              onBlur={event => {
+                                this.isFocused = false;
+                                this.updateBlockContent(event,event['path'][0].innerText)
+                              }}
+                              onFocus={() => {this.isFocused = true}}
+                              class= {classes} 
+                              data-placeholder = {'More options, press "/" '}
+                              id={this.nodeId} 
+                              contentEditable>
+                              {this.block.content}
+                            </div>
+                            
+                            <co-menu  class={this.nodeId}  reference={this.nodeId} node-id={this.nodeId} >
+                            </co-menu>
+                          </div>
     
 
     return ( 

@@ -13,3 +13,8 @@
 * {
     font-family: 'Open Sans', sans-serif;
 }
+
+.row {
+  display: grid;
+  grid-template-columns: 95% 5%;
+}
