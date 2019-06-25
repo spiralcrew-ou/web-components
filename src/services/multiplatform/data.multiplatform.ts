@@ -15,7 +15,7 @@ export class DataMultiplatform extends CachedMultiplatform<DataService> {
     return this.cachedDiscover(
       dataId,
       service => service.getData(dataId),
-      (service, data) => service.createData(data),
+      (service, data) => service.createData({...data, id: dataId}),
       this.linksFromTextNode
     );
   }
@@ -24,6 +24,8 @@ export class DataMultiplatform extends CachedMultiplatform<DataService> {
     this.cacheService.setCidConfig(
       this.serviceProviders[serviceProvider].service.getCidConfig()
     );
+    /** prevent old ids conflicts */
+    delete data['id'];
     return this.optimisticCreate(
       serviceProvider,
       data,

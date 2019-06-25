@@ -9,6 +9,7 @@ import {
   Commit
 } from './../types';
 import { NodeType } from './../actions';
+import { MergeService } from './merge/merge.service';
 
 export class UprtclData {
   uprtcl = uprtclMultiplatform;
@@ -16,18 +17,17 @@ export class UprtclData {
   draft = draftService;
 
   /** Single point to initialize empty text nodes
-   * 
+   *
    * @param _content Text used to initialize the text node
-    */
-  public initEmptyTextNode(_content: string) :TextNode {
+   */
+  public initEmptyTextNode(_content: string): TextNode {
     return {
-      text: _content, 
-      type: 'paragraph', 
+      text: _content,
+      type: 'paragraph',
       links: []
-    }
+    };
   }
 
-  
   /** Gets a PerspectiveFull object with the head, context and draft objects nested.
    * It may recurse if the head commit or the draft have a TextNode with links, getting
    * their content as PerspectiveFull recursively.
@@ -43,11 +43,8 @@ export class UprtclData {
     perspectiveId: string,
     levels: number
   ): Promise<PerspectiveFull> {
-    
     const perspective = await this.uprtcl.getPerspective(perspectiveId);
-    const context = await this.uprtcl.getContext(
-      perspective.contextId
-    );
+    const context = await this.uprtcl.getContext(perspective.contextId);
     /** plain data */
     const perspectiveFull = new PerspectiveFull();
     perspectiveFull.id = perspective.id;
@@ -58,12 +55,12 @@ export class UprtclData {
     perspectiveFull.name = perspective.name;
 
     /** additional data */
-    const draft = await this.draft.getDraft(perspectiveId);
+    const draft = await this.getDraft(perspectiveId);
     perspectiveFull.draft = await this.getTextNodeFull(draft, levels);
 
     const headId = await this.uprtcl.getCachedHead(perspectiveId);
     perspectiveFull.head = await this.getCommitFull(headId, levels);
-    
+
     return perspectiveFull;
   }
 
@@ -109,7 +106,6 @@ export class UprtclData {
     textNode: TextNode,
     levels: number
   ): Promise<TextNodeFull> {
-
     if (textNode == null) return null;
 
     const textNodeFull = new TextNodeFull();
@@ -188,10 +184,7 @@ export class UprtclData {
       perspective
     );
 
-    await this.draft.setDraft(
-      perspectiveId,
-      this.initEmptyTextNode(content)
-    );
+    await this.setDraft(perspectiveId, this.initEmptyTextNode(content));
 
     return perspectiveId;
   }
@@ -219,11 +212,7 @@ export class UprtclData {
     content: string
   ): Promise<string> {
     const newPerspectiveId = await this.initContext(serviceProvider, content);
-    await this.insertPerspective(
-      perspectiveId,
-      newPerspectiveId,
-      index
-    );
+    await this.insertPerspective(perspectiveId, newPerspectiveId, index);
     return newPerspectiveId;
   }
 
@@ -246,7 +235,6 @@ export class UprtclData {
     perspectiveId: string,
     index: number
   ): Promise<void> {
-
     let draft = await this.getOrCreateDraft(onPerspectiveId);
 
     if (index != -1) {
@@ -260,7 +248,7 @@ export class UprtclData {
       draft.links.push({ link: perspectiveId });
     }
 
-    await this.draft.setDraft(onPerspectiveId, draft);
+    await this.setDraft(onPerspectiveId, draft);
 
     return;
   }
@@ -285,7 +273,7 @@ export class UprtclData {
     draft.links.splice(index, 1);
 
     /* udpate draft without the link */
-    await this.draft.setDraft(fromPerspectiveId, draft);
+    await this.setDraft(fromPerspectiveId, draft);
   }
 
   /** Wrapper to get the head and the data of a perspective
@@ -306,10 +294,8 @@ export class UprtclData {
    *
    * @returns The draft object.
    */
-  async getOrCreateDraft(
-    perspectiveId: string
-  ): Promise<TextNode> {
-    let draft = await this.draft.getDraft(perspectiveId);
+  async getOrCreateDraft(perspectiveId: string): Promise<TextNode> {
+    let draft = await this.getDraft(perspectiveId);
 
     if (draft != null) {
       return draft;
@@ -318,33 +304,30 @@ export class UprtclData {
     /** get perspective latest data to initialize the draft */
     let data = await this.getPerspectiveData(perspectiveId);
 
-    await this.draft.setDraft(
+    await this.setDraft(
       perspectiveId,
       data ? data : this.initEmptyTextNode('')
     );
 
-    return this.draft.getDraft(perspectiveId);
+    return this.getDraft(perspectiveId);
   }
 
-   /** A simple function to safely update the text of a draft without
+  /** A simple function to safely update the text of a draft without
    * risking to change its type or links.
    *
    * @param perspectiveId The perspective id.
-   * 
+   *
    * @param text The new text.
    *
    * @returns The draft object.
    */
-  async setDraftText(
-    perspectiveId: string,
-    _text: string
-  ): Promise<TextNode> {
+  async setDraftText(perspectiveId: string, _text: string): Promise<TextNode> {
     let draft = await this.getOrCreateDraft(perspectiveId);
 
     draft.text = _text;
 
-    await this.draft.setDraft(perspectiveId, draft);
-    return this.draft.getDraft(perspectiveId);
+    await this.setDraft(perspectiveId, draft);
+    return this.getDraft(perspectiveId);
   }
 
   /** A simple function to safely update the type of a draft without
@@ -364,8 +347,8 @@ export class UprtclData {
 
     draft.type = _type;
 
-    await this.draft.setDraft(perspectiveId, draft);
-    return this.draft.getDraft(perspectiveId);
+    await this.setDraft(perspectiveId, draft);
+    return this.getDraft(perspectiveId);
   }
 
   
@@ -417,13 +400,16 @@ export class UprtclData {
     let newCommitId = headId;
 
     if (links.length > 0) {
-      let newNode : TextNode = {
+      let newNode: TextNode = {
         text: data.text,
         type: data.type,
         links: newLinks
       };
 
-      const newDataId = await this.data.createData<TextNode>(serviceProvider, newNode);
+      const newDataId = await this.data.createData<TextNode>(
+        serviceProvider,
+        newNode
+      );
 
       const commit: Commit = {
         creatorId: 'anon',
@@ -463,7 +449,7 @@ export class UprtclData {
    * stored.
    *
    * @param perspectiveId The perspective id.
-   * 
+   *
    * @param message The perspective id.
    */
   async commit(
@@ -472,18 +458,37 @@ export class UprtclData {
     message: string = '',
     timestamp: number = Date.now(),
     recurse: boolean = false
-  ) : Promise<void> {
-
-    const draft = await this.draft.getDraft(perspectiveId);
-    if (draft == null) {
+  ): Promise<void> {
+    
+    let draft = await this.getDraft(perspectiveId);
+    
+    /** recursion logic depends on draft or data */
+    let applicableData = draft;
+    if (applicableData == null) {
+      applicableData = await this.getPerspectiveData(perspectiveId)
+    }
+    if (applicableData == null) {
       return
     }
+
+    /** recursive call (start bottom up)*/
+    if (recurse) {
+      let createInLinks = applicableData.links.map(link => {
+        this.commit(serviceProvider, link.link, message, timestamp, recurse);
+      });
+
+      await Promise.all(createInLinks);
+    }
     
+    /** this perspective commit is done if draft is not null */
+    
+    if (!draft) {
+      return
+    }
+
     const dataId = await this.data.createData(serviceProvider, draft);
     /** delete draft */
     await this.draft.removeDraft(perspectiveId);
-    /** links */
-    const links = draft.links;
 
     const headId = await this.uprtcl.getHead(perspectiveId);
     const parentsIds = headId ? [headId] : [];
@@ -498,14 +503,37 @@ export class UprtclData {
     const commitId = await this.uprtcl.createCommit(serviceProvider, commit);
 
     await this.uprtcl.updateHead(perspectiveId, commitId);
+  }
 
-    /** recursive call */
-    if (recurse) {
-      let createInLinks = links.map((link) => {
-        this.commit(serviceProvider, link.link, message, timestamp, recurse)
-      })
+  public async getDraft(perspectiveId: string): Promise<TextNode> {
+    const draft = await this.draft.getDraft(perspectiveId);
+    return draft ? draft.draft : null;
+  }
 
-      await Promise.all(createInLinks);
+  public async setDraft(perspectiveId: string, draft: TextNode): Promise<void> {
+    const headId = await this.uprtcl.getCachedHead(perspectiveId);
+
+    const commitDraft = {
+      commitId: headId,
+      draft: draft
+    };
+
+    await this.draft.setDraft(perspectiveId, commitDraft);
+  }
+
+  public async pull(perspectiveId: string): Promise<any> {
+    const draftCommit = await this.draft.getDraft(perspectiveId);
+
+    const headId = await uprtclMultiplatform.getHead(perspectiveId);
+
+    if (headId !== draftCommit.commitId) {
+      const commit = await this.uprtcl.getCommit(headId);
+      const newData = await this.data.getData<TextNode>(commit.dataId);
+      const newDraft = MergeService.mergeData(newData, [draftCommit.draft]);
+
+      await this.draft.setDraft(perspectiveId, { commitId: headId, draft: newDraft });
+
+      await Promise.all(newDraft.links.map(link => this.pull(link.link)));
     }
   }
 }

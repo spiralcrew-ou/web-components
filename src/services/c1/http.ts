@@ -41,7 +41,7 @@ export class Http {
   }
 
   async putOrPost(url: string, _body: any, _method: string): Promise<string> {
-    // console.log('[HTTP POST] ', url, _body, _method);
+    console.log('[HTTP POST] ', url, _body, _method);
     return fetch(this.baseUrl + url, {
       method: _method,
       headers: {
@@ -58,7 +58,7 @@ export class Http {
         return response.json() as Promise<PostResult>;
       })
       .then(result => {
-        // console.log('[HTTP POST RESULT] ', url, _body, _method, result);
+        console.log('[HTTP POST RESULT] ', url, _body, _method, result);
         if (result.elementIds != null) {
           return result.elementIds[0];
         }

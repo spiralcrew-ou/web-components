@@ -15,9 +15,6 @@ import {
 
 export namespace Components {
 
-  interface CoEditor {}
-  interface CoEditorAttributes extends StencilHTMLAttributes {}
-
   interface CoInputChangePerspective {}
   interface CoInputChangePerspectiveAttributes extends StencilHTMLAttributes {
     'onShowInputChangePerspective'?: (event: CustomEvent) => void;
@@ -109,20 +106,6 @@ export namespace Components {
     'text'?: string;
   }
 
-  interface TextNode {
-    'createCommit': () => Promise<any[]>;
-    'createPerspective': (serviceProvider: string, name: string) => Promise<void>;
-    'defaultService': string;
-    'isRootNode': boolean;
-    'perspectiveId': string;
-  }
-  interface TextNodeAttributes extends StencilHTMLAttributes {
-    'defaultService'?: string;
-    'isRootNode'?: boolean;
-    'onCreateSibling'?: (event: CustomEvent) => void;
-    'perspectiveId'?: string;
-  }
-
   interface UprtclToolbar {
     'defaultService': string;
     'perspective': Perspective;
@@ -141,7 +124,6 @@ export namespace Components {
 
 declare global {
   interface StencilElementInterfaces {
-    'CoEditor': Components.CoEditor;
     'CoInputChangePerspective': Components.CoInputChangePerspective;
     'CoInputCommit': Components.CoInputCommit;
     'CoInputMerge': Components.CoInputMerge;
@@ -155,12 +137,10 @@ declare global {
     'CoWorkspaceSelector': Components.CoWorkspaceSelector;
     'CoWorkspace': Components.CoWorkspace;
     'TextBlock': Components.TextBlock;
-    'TextNode': Components.TextNode;
     'UprtclToolbar': Components.UprtclToolbar;
   }
 
   interface StencilIntrinsicElements {
-    'co-editor': Components.CoEditorAttributes;
     'co-input-change-perspective': Components.CoInputChangePerspectiveAttributes;
     'co-input-commit': Components.CoInputCommitAttributes;
     'co-input-merge': Components.CoInputMergeAttributes;
@@ -174,16 +154,9 @@ declare global {
     'co-workspace-selector': Components.CoWorkspaceSelectorAttributes;
     'co-workspace': Components.CoWorkspaceAttributes;
     'text-block': Components.TextBlockAttributes;
-    'text-node': Components.TextNodeAttributes;
     'uprtcl-toolbar': Components.UprtclToolbarAttributes;
   }
 
-
-  interface HTMLCoEditorElement extends Components.CoEditor, HTMLStencilElement {}
-  var HTMLCoEditorElement: {
-    prototype: HTMLCoEditorElement;
-    new (): HTMLCoEditorElement;
-  };
 
   interface HTMLCoInputChangePerspectiveElement extends Components.CoInputChangePerspective, HTMLStencilElement {}
   var HTMLCoInputChangePerspectiveElement: {
@@ -263,12 +236,6 @@ declare global {
     new (): HTMLTextBlockElement;
   };
 
-  interface HTMLTextNodeElement extends Components.TextNode, HTMLStencilElement {}
-  var HTMLTextNodeElement: {
-    prototype: HTMLTextNodeElement;
-    new (): HTMLTextNodeElement;
-  };
-
   interface HTMLUprtclToolbarElement extends Components.UprtclToolbar, HTMLStencilElement {}
   var HTMLUprtclToolbarElement: {
     prototype: HTMLUprtclToolbarElement;
@@ -276,7 +243,6 @@ declare global {
   };
 
   interface HTMLElementTagNameMap {
-    'co-editor': HTMLCoEditorElement
     'co-input-change-perspective': HTMLCoInputChangePerspectiveElement
     'co-input-commit': HTMLCoInputCommitElement
     'co-input-merge': HTMLCoInputMergeElement
@@ -290,12 +256,10 @@ declare global {
     'co-workspace-selector': HTMLCoWorkspaceSelectorElement
     'co-workspace': HTMLCoWorkspaceElement
     'text-block': HTMLTextBlockElement
-    'text-node': HTMLTextNodeElement
     'uprtcl-toolbar': HTMLUprtclToolbarElement
   }
 
   interface ElementTagNameMap {
-    'co-editor': HTMLCoEditorElement;
     'co-input-change-perspective': HTMLCoInputChangePerspectiveElement;
     'co-input-commit': HTMLCoInputCommitElement;
     'co-input-merge': HTMLCoInputMergeElement;
@@ -309,7 +273,6 @@ declare global {
     'co-workspace-selector': HTMLCoWorkspaceSelectorElement;
     'co-workspace': HTMLCoWorkspaceElement;
     'text-block': HTMLTextBlockElement;
-    'text-node': HTMLTextNodeElement;
     'uprtcl-toolbar': HTMLUprtclToolbarElement;
   }
 

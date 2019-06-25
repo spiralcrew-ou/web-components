@@ -2,62 +2,65 @@ import { TextNode } from '../../types';
 import { Commit } from '../local/db.objects';
 import { UprtclService } from '../uprtcl.service';
 import { DataService } from '../data.service';
-// import { DiffMatchPatch } from 'diff-match-patch-ts';
+import { Diff, DiffMatchPatch, DiffOp } from 'diff-match-patch-ts';
 
 import * as _ from 'lodash';
 import findMostRecentCommonAncestor from './common.ancestor';
+
+const diff = new DiffMatchPatch();
+
 export class MergeService {
-  static mergePerspectives(
-    uprtcl: UprtclService,
-    data: DataService
-  ): (
-    toPerspectiveId: string,
-    fromPerspectivesIds: string[]
-  ) => Promise<string> {
-    return async (toPerspectiveId: string, fromPerspectivesIds: string[]) => {
-      const commitsIds = [toPerspectiveId, ...fromPerspectivesIds].map(id =>
-        uprtcl.getHead(id)
-      );
+  uprtcl: UprtclService;
+  data: DataService;
 
-      const headsIds = await Promise.all(commitsIds);
-
-      const mergeCommitId = await this.mergeCommits(uprtcl, data)(headsIds);
-
-      await uprtcl.updateHead(toPerspectiveId, mergeCommitId);
-
-      return mergeCommitId;
-    };
+  constructor(uprtcl: UprtclService, data: DataService) {
+    this.uprtcl = uprtcl;
+    this.data = data;
   }
 
-  static mergeCommits(
-    uprtcl: UprtclService,
-    data: DataService
-  ): (commitsIds: string[]) => Promise<string> {
-    return async (commitsIds: string[]) => {
-      const ancestorId = await findMostRecentCommonAncestor(uprtcl)(commitsIds);
-      const ancestor = await uprtcl.getCommit(ancestorId);
+  async mergePerspectives(
+    toPerspectiveId: string,
+    fromPerspectivesIds: string[]
+  ): Promise<string> {
+    const commitsIds = [toPerspectiveId, ...fromPerspectivesIds].map(id =>
+      this.uprtcl.getHead(id)
+    );
 
-      const originalData: TextNode = await data.getData(ancestor.dataId);
-      const datasPromises = commitsIds.map(id =>
-        uprtcl.getCommit(id).then(commit => data.getData(commit.dataId))
-      );
+    const headsIds = await Promise.all(commitsIds);
 
-      const newDatas: TextNode[] = await Promise.all(datasPromises);
+    const mergeCommitId = await this.mergeCommits(headsIds);
 
-      const newData = await this.mergeData(originalData, newDatas);
+    await this.uprtcl.updateHead(toPerspectiveId, mergeCommitId);
 
-      const newDataId = await data.createData(newData);
+    return mergeCommitId;
+  }
 
-      const mergeCommit: Commit = {
-        creatorId: 'anon',
-        dataId: newDataId,
-        parentsIds: commitsIds,
-        message: 'merge commits',
-        timestamp: Date.now()
-      };
+  async mergeCommits(commitsIds: string[]): Promise<string> {
+    const ancestorId = await findMostRecentCommonAncestor(this.uprtcl)(
+      commitsIds
+    );
+    const ancestor = await this.uprtcl.getCommit(ancestorId);
 
-      return uprtcl.createCommit(mergeCommit);
+    const originalData: TextNode = await this.data.getData(ancestor.dataId);
+    const datasPromises = commitsIds.map(id =>
+      this.uprtcl.getCommit(id).then(commit => this.data.getData(commit.dataId))
+    );
+
+    const newDatas: TextNode[] = await Promise.all(datasPromises);
+
+    const newData = await MergeService.mergeData(originalData, newDatas);
+
+    const newDataId = await this.data.createData(newData);
+
+    const mergeCommit: Commit = {
+      creatorId: 'anon',
+      dataId: newDataId,
+      parentsIds: commitsIds,
+      message: 'merge commits',
+      timestamp: Date.now()
     };
+
+    return this.uprtcl.createCommit(mergeCommit);
   }
 
   static mergeLinks(
@@ -107,7 +110,7 @@ export class MergeService {
   }
 
   static mergeData(originalData: TextNode, newDatas: TextNode[]): TextNode {
-    const resultText = this.mergeResult(
+    const resultText = this.mergeContent(
       originalData.text,
       newDatas.map(data => data.text)
     );
@@ -129,12 +132,90 @@ export class MergeService {
       type: resultType
     };
   }
-/* 
-  static mergeContent(str1: string, str2: string) {
-    const diff = new DiffMatchPatch();
-    diff.
-    return diff.diff_main(str1, str2);
-  } */
+
+  static alignDiffs(diffs: Diff[][]): { original: Diff[]; news: Diff[][] } {
+    const chars = {
+      original: [],
+      news: diffs.map(() => [])
+    };
+
+    while (!diffs.every(diff => diff.length === 0)) {
+      const removalIndex = diffs.findIndex(
+        diff => diff.length > 0 && diff[0][0] === DiffOp.Delete
+      );
+      if (
+        removalIndex !== -1 &&
+        diffs.every(
+          (diff, index) =>
+            removalIndex === index ||
+            diff[0][0] === DiffOp.Equal ||
+            (diff[0][0] === DiffOp.Delete &&
+              diff[0][1] === diffs[removalIndex][0][1])
+        )
+      ) {
+        // There has been a removal
+        let original = diffs[removalIndex][0];
+        diffs.forEach(diff => diff.shift());
+        chars.original.push(original);
+        chars.news.forEach(newChars => newChars.push(original));
+      } else {
+        const changeIndex = diffs.findIndex(
+          diff => diff.length > 0 && diff[0][0] !== DiffOp.Equal
+        );
+        if (changeIndex !== -1) {
+          const change = diffs[changeIndex].shift();
+          chars.original.push(null);
+          for (let i = 0; i < diffs.length; i++) {
+            if (changeIndex === i) {
+              chars.news[i].push(change);
+            } else {
+              chars.news[i].push(null);
+            }
+          }
+        } else {
+          let original = null;
+          diffs.forEach(diff => (original = diff.shift()));
+          chars.original.push(original);
+          chars.news.forEach(newChars => newChars.push(original));
+        }
+      }
+    }
+
+    return chars;
+  }
+
+  static mergeContent(originalString: string, newStrings: string[]) {
+    const diffs = newStrings.map(newString =>
+      MergeService.char_diff(originalString, newString)
+    );
+
+    const alignedDiffs = this.alignDiffs(diffs);
+    let mergeDiffs: Diff[] = [];
+    for (let i = 0; i < alignedDiffs.original.length; i++) {
+      const mergeDiff = this.mergeResult(
+        alignedDiffs.original[i],
+        alignedDiffs.news.map(newChar => newChar[i])
+      );
+      mergeDiffs.push(mergeDiff);
+    }
+
+    const patches = diff.patch_make(originalString, mergeDiffs, undefined);
+    return diff.patch_apply(patches, originalString)[0];
+  }
+
+  static toChars(diffs: Diff[]): Diff[] {
+    let result: Diff[] = [];
+    for (const diff of diffs) {
+      const charDiff = diff[1].split('').map(word => <Diff>[diff[0], word]);
+      result = result.concat(charDiff);
+    }
+    return result;
+  }
+
+  static char_diff(str1: string, str2: string): Diff[] {
+    const diffs = diff.diff_main(str1, str2);
+    return this.toChars(diffs);
+  }
 
   static mergeResult<T>(original: T, modifications: Array<T>): T {
     const changes = modifications.filter(
