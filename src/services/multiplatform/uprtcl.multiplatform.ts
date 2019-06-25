@@ -13,7 +13,16 @@ import { ipldService } from '../ipld';
 
 const currentAuthorId = 'textsdf:02';
 
-export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
+export class UprtclMultiplatform extends CachedMultiplatform<UprtclService>
+  implements UprtclService {
+
+  getCidConfig(): import("../cid.config").CidConfig {
+    throw new Error('Method not implemented.');
+  }
+  setCidConfig(_cidConfig: import("../cid.config").CidConfig): void {
+    throw new Error('Method not implemented.');
+  }
+
   linksFromPerspective(perspective: Perspective) {
     return [perspective.contextId];
   }
@@ -22,13 +31,17 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
     return [commit.dataId, ...commit.parentsIds];
   }
 
+  defaultService: string;
+
   constructor(
     serviceProviders: Dictionary<{
       service: UprtclService;
       discovery: DiscoveryService;
-    }>
+    }>,
+    defaultService: string
   ) {
     super(serviceProviders, new UprtclLocal());
+    this.defaultService = defaultService;
   }
 
   /** The multiplatform service is the one who knows the current author DID */
@@ -48,7 +61,7 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
     );
 
     /** Force the root context object to exist in the service provider */
-    let rootContextId1 = await this.createContext(serviceProvider, userContext);
+    let rootContextId1 = await this.createContextIn(serviceProvider, userContext);
 
     if (rootContextId !== rootContextId1) {
       throw new Error(
@@ -124,7 +137,11 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
     );
   }
 
-  createContext(serviceProvider: string, context: Context): Promise<string> {
+  createContext(context: Context): Promise<string> {
+    return this.createContextIn(this.defaultService, context);
+  }
+
+  createContextIn(serviceProvider: string, context: Context): Promise<string> {
     this.cacheService.setCidConfig(
       this.serviceProviders[serviceProvider].service.getCidConfig()
     );
@@ -136,7 +153,11 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
     );
   }
 
-  async createPerspective(
+  async createPerspective(perspective: Perspective): Promise<string> {
+    return this.createPerspectiveIn(this.defaultService, perspective);
+  }
+
+  async createPerspectiveIn(
     serviceProvider: string,
     perspective: Perspective
   ): Promise<string> {
@@ -166,7 +187,11 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
     );
   }
 
-  createCommit(serviceProvider: string, commit: Commit): Promise<string> {
+  createCommit(commit: Commit): Promise<string> {
+    return this.createCommitIn(this.defaultService, commit);
+  }
+
+  createCommitIn(serviceProvider: string, commit: Commit): Promise<string> {
     this.cacheService.setCidConfig(
       this.serviceProviders[serviceProvider].service.getCidConfig()
     );
