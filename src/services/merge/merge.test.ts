@@ -10,12 +10,14 @@ import { TextNode } from '../../types';
 
 describe('Merge service tests', () => {
   let uprtcl: UprtclService;
+  // let merge: MergeService;
   let contextId: string;
   let perspective: string;
   let commit: string;
 
   beforeEach(async () => {
     uprtcl = new MockUprtcl();
+    //  merge = new MergeService(uprtcl, null);
     contextId = await uprtcl.createContext(sampleContext());
     perspective = await uprtcl.createPerspective(samplePerspective(contextId));
 
@@ -100,4 +102,26 @@ describe('Merge service tests', () => {
     expect(result).toEqual(expectedResult);
   });
 
+  it('Diff two strings', async () => {
+    const str1 = 'some sentence that be merged carefully';
+    const str2 = 'firstly, some sentence that should be merged carefully';
+    const str3 = 'some sentence u that anonimously be merged ';
+
+    let result = MergeService.char_diff(str1, str2);
+    result = MergeService.char_diff(str1, str3);
+    console.log(result[0]);
+  });
+
+  it('Merge two strings', async () => {
+    const str1 = 'some sentence that be merged carefully';
+    const str2 =
+      'first some long sentenca that should be merged carefully and something more';
+    const str3 =
+      'i mean some sentencb that anonimously be merged carefully and another else';
+
+    let result = MergeService.mergeContent(str1, [str2, str3]);
+    expect(result).toBe(
+      'first i mean some long sentencab that should anonimously be merged carefully and something more and another else'
+    );
+  });
 });
