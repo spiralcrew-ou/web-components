@@ -4,7 +4,6 @@ import Buffer from 'buffer/';
 import { CidConfig } from './cid.config';
 
 export class IpldService {
-  
   async generateCidOrdered(
     object: any,
     cidConfig: CidConfig,
@@ -19,9 +18,17 @@ export class IpldService {
     return ipldService.generateCid(plain, cidConfig);
   }
 
-  async validateCid (cidStr: string, object: object, propertyOrder: string[]): Promise<boolean> {
+  async validateCid(
+    cidStr: string,
+    object: object,
+    propertyOrder: string[]
+  ): Promise<boolean> {
     let cidConfig = CidConfig.fromCid(cidStr);
-    let cidCheck = await this.generateCidOrdered(object, cidConfig, propertyOrder);
+    let cidCheck = await this.generateCidOrdered(
+      object,
+      cidConfig,
+      propertyOrder
+    );
     return cidCheck === cidStr;
   }
 
@@ -40,6 +47,8 @@ export class IpldService {
       encoded,
       cidConfig.base
     );
+
+    console.log('cid generated', object, cidConfig, cid.toString());
 
     return cid.toString();
   }

@@ -1,6 +1,6 @@
 import { UprtclService } from '../uprtcl.service';
 import { HolochainConnection, EntryResult } from './holochain.connection';
-import { Perspective, Commit, Context } from '../../types';
+import { Perspective, Commit, Context, PropertyOrder } from '../../types';
 import { CidConfig } from '../cid.config';
 
 export class UprtclHolochain implements UprtclService {
@@ -14,15 +14,11 @@ export class UprtclHolochain implements UprtclService {
     this.cidConfig = new CidConfig('base58btc', 0, 'dag-pb', 'sha2-256');
   }
 
-  splitId(object: any) {
-    let id = null;
+  splitId(object: any, propertyOrder: string[]) {
+    let id = object['id'];
     const result = {};
-    for (const key of Object.keys(object)) {
-      if (key === 'id') {
-        id = object[key];
-      } else {
-        result[key] = object[key];
-      }
+    for (const key of propertyOrder) {
+      result[key] = object[key];
     }
 
     return { object, id };
@@ -41,7 +37,7 @@ export class UprtclHolochain implements UprtclService {
   setCidConfig(): CidConfig {
     throw new Error('Holochain Cid version is fixed for the moment');
   }
-  
+
   getContext(contextId: string): Promise<Context> {
     return this.getEntry(contextId).then(result => result.entry);
   }
@@ -69,7 +65,7 @@ export class UprtclHolochain implements UprtclService {
   }
 
   createContext(context: Context): Promise<string> {
-    const { object, id } = this.splitId(context);
+    const { object, id } = this.splitId(context, PropertyOrder.Context);
     return this.uprtclZome.call('create_context', {
       previous_address: id,
       context: object
@@ -77,7 +73,7 @@ export class UprtclHolochain implements UprtclService {
   }
 
   createPerspective(perspective: Perspective): Promise<string> {
-    const { object, id } = this.splitId(perspective);
+    const { object, id } = this.splitId(perspective, PropertyOrder.Perspective);
     return this.uprtclZome.call('create_perspective', {
       previous_address: id,
       perspective: object
@@ -85,7 +81,7 @@ export class UprtclHolochain implements UprtclService {
   }
 
   createCommit(commit: Commit): Promise<string> {
-    const { object, id } = this.splitId(commit);
+    const { object, id } = this.splitId(commit, PropertyOrder.Commit);
     return this.uprtclZome.call('create_commit', {
       previous_address: id,
       commit: object
