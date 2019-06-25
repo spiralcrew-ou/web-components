@@ -8,6 +8,7 @@ import {
   Context,
   Commit
 } from './../types';
+import { NodeType } from './../actions';
 import { MergeService } from './merge/merge.service';
 
 export class UprtclData {
@@ -256,23 +257,18 @@ export class UprtclData {
    *
    * @param fromPerspectiveId The parent perspective id.
    *
-   * @param perspectiveId The child perspective id to be removed (must be a current child
-   * of the parent).
+   * @param index The index of the child to be removed.
    *
    * @returns The id of the new child **perspective**.
    */
   async removePerspective(
     fromPerspectiveId: string,
-    perspectiveId: string
+    index: number
   ): Promise<void> {
-    let draft = await this.getDraft(fromPerspectiveId);
+    let draft = await this.getOrCreateDraft(fromPerspectiveId);
 
-    let index = draft.links.findIndex(link => link.link === perspectiveId);
-    if (index == -1)
-      throw new Error(
-        `perspective ${perspectiveId} not found under ${fromPerspectiveId}`
-      );
-
+    if (draft.links.length < index) throw new Error(`parent dont have a children at index ${index}`);
+    
     /** remove the link */
     draft.links.splice(index, 1);
 
@@ -333,6 +329,29 @@ export class UprtclData {
     await this.setDraft(perspectiveId, draft);
     return this.getDraft(perspectiveId);
   }
+
+  /** A simple function to safely update the type of a draft without
+   * risking to change its text or links.
+   *
+   * @param perspectiveId The perspective id.
+   * 
+   * @param type The new text.
+   *
+   * @returns The draft object.
+   */
+  async setDraftType(
+    perspectiveId: string,
+    _type: NodeType
+  ): Promise<TextNode> {
+    let draft = await this.getOrCreateDraft(perspectiveId);
+
+    draft.type = _type;
+
+    await this.setDraft(perspectiveId, draft);
+    return this.getDraft(perspectiveId);
+  }
+
+  
 
   /** Recursively creates a new perspective out of an existing perspective
    * and of all its children, adding a new commit to each parent to

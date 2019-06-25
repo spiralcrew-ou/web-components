@@ -1,5 +1,5 @@
 import { UprtclData } from "./services/uprtcl-data";
-import { PerspectiveFull, TextNodeFull, TextNode } from "./types";
+import { PerspectiveFull, TextNodeFull } from "./types";
 
 export enum NodeType {
   title = "title",
@@ -54,15 +54,6 @@ const getPerspectiveData = (perspective: PerspectiveFull): TextNodeFull => {
     return perspective.head.data;
   }
 };
-
-const mapBlockToTextNode = (block: Block): TextNode => {
-  let textNode: TextNode = {
-    text: block.content,
-    type: NodeType[block.style],
-    links: block.children.map(childId => { return { link: childId } })
-  }
-  return textNode;
-}
 
 const mapPerspectiveToBlock = (
   perspectiveFull: PerspectiveFull
@@ -149,7 +140,6 @@ export const setContent = (blockId: string, content: string) => {
     block = mapPerspectiveToBlock(perspectiveFull);
     const tree = Object.assign({}, getState().workpad.tree)
     tree[blockId] = block
-
     dispatch({ type: 'SET_CONTENT', tree });
   };
 };
@@ -198,7 +188,7 @@ export const newBlock = (blockId: string, _content: string, parentId: string, in
 
 export const setStyle =  (blockId: string, newStyle: NodeType, parentId: string, index: number) => {
   return async (dispatch, getState) => {
-
+    
     const tree = getState().workpad.tree;
     const block: Block = tree[blockId];
     const parent: Block = tree[parentId];
@@ -207,7 +197,7 @@ export const setStyle =  (blockId: string, newStyle: NodeType, parentId: string,
     /** set the new style */
     let oldStyle = block.style;
     block.style = newStyle;
-    await uprtclData.setDraft(blockId, mapBlockToTextNode(block));
+    await uprtclData.setDraftType(blockId, newStyle);
 
     switch(oldStyle) {
       case NodeType.title: 
@@ -223,8 +213,8 @@ export const setStyle =  (blockId: string, newStyle: NodeType, parentId: string,
           case NodeType.paragraph:
             /** removing in sequence (parallel wont work due to index finding) */
             for (let childIx = 0; childIx < block.children.length; childIx++) {
-              let childId = block.children[childIx];
-              await uprtclData.removePerspective(blockId, childId);
+              /** remove n times the first element */
+              await uprtclData.removePerspective(blockId, 0);
             }
 
             /** adding in sequence */
@@ -265,8 +255,8 @@ export const setStyle =  (blockId: string, newStyle: NodeType, parentId: string,
 
             /** removing in sequence (parallel wont work due to index finding) */
             for (let sybIx = 0; sybIx < youngerSyblings.length; sybIx++) {
-              let sybId = youngerSyblings[sybIx];
-              await uprtclData.removePerspective(parent.id, sybId);
+              /** remove n times the next block */
+              await uprtclData.removePerspective(parent.id, index + 1);
             }
             
             /** adding in sequence */
@@ -287,14 +277,12 @@ export const setStyle =  (blockId: string, newStyle: NodeType, parentId: string,
 
 
 /**   
- * This method remove a block (perspective indeed) from tree.
- * @param {*} block
- * @returns dispatch a reloadTree event
+ * This method removes a block (perspective indeed) from tree. It removes
+ * all its children automatically, se beware!
  */
-export const removeBlock = (blockId, parentId) => {
+export const removeBlock = (parentId: string, index: number) => {
   return async(dispatch) => {
-
-    await uprtclData.removePerspective(parentId, blockId)
+    await uprtclData.removePerspective(parentId, index);
     dispatch(reloadTree());
   }
 };

@@ -20,6 +20,7 @@ export class TaskQueue {
   retryEnabled = false;
 
   queue: Dictionary<Task> = {};
+  finishedTasks: Dictionary<boolean> = {};
   dependenciesQueue: Dictionary<Task> = {};
 
   constructor(retryEnabled: boolean = true, retryInterval: number = 100) {
@@ -33,6 +34,8 @@ export class TaskQueue {
       task.id = Math.random().toString();
     }
 
+    this.finishedTasks[task.id] = false;
+    
     if (navigator.onLine) {
       this.queue[task.id] = null;
       delete this.queue[task.id];
@@ -42,7 +45,7 @@ export class TaskQueue {
         task,
         this.queue
       );
-      this.runTask(task);
+      this.runTaskIfAble(task);
     } else {
       log(
         '[TASK QUEUE] Received task: we are offline, queue task',
@@ -60,6 +63,15 @@ export class TaskQueue {
     }
   }
 
+  private runTaskIfAble(task: Task) {
+    if (task.dependsOn && this.finishedTasks[task.dependsOn] === false) {
+      console.log('scheduling task for later');
+      this.dependenciesQueue[task.id] = task;
+    } else {
+      this.runTask(task);
+    }
+  }
+
   private runTasks() {
     if (navigator.onLine) {
       log('[TASK QUEUE] Running tasks', this.queue);
@@ -72,12 +84,7 @@ export class TaskQueue {
       this.interval = null;
 
       for (const taskId of Object.keys(queue)) {
-        const task = queue[taskId];
-        if (task.dependsOn && queue[task.dependsOn]) {
-          this.dependenciesQueue[task.id] = task;
-        } else {
-          this.runTask(task);
-        }
+        this.runTaskIfAble(queue[taskId]);
       }
     }
   }
@@ -86,6 +93,8 @@ export class TaskQueue {
     try {
       // Try to execute task
       await task.task();
+
+      this.finishedTasks[task.id] = true;
 
       const dependantTasksIds = Object.keys(this.dependenciesQueue).filter(
         dependantTaskId =>

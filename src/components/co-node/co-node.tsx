@@ -4,9 +4,6 @@ import {
 import { Store, Action } from '@stencil/redux';
 import { newBlock, removeBlock, reloadTree, setContent, openMenu, Block, renderingWorkpad } from '../../actions';
 
-
-
-
 @Component({
   tag: 'co-node',
   styleUrl: 'co-node.scss',
@@ -21,10 +18,12 @@ export class CONode {
   @Prop() indexInParent: number;
 
   @State() block : Block;
-  rootId; 
   @State() showMenuOption: boolean;
   @State() isFocused: boolean = false;
   @Event({ eventName: 'isRunning', bubbles: true }) isRunning: EventEmitter
+  
+  rootId; 
+  emptyOnce = false;
   
   newBlock: Action
   removeBlock: Action
@@ -76,10 +75,16 @@ export class CONode {
     event.stopPropagation();
     if (event.key === 'Backspace') {
       if (event['path'][0].innerText === '') {
-        this.removeBlock(this.block)
+        if (!this.emptyOnce) {
+          this.emptyOnce = true;
+        } else {
+          this.removeBlock(this.parentId, this.indexInParent);
+        }
         /**TODO: First node. 
           */
       }
+    } else {
+      this.emptyOnce = false;
     }
 
     if(event.key === '/'){
@@ -89,8 +94,10 @@ export class CONode {
 
   async updateBlockContent(_event:FocusEvent, _newContent) { 
     _event.stopPropagation()   
-    if (_newContent != this.block.content)
-      await this.setContent(this.block.id, _newContent)
+    if (this.block) {
+      if (_newContent != this.block.content)
+        await this.setContent(this.block.id, _newContent)
+    }
   }
 
   render() {

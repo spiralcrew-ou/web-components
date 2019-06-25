@@ -15,7 +15,7 @@ export class DataMultiplatform extends CachedMultiplatform<DataService> {
     return this.cachedDiscover(
       dataId,
       service => service.getData(dataId),
-      (service, data) => service.createData(data),
+      (service, data) => service.createData({...data, id: dataId}),
       this.linksFromTextNode
     );
   }

@@ -57,11 +57,13 @@ export class CachedMultiplatform<T extends CidCompatible> extends Multiplatform<
       return null;
     }
 
-    return this.cached(
+    const object = await this.cached(
       getter,
       () => this.discover(hash, getter, linksSelector),
       cloner
     );
+    object['id'] = hash;
+    return object;
   }
 
   /**

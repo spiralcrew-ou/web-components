@@ -8,7 +8,7 @@ import { hash } from './eth.support';
 import { CidConfig } from '../cid.config';
 
 /** functions signatures */
-const ADD_PERSP = 'addPerspective(bytes32,bytes32,address,string)';
+const ADD_PERSP = 'addPerspective(bytes32,bytes32,string,address,string)';
 const UPDATE_HEAD = 'updateHead(bytes32,string)';
 const GET_PERSP = 'getPerspective(bytes32)';
 
@@ -157,23 +157,24 @@ export class UprtclEthereum implements UprtclService {
     let perspectiveIdHash = await hash(perspectiveId);
     let contextIdHash = await hash(perspective.contextId);
     
-    let result = await this.ethereum.send(
+    /** TX is sent, and await to force order (preent head update on an unexisting perspective) */
+    await this.ethereum.send(
         ADD_PERSP, 
-        [perspectiveIdHash, contextIdHash, this.ethereum.account, perspectiveId]);
+        [perspectiveIdHash, contextIdHash, '', this.ethereum.account, perspectiveId]);
 
-    console.log(`[ETH] createPerspective - TX mined`, result);
-    return result;
+    console.log(`[ETH] addPerspective - TX minted`);
+
+    return perspectiveId;
   }
 
   async updateHead(perspectiveId: string, headId: string): Promise<void> {
     let perspectiveIdHash = await hash(perspectiveId);
 
-    let result = await this.ethereum.send(
+    await this.ethereum.send(
       UPDATE_HEAD, 
       [perspectiveIdHash, headId]);
 
-    console.log(`[ETH] updateHead - TX mined`, result);
-    return result;
+    console.log(`[ETH] updateHead - TX minted`);
   }
 
   async createCommit(commit: Commit) {
