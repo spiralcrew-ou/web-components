@@ -184,6 +184,8 @@ export class UprtclData {
       perspective
     );
 
+    await this.uprtcl.updateHead(perspectiveId, null);
+
     await this.setDraft(perspectiveId, this.initEmptyTextNode(content));
 
     return perspectiveId;
@@ -284,7 +286,7 @@ export class UprtclData {
    * @returns The data object.
    */
   async getPerspectiveData(perspectiveId: string) {
-    const headId = await this.uprtcl.getHead(perspectiveId);
+    const headId = await this.uprtcl.getCachedHead(perspectiveId);
     const head = headId ? await this.uprtcl.getCommit(headId) : null;
     return head ? this.data.getData<TextNode>(head.dataId) : null;
   }
@@ -372,7 +374,7 @@ export class UprtclData {
   ): Promise<string> {
     /** get perspective and include first level links */
     const perspective = await this.uprtcl.getPerspective(perspectiveId);
-    const headId = await this.uprtcl.getHead(perspectiveId);
+    const headId = await this.uprtcl.getCachedHead(perspectiveId);
     const head = headId ? await this.uprtcl.getCommit(headId) : null;
     const data = head ? await this.data.getData<TextNode>(head.dataId) : null;
 
@@ -434,9 +436,7 @@ export class UprtclData {
       newPerspective
     );
 
-    if (newCommitId) {
-      await this.uprtcl.updateHead(newPerspectiveId, newCommitId);
-    }
+    await this.uprtcl.updateHead(newPerspectiveId, newCommitId);
 
     return newPerspectiveId;
   }
@@ -469,7 +469,7 @@ export class UprtclData {
     /** links */
     const links = draft.links;
 
-    const headId = await this.uprtcl.getHead(perspectiveId);
+    const headId = await this.uprtcl.getCachedHead(perspectiveId);
     const parentsIds = headId ? [headId] : [];
 
     const commit: Commit = {
