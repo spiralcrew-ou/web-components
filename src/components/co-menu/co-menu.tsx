@@ -108,6 +108,7 @@ export class COMenu {
                 this.callPull()
                 this.close()
               }}> Pull</div>
+              <img class='w-8 h-8 ' src='../../assets/img/net.svg'></img>
 
               <div class='my-1' onClick={() => {
                 this.perspectiveToCommit(this.block.id)

@@ -554,12 +554,21 @@ export class UprtclData {
     ancestorId: string,
     commitId: string
   ): Promise<boolean> {
-    const commit = await uprtclMultiplatform.getCommit(commitId);
+    
+    const commit = await this.uprtcl.getCommit(commitId);
+    
     if (commit.parentsIds.includes(ancestorId)) {
       return true;
     } else {
-      return false;
+      /** recursive call */
+      for(let ix = 0; ix < commit.parentsIds.length; ix++) {
+        if (this.isAncestorOf(commit.parentsIds[ix], commitId)) {
+          return
+        }
+      }
     }
+
+    return false;
   }
 
   private async pullDraft(perspectiveId: string, headId: string): Promise<any> {
@@ -593,24 +602,24 @@ export class UprtclData {
   }
 
   private async pullHead(perspectiveId: string): Promise<string> {
-    const cachedHead = await uprtclMultiplatform.getCachedHead(perspectiveId);
-    const headId = await uprtclMultiplatform.getHead(perspectiveId);
+    const cachedHead = await this.uprtcl.getCachedHead(perspectiveId);
+    const headId = await this.uprtcl.getHead(perspectiveId);
 
     // Compare the remote
-    if (!(await this.isAncestorOf(cachedHead, headId))) {
-      const perspective = await uprtclMultiplatform.getPerspective(
+    if (cachedHead && headId && !await this.isAncestorOf(cachedHead, headId)) {
+      const perspective = await this.uprtcl.getPerspective(
         perspectiveId
       );
-      const uprtclService = uprtclMultiplatform.getServiceProvider(
+      const uprtclService = this.uprtcl.getServiceProvider(
         perspective.origin
       );
-      const dataService = dataMultiplatform.getServiceProvider(
+      const dataService = this.data.getServiceProvider(
         perspective.origin
       );
 
       const merge = new MergeService(uprtclService, dataService);
       const mergeCommitId = await merge.mergeCommits([cachedHead, headId]);
-      await uprtclMultiplatform.updateHead(perspectiveId, mergeCommitId);
+      await this.uprtcl.updateHead(perspectiveId, mergeCommitId);
       return mergeCommitId;
     }
 
