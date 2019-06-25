@@ -11,7 +11,7 @@ import { CachedMultiplatform } from './cached.multiplatform';
 import { UprtclLocal } from '../local/uprtcl.local';
 import { ipldService } from '../ipld';
 
-const currentAuthorId = 'guillem:17';
+const currentAuthorId = 'guillem:29';
 
 export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
   linksFromPerspective(perspective: Perspective) {
@@ -143,10 +143,25 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
     this.cacheService.setCidConfig(
       this.serviceProviders[serviceProvider].service.getCidConfig()
     );
+
+    const initHead = async (perspectiveId: string) => {
+      const isHeadCached = await (<UprtclLocal>this.cacheService).headExists(
+        perspectiveId
+      );
+
+      if (!isHeadCached) {
+        await this.cacheService.updateHead(perspectiveId, null);
+      }
+    };
+
     return this.optimisticCreate(
       serviceProvider,
       perspective,
-      (service, perspective) => service.createPerspective(perspective),
+      async (service, perspective) => {
+        const perspectiveId = await service.createPerspective(perspective);
+        await initHead(perspectiveId);
+        return perspectiveId;
+      },
       this.linksFromPerspective(perspective)
     );
   }
@@ -164,7 +179,10 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService> {
   }
 
   async getCachedHead(perspectiveId: string): Promise<string> {
-    if (await (<UprtclLocal>this.cacheService).headExists(perspectiveId)) {
+    const isHeadCached = await (<UprtclLocal>this.cacheService).headExists(
+      perspectiveId
+    );
+    if (isHeadCached) {
       return this.cacheService.getHead(perspectiveId);
     } else {
       return this.getHead(perspectiveId);

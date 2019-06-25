@@ -184,8 +184,6 @@ export class UprtclData {
       perspective
     );
 
-    await this.uprtcl.updateHead(perspectiveId, null);
-
     await this.setDraft(perspectiveId, this.initEmptyTextNode(content));
 
     return perspectiveId;
@@ -436,7 +434,9 @@ export class UprtclData {
       newPerspective
     );
 
-    await this.uprtcl.updateHead(newPerspectiveId, newCommitId);
+    if (newCommitId) {
+      await this.uprtcl.updateHead(newPerspectiveId, newCommitId);
+    }
 
     return newPerspectiveId;
   }
@@ -458,16 +458,15 @@ export class UprtclData {
     timestamp: number = Date.now(),
     recurse: boolean = false
   ): Promise<void> {
-    
     let draft = await this.getDraft(perspectiveId);
-    
+
     /** recursion logic depends on draft or data */
     let applicableData = draft;
     if (applicableData == null) {
-      applicableData = await this.getPerspectiveData(perspectiveId)
+      applicableData = await this.getPerspectiveData(perspectiveId);
     }
     if (applicableData == null) {
-      return
+      return;
     }
 
     /** recursive call (start bottom up)*/
@@ -478,13 +477,12 @@ export class UprtclData {
 
       await Promise.all(createInLinks);
     }
-    
-    /** this perspective commit is done if draft is not null */
-    
-    if (!draft) {
-      return
-    }
 
+    /** this perspective commit is done if draft is not null */    
+    if (!draft) {
+      return;
+    }
+    
     const dataId = await this.data.createData(serviceProvider, draft);
     /** delete draft */
     await this.draft.removeDraft(perspectiveId);
@@ -520,12 +518,24 @@ export class UprtclData {
     await this.draft.setDraft(perspectiveId, commitDraft);
   }
 
-  public async pull(perspectiveId: string): Promise<any> {
+  private async isAncestorOf(
+    ancestorId: string,
+    commitId: string
+  ): Promise<boolean> {
+    const commit = await uprtclMultiplatform.getCommit(commitId);
+    if (commit.parentsIds.includes(ancestorId)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private async pullDraft(perspectiveId: string, headId: string): Promise<any> {
+    // Retrieve the commit with which the draft was created of the perspective
     const draftCommit = await this.draft.getDraft(perspectiveId);
 
-    const headId = await uprtclMultiplatform.getHead(perspectiveId);
-
     if (headId !== draftCommit.commitId) {
+      // Head and cached head are different, we need to merge its contents together
       const head = await this.uprtcl.getCommit(headId);
       const newData = await this.data.getData<TextNode>(head.dataId);
 
@@ -540,6 +550,7 @@ export class UprtclData {
         draftCommit.draft
       ]);
 
+      // Set the new draft with the merged contents to the perspective
       await this.draft.setDraft(perspectiveId, {
         commitId: headId,
         draft: newDraft
@@ -547,6 +558,36 @@ export class UprtclData {
 
       await Promise.all(newDraft.links.map(link => this.pull(link.link)));
     }
+  }
+
+  private async pullHead(perspectiveId: string): Promise<string> {
+    const cachedHead = await uprtclMultiplatform.getCachedHead(perspectiveId);
+    const headId = await uprtclMultiplatform.getHead(perspectiveId);
+
+    // Compare the remote
+    if (!(await this.isAncestorOf(cachedHead, headId))) {
+      const perspective = await uprtclMultiplatform.getPerspective(
+        perspectiveId
+      );
+      const uprtclService = uprtclMultiplatform.getServiceProvider(
+        perspective.origin
+      );
+      const dataService = dataMultiplatform.getServiceProvider(
+        perspective.origin
+      );
+
+      const merge = new MergeService(uprtclService, dataService);
+      const mergeCommitId = await merge.mergeCommits([cachedHead, headId]);
+      await uprtclMultiplatform.updateHead(perspectiveId, mergeCommitId);
+      return mergeCommitId;
+    }
+
+    return headId;
+  }
+
+  public async pull(perspectiveId: string): Promise<any> {
+    const newHeadId = await this.pullHead(perspectiveId);
+    await this.pullDraft(perspectiveId, newHeadId);
   }
 }
 
