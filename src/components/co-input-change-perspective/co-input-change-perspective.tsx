@@ -1,50 +1,73 @@
-import { Component, State, Event, EventEmitter } from '@stencil/core';
-
+import { Component, State, Prop, Event, EventEmitter } from '@stencil/core';
+import { Store, Action } from '@stencil/redux';
+import {
+  updateContextPerspectives,
+  checkoutPerspective
+} from '../../actions';
+import { Perspective } from './../../types';
 
 @Component({
-    tag: 'co-input-change-perspective',
-    styleUrl: 'co-input-change-perspective.scss',
-    shadow: true
+  tag: 'co-input-change-perspective',
+  styleUrl: 'co-input-change-perspective.scss',
+  shadow: true
 })
 export class COInputChangePerspective {
 
-    @State() show: boolean = true
-    @State() message: string
-    @State() providerSelected: string 
+  @Prop({ context: 'store' }) store: Store;
 
-    @Event({eventName: 'showInputChangePerspective',bubbles:true}) showInputChangePerspective: EventEmitter
+  @State() show: boolean = true
+  @State() newPerspectiveId: string
+  @State() rootId: string
+  @State() contextPerspectives: Perspective[]
 
-    handleMessage(event) {
-        this.message = event.target.value
-    }
+  @Event({ eventName: 'showInputChangePerspective', bubbles: true }) showInputChangePerspective: EventEmitter
 
-    handleProviderSelected(event) { 
-        this.providerSelected = event.target.value
-    }
+  updateContextPerspectives: Action
+  checkoutPerspective: Action
 
-    commit() {
-        this.showInputChangePerspective.emit(false)
-    }
+  handleSelected(event) {
+    this.newPerspectiveId = event.target.value
+  }
 
-    
-    renderInput() {
-        return <div class='container m-4 w-1/2 h-1/2 border-2 shadow-md p-2 rounded-lg font-thin z-10 fixed bg-white form text-gray-800 text-sm  '>
-            <h2 class='text-3xl m-2'>Change Perspective</h2>
-            <content>
-                <input 
-                    value={this.message}
-                    onChange={event => this.handleMessage(event)}
-                    class='ml-2 px-2 w-11/12 my-2 py-2 border-gray-600 border-b' 
-                    placeholder='Please, drop a message'>
-                </input>
-            </content>
-            <footer class='flex text-red-700 justify-end'>
-                <button class='uppercase m-2 font-thin object-none ' onClick={() => this.showInputChangePerspective.emit(false)}>Cancel</button>
-                <button class='uppercase m-2 font-thin object-none '>Accept</button>
-            </footer>
-        </div>
-    }
+  componentWillLoad() {
+    this.store.mapDispatchToProps(this, {
+      updateContextPerspectives,
+      checkoutPerspective
+    })
 
-    render = () => this.renderInput()
+    this.store.mapStateToProps(this, state => {
+      return {
+        rootId: state.workpad.rootId,
+        contextPerspectives: state.workpad.contextPerspectives
+      }
+    })
+
+    this.updateContextPerspectives(this.rootId);
+  }
+
+  checkout() {
+    this.checkoutPerspective(this.newPerspectiveId);
+    this.showInputChangePerspective.emit(false)
+  }
+
+  renderInput() {
+    return <div class='container m-4 w-1/2 h-1/2 border-2 shadow-md p-2 rounded-lg font-thin z-10 fixed bg-white form text-gray-800 text-sm  '>
+      <h2 class='text-3xl m-2'>Change Perspective</h2>
+      <content>
+        <select onChange={event => this.handleSelected(event)}>
+          <option value="">select</option>
+          {this.contextPerspectives.map(perspective => {
+            return (<option value={perspective.id}>{perspective.name} - {perspective.origin} - {perspective.creatorId}</option>)
+          })}
+        </select>
+      </content>
+      <footer class='flex text-red-700 justify-end'>
+        <button class='uppercase m-2 font-thin object-none ' onClick={() => this.showInputChangePerspective.emit(false)}>Cancel</button>
+        <button class='uppercase m-2 font-thin object-none ' onClick={() => this.checkout()}>Accept</button>
+      </footer>
+    </div>
+  }
+
+  render = () => this.renderInput()
 
 }

@@ -319,7 +319,6 @@ export const newPerspective = (
     )
 
     // TODO, reuse a tree reload or something
-
     let perspectiveFull = await uprtclData.getPerspectiveFull(
       newPerspectiveId, -1);
   
@@ -331,9 +330,29 @@ export const newPerspective = (
       rootId: newPerspectiveId,
       tree: _tree
     })
+  }
+}
 
-    /** to prevent UI from trying to render before the tree us updated */
-    
+/**
+ * 
+ */
+export const checkoutPerspective = (
+  perspectiveId: string) => {
+
+  return async (dispatch) => {
+
+    // TODO, reuse a tree reload or something
+    let perspectiveFull = await uprtclData.getPerspectiveFull(
+      perspectiveId, -1);
+  
+    let _tree = {}
+    setTreeWithPerspectiveRec(perspectiveFull, _tree);
+
+    dispatch({ 
+      type: "CHECKOUT_PERSPECTIVE", 
+      rootId: perspectiveId,
+      tree: _tree
+    })
   }
 }
         
@@ -373,12 +392,18 @@ export const perspectiveToCreate = (perspectiveOriginId: string) => {
   }
 }
 
-export const perspectiveToChange = (perspectiveOriginId:string) => {
-
-  let contextPerspectives = [];
-
+export const perspectiveToChange = (perspectiveOriginId: string) => {
   return dispatch => {
-    dispatch({type: 'PERSPECTIVE_TO_CHANGE', perspectiveId:perspectiveOriginId, contextPerspectives })
+    dispatch({type: 'PERSPECTIVE_TO_CHANGE',perspectiveId: perspectiveOriginId})
+  }
+}
+
+export const updateContextPerspectives = (perspectiveOriginId:string) => {
+  return async dispatch => {
+    let perspective = await uprtclData.uprtcl.getPerspective(perspectiveOriginId);
+    let contextPerspectives = await uprtclData.uprtcl.getContextPerspectives(perspective.contextId);
+
+    dispatch({type: 'UPDATE_CONTEXT_PERSPECTIVES', perspectiveId:perspectiveOriginId, contextPerspectives })
   }
 }
 

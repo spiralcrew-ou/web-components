@@ -34,7 +34,6 @@ export class COMenu {
   @Event({ eventName: 'showInputChangePerspective', bubbles: true }) showInputChangePerspective: EventEmitter
   @Event({ eventName: 'showInputMerge', bubbles: true }) showInputMerge: EventEmitter
 
-
   setStyle: Action
   pull: Action
 

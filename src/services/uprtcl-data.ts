@@ -172,11 +172,11 @@ export class UprtclData {
    *
    * @returns The id of the new **perspective**.
    */
-  async initContext(serviceProvider: string, content: string): Promise<string> {
+  async initContext(serviceProvider: string, content: string, _timestamp: number = Date.now()): Promise<string> {
     const context: Context = {
       creatorId: 'anon',
       nonce: 0,
-      timestamp: 0
+      timestamp: _timestamp
     };
     const contextId = await this.uprtcl.createContextIn(
       serviceProvider,
