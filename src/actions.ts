@@ -353,6 +353,7 @@ export const checkoutPerspective = (
       rootId: perspectiveId,
       tree: _tree
     })
+    dispatch(renderingWorkpad(false))
   }
 }
         

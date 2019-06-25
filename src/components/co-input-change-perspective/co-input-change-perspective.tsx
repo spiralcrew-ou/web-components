@@ -2,7 +2,8 @@ import { Component, State, Prop, Event, EventEmitter } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
 import {
   updateContextPerspectives,
-  checkoutPerspective
+  checkoutPerspective,
+  renderingWorkpad
 } from '../../actions';
 import { Perspective } from './../../types';
 
@@ -24,6 +25,7 @@ export class COInputChangePerspective {
 
   updateContextPerspectives: Action
   checkoutPerspective: Action
+  renderingWorkpad: Action
 
   handleSelected(event) {
     this.newPerspectiveId = event.target.value
@@ -32,7 +34,8 @@ export class COInputChangePerspective {
   componentWillLoad() {
     this.store.mapDispatchToProps(this, {
       updateContextPerspectives,
-      checkoutPerspective
+      checkoutPerspective,
+      renderingWorkpad
     })
 
     this.store.mapStateToProps(this, state => {
@@ -46,13 +49,14 @@ export class COInputChangePerspective {
   }
 
   checkout() {
+    this.renderingWorkpad(true);
     this.checkoutPerspective(this.newPerspectiveId);
     this.showInputChangePerspective.emit(false)
   }
 
   renderInput() {
     return <div class='container m-4 w-1/2 h-1/2 border-2 shadow-md p-2 rounded-lg font-thin z-10 fixed bg-white form text-gray-800 text-sm  '>
-      <h2 class='text-3xl m-2'>Change Perspective</h2>
+      <h2 class='text-3xl m-2'>Changes Perspective</h2>
       <content>
         <select onChange={event => this.handleSelected(event)}>
           <option value="">select</option>
