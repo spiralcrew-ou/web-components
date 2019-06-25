@@ -348,8 +348,11 @@ export const perspectiveToCreate = (perspectiveOriginId: string) => {
 }
 
 export const perspectiveToChange = (perspectiveOriginId:string) => {
+
+  let contextPerspectives = [];
+
   return dispatch => {
-    dispatch({type: 'PERSPECTIVE_TO_CHANGE',perspectiveId:perspectiveOriginId })
+    dispatch({type: 'PERSPECTIVE_TO_CHANGE', perspectiveId:perspectiveOriginId, contextPerspectives })
   }
 }
 

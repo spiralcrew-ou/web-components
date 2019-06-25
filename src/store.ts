@@ -11,16 +11,11 @@ const initialState = {
     tree: {},
     block: {},
     isRendering: false,
-    perspectiveId: null
+    perspectiveId: null,
+    contextPerspectives: []
   },
   menu: {
     isClose: true,
-    inBlockData: {
-      blockId: '',
-      parentId: '',
-      index: 0,
-      calledBy: ''
-    }
   },
   support: {
     availableProviders: [],
