@@ -6,8 +6,8 @@ export interface EntryResult<T = any> {
   type: string;
 }
 
-//const host = 'ws://3.130.73.99:80';
-const host = 'ws://localhost:8888';
+const host = 'ws://3.130.73.99:80';
+// const host = 'ws://localhost:8888';
 
 export class HolochainConnection {
   instanceId: string;

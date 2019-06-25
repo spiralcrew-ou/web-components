@@ -267,8 +267,9 @@ export class UprtclData {
   ): Promise<void> {
     let draft = await this.getOrCreateDraft(fromPerspectiveId);
 
-    if (draft.links.length < index) throw new Error(`parent dont have a children at index ${index}`);
-    
+    if (draft.links.length < index)
+      throw new Error(`parent dont have a children at index ${index}`);
+
     /** remove the link */
     draft.links.splice(index, 1);
 
@@ -334,7 +335,7 @@ export class UprtclData {
    * risking to change its text or links.
    *
    * @param perspectiveId The perspective id.
-   * 
+   *
    * @param type The new text.
    *
    * @returns The draft object.
@@ -350,8 +351,6 @@ export class UprtclData {
     await this.setDraft(perspectiveId, draft);
     return this.getDraft(perspectiveId);
   }
-
-  
 
   /** Recursively creates a new perspective out of an existing perspective
    * and of all its children, adding a new commit to each parent to
@@ -516,11 +515,24 @@ export class UprtclData {
     const headId = await uprtclMultiplatform.getHead(perspectiveId);
 
     if (headId !== draftCommit.commitId) {
-      const commit = await this.uprtcl.getCommit(headId);
-      const newData = await this.data.getData<TextNode>(commit.dataId);
-      const newDraft = MergeService.mergeData(newData, [draftCommit.draft]);
+      const head = await this.uprtcl.getCommit(headId);
+      const newData = await this.data.getData<TextNode>(head.dataId);
 
-      await this.draft.setDraft(perspectiveId, { commitId: headId, draft: newDraft });
+      let oldData = this.initEmptyTextNode('');
+      if (draftCommit.commitId) {
+        const oldCommit = await this.uprtcl.getCommit(draftCommit.commitId);
+        oldData = await this.data.getData(oldCommit.dataId);
+      }
+
+      const newDraft = MergeService.mergeData(oldData, [
+        newData,
+        draftCommit.draft
+      ]);
+
+      await this.draft.setDraft(perspectiveId, {
+        commitId: headId,
+        draft: newDraft
+      });
 
       await Promise.all(newDraft.links.map(link => this.pull(link.link)));
     }
