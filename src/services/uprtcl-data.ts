@@ -555,6 +555,8 @@ export class UprtclData {
     commitId: string
   ): Promise<boolean> {
     
+    if (ancestorId === commitId) return true
+
     const commit = await this.uprtcl.getCommit(commitId);
     
     if (commit.parentsIds.includes(ancestorId)) {
@@ -571,11 +573,11 @@ export class UprtclData {
     return false;
   }
 
-  private async pullDraft(perspectiveId: string, headId: string): Promise<any> {
+  private async pullToDraft(perspectiveId: string, headId: string): Promise<any> {
     // Retrieve the commit with which the draft was created of the perspective
     const draftCommit = await this.draft.getDraft(perspectiveId);
 
-    if (headId !== draftCommit.commitId) {
+    if (draftCommit && (headId !== draftCommit.commitId)) {
       // Head and cached head are different, we need to merge its contents together
       const head = await this.uprtcl.getCommit(headId);
       const newData = await this.data.getData<TextNode>(head.dataId);
@@ -627,8 +629,9 @@ export class UprtclData {
   }
 
   public async pull(perspectiveId: string): Promise<void> {
+    debugger
     const newHeadId = await this.pullHead(perspectiveId);
-    await this.pullDraft(perspectiveId, newHeadId);
+    await this.pullToDraft(perspectiveId, newHeadId);
   }
 
   public async merge(

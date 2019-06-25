@@ -29,6 +29,11 @@ export const config: Config = {
     browser: true,
     preferBuiltins: true
   },
+  commonjs: {
+    namedExports: {
+       'node_modules/lodash/lodash.js': ['isEqual'],
+    }
+  },
   devServer: {
     openBrowser: false,
     port: 3333

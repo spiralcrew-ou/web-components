@@ -72,7 +72,7 @@ const reloadMasterTree = async (getState): Promise<any> => {
   setTreeWithPerspectiveRec(perspectiveFull, _tree);
 
   let textNodeTree = await uprtclData.toTextNodeTree(getState().workpad.rootId);
-  console.log('[REDUX] Reload master tree.', {textNodeTree, _tree });
+  console.log('[REDUX] Reload master tree.', {textNodeTree, perspectiveFull, _tree });
   return _tree;
 }
 

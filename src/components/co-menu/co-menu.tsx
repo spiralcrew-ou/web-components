@@ -27,6 +27,7 @@ export class COMenu {
   @Prop() parentId: string
   @Prop() index: number
   @State() block: Block
+  @State() rootId: string
 
   @Event({ eventName: 'showInputCommit', bubbles: true }) showInputCommit: EventEmitter
   @Event({ eventName: 'showInputNewPerspective', bubbles: true }) showInputNewPerspective: EventEmitter
@@ -57,12 +58,13 @@ export class COMenu {
     this.store.mapStateToProps(this, state => {
       return {
         block: state.workpad.tree[this.reference],
+        rootId: state.workpad.rootId,
       }
     })
   }
 
   callPull() {
-    this.pull(this.block.id);
+    this.pull(this.rootId);
   }
 
   open() {
