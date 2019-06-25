@@ -290,6 +290,20 @@ export const commitGlobal = (blockId: string, message: string = '') => {
   };
 };
 
+export const pull = (blockId: string) => {
+  return async (dispatch, getState) => {
+
+    await uprtclData.pull(blockId)
+
+    const tree = getState().workpad.tree;
+    const block: Block = tree[blockId];
+    
+    dispatch({ type: 'PULL_MADE', block });
+    dispatch(reloadTree());
+  };
+};
+
+
 /**
  * 
  */
@@ -298,16 +312,28 @@ export const newPerspective = (
   name: string, 
   serviceProvider: string) => {
 
-  return async(dispatch) => {
+  return async (dispatch) => {
 
     let newPerspectiveId = await uprtclData.createGlobalPerspective(
       serviceProvider, blockId, name
     )
 
+    // TODO, reuse a tree reload or something
+
+    let perspectiveFull = await uprtclData.getPerspectiveFull(
+      newPerspectiveId, -1);
+  
+    let _tree = {}
+    setTreeWithPerspectiveRec(perspectiveFull, _tree);
+
     dispatch({ 
       type: "NEW_PERSPECTIVE", 
-      rootId: newPerspectiveId
-    });
+      rootId: newPerspectiveId,
+      tree: _tree
+    })
+
+    /** to prevent UI from trying to render before the tree us updated */
+    
   }
 }
         
@@ -359,6 +385,12 @@ export const perspectiveToChange = (perspectiveOriginId:string) => {
 export const perspectiveToMerge = (perspectiveOriginId:string) => {
   return dispatch => {
     dispatch({type: 'PERSPECTIVE_TO_MERGE',perspectiveId:perspectiveOriginId })
+  }
+}
+
+export const perspectiveToPull = (perspectiveOriginId:string) => {
+  return dispatch => {
+    dispatch({type: 'PERSPECTIVE_TO_PULL',perspectiveId:perspectiveOriginId })
   }
 }
 

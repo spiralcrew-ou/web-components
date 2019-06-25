@@ -40,9 +40,11 @@ export const workpadReducer = (state = { ...initialState.workpad }, action) => {
     case 'COMMIT_GLOBAL':
       return { ...state, ...action }
     case 'NEW_PERSPECTIVE':
-        return {...state,...action}
+      return {...state,...action}
     case 'MERGE':
       return {...state,...action}
+    case 'PULL_MADE':
+        return {...state,...action}
     case 'RENDERING_WORKPAD':
       return {...state,...action}
     case 'PERSPECTIVE_TO_COMMIT':
@@ -52,8 +54,8 @@ export const workpadReducer = (state = { ...initialState.workpad }, action) => {
     case 'PERSPECTIVE_TO_CHANGE':
       return {...state,...action}
     case 'PERSPECTIVE_TO_MERGE':
-        return {...state,...action}
-
+      return {...state,...action}
+    
     default:
       return state
   }

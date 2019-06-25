@@ -3,6 +3,7 @@ import { Store, Action } from '@stencil/redux';
 import {
   setStyle,
   renderingWorkpad,
+  pull,
   NodeType,
   Block,
   perspectiveToCreate,
@@ -34,6 +35,7 @@ export class COMenu {
 
 
   setStyle: Action
+  pull: Action
 
   renderingWorkpad: Action
   perspectiveToCreate: Action
@@ -45,6 +47,7 @@ export class COMenu {
     this.store.mapDispatchToProps(this, {
       setStyle,
       renderingWorkpad,
+      pull,
       perspectiveToCreate,
       perspectiveToCommit,
       perspectiveToChange,
@@ -58,7 +61,9 @@ export class COMenu {
     })
   }
 
-
+  callPull() {
+    this.pull(this.block.id);
+  }
 
   open() {
     const menu = this._element.shadowRoot.getElementById(`${this.block.id}`) as any
@@ -98,6 +103,11 @@ export class COMenu {
                 this.setBlockStyle(NodeType.paragraph)
               }}>this is a paragraph</div>
               <img class='w-8 h-8 ' src='../../assets/img/lowercase.svg'></img>
+
+              <div class='my-1' onClick={() => {
+                this.callPull()
+                this.close()
+              }}> Pull</div>
 
               <div class='my-1' onClick={() => {
                 this.perspectiveToCommit(this.block.id)
