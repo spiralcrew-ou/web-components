@@ -104,7 +104,7 @@ export class Workpad {
           contentEditable>
             <div class='py-4 px-2  text-white mb-8 w-full'>{this.tree[this.rootDocumentId].content}</div>
             <div>
-              <img id={'menuRef' + this.documentId} class='w-6 h-6' src='../../assets/img/menu.svg'></img>
+              <img id={'menuRef' + this.documentId} class='w-6 h-6' src='../../assets/img/menu_white.svg'></img>
             </div>
           </header>
 
