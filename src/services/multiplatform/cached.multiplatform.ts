@@ -75,7 +75,7 @@ export class CachedMultiplatform<T extends CidCompatible> extends Multiplatform<
     cloner: (service: T, object: O) => Promise<any>,
     cacheGetter: (service: T) => Promise<O>
   ) {
-    try {
+    if (navigator.onLine) {
       // Try to get object from source
       const object = await sourceGetter();
 
@@ -84,7 +84,7 @@ export class CachedMultiplatform<T extends CidCompatible> extends Multiplatform<
 
       // And return it
       return object;
-    } catch (e) {
+    } else {
       // Otherwise, return object from cache
       return cacheGetter(this.cacheService);
     }
