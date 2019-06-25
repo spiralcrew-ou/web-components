@@ -79,7 +79,14 @@ export class TextNodeFull {
   type: string;
   links: Array<{
     position?: Position;
-    type?: string,
     link: PerspectiveFull;
   }> = [];
 }
+
+export class TextNodeTree {
+  id?: string;
+  text: string;
+  type: string;
+  links: Array<TextNodeTree> = [];
+}
+

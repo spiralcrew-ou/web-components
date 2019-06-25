@@ -8,7 +8,7 @@ export enum NodeType {
 export interface Block {
   id: string,
   children: string[],
-  status: "DRAFT" | "COMMITED",
+  status: string,  
   content: string,
   style: NodeType,
   serviceProvider: string
@@ -18,40 +18,15 @@ const uprtclData = new UprtclData();
 
 /** ----- SUPPORT FUNCTIONS ------ */
 
-const hasChanges = (_perspective: PerspectiveFull): boolean => {
-
-  if (!_perspective.head) {
-    return true;
-  }
-
-  let node = _perspective.head.data;
-  let draft = _perspective.draft;
-
-  if (!node) {
-    return true;
-  }
-
-  if (draft != null) {
-    let textEqual = node.text === draft.text;
-    let linksEqual = node.links.length === draft.links.length;
-    for (let i = 0; i < node.links.length; i++) {
-      linksEqual =
-        linksEqual &&
-        node.links[i].link === draft.links[i].link;
-      // TODO: compare position...
-    }
-
-    return !(textEqual && linksEqual);
-  }
-
-  return false;
-};
-
 const getPerspectiveData = (perspective: PerspectiveFull): TextNodeFull => {
-  if (hasChanges(perspective)) {
+  if (perspective.draft) {
     return perspective.draft;
   } else {
-    return perspective.head.data;
+    if (perspective.head) {
+      return perspective.head.data;
+    } else {
+      null
+    }
   }
 };
 
@@ -63,7 +38,7 @@ const mapPerspectiveToBlock = (
   const block: Block = {
     id: perspectiveFull.id,
     children: [],
-    status: hasChanges(perspectiveFull) ? "DRAFT" : "COMMITED",
+    status: perspectiveFull.draft != null ? 'DRAFT' : 'COMMITED',
     content: data ? data.text : '',
     style: data ? NodeType[data.type] : NodeType.paragraph,
     serviceProvider: perspectiveFull.origin
@@ -95,7 +70,9 @@ const reloadMasterTree = async (getState): Promise<any> => {
 
   let _tree = {}
   setTreeWithPerspectiveRec(perspectiveFull, _tree);
-  console.log('[REDUX] Reload master tree.', { perspectiveFull, _tree });
+
+  let textNodeTree = await uprtclData.toTextNodeTree(getState().workpad.rootId);
+  console.log('[REDUX] Reload master tree.', {textNodeTree, _tree });
   return _tree;
 }
 

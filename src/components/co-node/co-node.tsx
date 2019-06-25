@@ -63,7 +63,6 @@ export class CONode {
     if (event.key === 'Enter') {
       event.preventDefault();
       event.stopPropagation();
-      this.renderingWorkpad(true)
       this.newBlock(
         this.nodeId, 
         '', 
@@ -108,14 +107,12 @@ export class CONode {
   render() {
     const isDocTitle = this.block.id === this.rootId
     const blockClasses = 'text-gray-800 p-2 leading-relaxed'
-    const draftClasses = this.block.status === 'DRAFT'  ?  'has-changes'  :  '' 
     const focusClasses = this.isFocused ? 'bg-gray-200' :  ''
     const titleClasses = this.block.style === 'title' ? 'text-2xl' : ''
     const paragraphClasses =  this.block.style ==='paragraph' ? 'font-light px-2 py-2 ' : ''
     const commitedClasses = ''
     const classes = [
       blockClasses, 
-      draftClasses, 
       commitedClasses,
       titleClasses,
       paragraphClasses].join(" ")
