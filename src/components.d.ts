@@ -51,7 +51,10 @@ export namespace Components {
   }
   interface CoMenuAttributes extends StencilHTMLAttributes {
     'index'?: number;
+    'onShowInputChangePerspective'?: (event: CustomEvent) => void;
     'onShowInputCommit'?: (event: CustomEvent) => void;
+    'onShowInputMerge'?: (event: CustomEvent) => void;
+    'onShowInputNewPerspective'?: (event: CustomEvent) => void;
     'parentId'?: string;
     'reference'?: string;
   }

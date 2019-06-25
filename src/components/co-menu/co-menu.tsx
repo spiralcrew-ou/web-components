@@ -27,7 +27,10 @@ export class COMenu {
   @State() block: Block
   
   @Event({ eventName: 'showInputCommit', bubbles: true }) showInputCommit: EventEmitter
-
+  @Event({ eventName: 'showInputNewPerspective', bubbles: true }) showInputNewPerspective: EventEmitter
+  @Event({ eventName: 'showInputChangePerspective', bubbles: true }) showInputChangePerspective: EventEmitter
+  @Event({ eventName: 'showInputMerge', bubbles: true }) showInputMerge: EventEmitter
+  
 
   setStyle: Action
 
@@ -50,7 +53,6 @@ export class COMenu {
     this.store.mapStateToProps(this, state => {
       return {
         block: state.workpad.tree[this.reference],
-
       }
     })
   }
@@ -97,6 +99,24 @@ export class COMenu {
         this.showInputCommit.emit(true)
         this.close()
       }}> Commit</div>
+      <div onClick={() => {
+        this.perspectiveToCreate(this.block.id)
+        this.showInputNewPerspective.emit(true)
+        this.close()
+      }}> New Perspective</div>
+      <div onClick={() => {
+        this.perspectiveToChange(this.block.id)
+        this.showInputChangePerspective.emit(true)
+        this.close()
+      }}> Change Perspective</div>
+      <div onClick={() => {
+        this.perspectiveToMerge(this.block.id)
+        this.showInputMerge.emit(true)
+        this.close()
+      }}> Merge</div>
+    
+    
+
     </div>
     <img id={`caller${this.reference}`} onClick= {() => this.open()} class='w-6 h-6' src='../../assets/img/menu.svg'></img>
     </div> 

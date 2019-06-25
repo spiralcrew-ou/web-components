@@ -118,25 +118,7 @@ export class Workpad {
           </co-node>
 
         </content>
-        <footer class='text-color-white flex justify-end  border-t'>
-
-          <button
-            class='m-2 p-2 border border-red-700 text-red-700 uppercase text-base font-thin'
-            onClick={() => this.showInputCommit.emit(true)} > Commit</button>
-
-          <button
-            onClick={() => this.showInputNewPerspective.emit(true)}
-            class='m-2 p-2 border border-red-700 text-red-700 uppercase text-base font-thin'
-          > New Perspective</button>
-          <button
-            onClick={() => this.showInputChangePerspective.emit(true)}
-            class='m-2 p-2 border border-red-700 text-red-700 uppercase text-base font-thin'
-          > Change Perspective</button>
-          <button
-            onClick={() => this.showInputMerge.emit(true)}
-            class='m-2 p-2 border border-red-700 text-red-700 uppercase text-base font-thin'
-          > Merge</button>
-        </footer>
+       
       </div>
     )
   }
