@@ -7,17 +7,21 @@ import {
 } from './uprtcl.mock';
 import { MergeService } from './merge.service';
 import { TextNode } from '../../types';
+import { DataService } from '../data.service';
+import { MockData, sampleData } from './data.mock';
 
 describe('Merge service tests', () => {
   let uprtcl: UprtclService;
-  // let merge: MergeService;
+  let data: DataService;
+  let merge: MergeService;
   let contextId: string;
   let perspective: string;
   let commit: string;
 
   beforeEach(async () => {
     uprtcl = new MockUprtcl();
-    //  merge = new MergeService(uprtcl, null);
+    data = new MockData();
+    merge = new MergeService(uprtcl, data);
     contextId = await uprtcl.createContext(sampleContext());
     perspective = await uprtcl.createPerspective(samplePerspective(contextId));
 
@@ -48,7 +52,7 @@ describe('Merge service tests', () => {
       type: 'paragraph'
     };
     let newData2: TextNode = {
-      text: 'hi',
+      text: '1hi',
       links: [{ link: 'link1' }, { link: 'link2' }, { link: 'link3' }],
       type: 'title'
     };
@@ -56,7 +60,7 @@ describe('Merge service tests', () => {
     // Check reordering links merge
     let result = MergeService.mergeData(original, [newData1, newData2]);
     let expectedResult: TextNode = {
-      text: 'hi2',
+      text: '1hi2',
       type: 'title',
       links: [{ link: 'link2' }, { link: 'link3' }, { link: 'link1' }]
     };
@@ -70,7 +74,7 @@ describe('Merge service tests', () => {
     };
     result = MergeService.mergeData(original, [newData1, newData2]);
     expectedResult = {
-      text: 'hi2',
+      text: '1hi2',
       type: 'title',
       links: [{ link: 'link2' }, { link: 'link1' }]
     };
@@ -102,16 +106,6 @@ describe('Merge service tests', () => {
     expect(result).toEqual(expectedResult);
   });
 
-  it('Diff two strings', async () => {
-    const str1 = 'some sentence that be merged carefully';
-    const str2 = 'firstly, some sentence that should be merged carefully';
-    const str3 = 'some sentence u that anonimously be merged ';
-
-    let result = MergeService.char_diff(str1, str2);
-    result = MergeService.char_diff(str1, str3);
-    console.log(result[0]);
-  });
-
   it('Merge two strings', async () => {
     const str1 = 'some sentence that be merged carefully';
     const str2 =
@@ -123,5 +117,26 @@ describe('Merge service tests', () => {
     expect(result).toBe(
       'first i mean some long sentencab that should anonimously be merged carefully and something more and another else'
     );
+  });
+
+  it('Merge two branches', async () => {
+    const perspective1 = await uprtcl.createPerspective(
+      samplePerspective(contextId)
+    );
+
+    const data1 = await data.createData(sampleData('data and some more'));
+    const data2 = await data.createData(sampleData('data or other things'));
+
+    const commit2 = await uprtcl.createCommit(sampleCommit(data1, [commit]));
+    const commit3 = await uprtcl.createCommit(sampleCommit(data2, [commit]));
+    await uprtcl.updateHead(perspective, commit2);
+    await uprtcl.updateHead(perspective1, commit3);
+
+    const mergeCommitId = await merge.mergePerspectives(perspective, [
+      perspective1
+    ]);
+    const mergeCommit = await uprtcl.getCommit(mergeCommitId);
+    const mergedData = await data.getData(mergeCommit.dataId);
+    expect(mergedData.text).toEqual('data and some more or other things');
   });
 });
