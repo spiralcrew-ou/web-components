@@ -458,16 +458,36 @@ export class UprtclData {
     timestamp: number = Date.now(),
     recurse: boolean = false
   ): Promise<void> {
-    const draft = await this.getDraft(perspectiveId);
-    if (draft == null) {
-      return;
+    
+    let draft = await this.getDraft(perspectiveId);
+    
+    /** recursion logic depends on draft or data */
+    let applicableData = draft;
+    if (applicableData == null) {
+      applicableData = await this.getPerspectiveData(perspectiveId)
+    }
+    if (applicableData == null) {
+      return
+    }
+
+    /** recursive call (start bottom up)*/
+    if (recurse) {
+      let createInLinks = applicableData.links.map(link => {
+        this.commit(serviceProvider, link.link, message, timestamp, recurse);
+      });
+
+      await Promise.all(createInLinks);
+    }
+    
+    /** this perspective commit is done if draft is not null */
+    
+    if (!draft) {
+      return
     }
 
     const dataId = await this.data.createData(serviceProvider, draft);
     /** delete draft */
     await this.draft.removeDraft(perspectiveId);
-    /** links */
-    const links = draft.links;
 
     const headId = await this.uprtcl.getCachedHead(perspectiveId);
     const parentsIds = headId ? [headId] : [];
@@ -482,15 +502,6 @@ export class UprtclData {
     const commitId = await this.uprtcl.createCommit(serviceProvider, commit);
 
     await this.uprtcl.updateHead(perspectiveId, commitId);
-
-    /** recursive call */
-    if (recurse) {
-      let createInLinks = links.map(link => {
-        this.commit(serviceProvider, link.link, message, timestamp, recurse);
-      });
-
-      await Promise.all(createInLinks);
-    }
   }
 
   public async getDraft(perspectiveId: string): Promise<TextNode> {

@@ -24,6 +24,8 @@ export class DataMultiplatform extends CachedMultiplatform<DataService> {
     this.cacheService.setCidConfig(
       this.serviceProviders[serviceProvider].service.getCidConfig()
     );
+    /** prevent old ids conflicts */
+    delete data['id'];
     return this.optimisticCreate(
       serviceProvider,
       data,
