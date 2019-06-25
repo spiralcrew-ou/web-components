@@ -10,12 +10,14 @@ import { TextNode } from '../../types';
 
 describe('Merge service tests', () => {
   let uprtcl: UprtclService;
+  // let merge: MergeService;
   let contextId: string;
   let perspective: string;
   let commit: string;
 
   beforeEach(async () => {
     uprtcl = new MockUprtcl();
+    //  merge = new MergeService(uprtcl, null);
     contextId = await uprtcl.createContext(sampleContext());
     perspective = await uprtcl.createPerspective(samplePerspective(contextId));
 
@@ -103,22 +105,23 @@ describe('Merge service tests', () => {
   it('Diff two strings', async () => {
     const str1 = 'some sentence that be merged carefully';
     const str2 = 'firstly, some sentence that should be merged carefully';
-    const str3 = 'some sentence that anonimously be merged ';
+    const str3 = 'some sentence u that anonimously be merged ';
 
-    let result = MergeService.word_diff(str1, str2);
-    console.log(result);
-    result = MergeService.word_diff(str1, str3);
-    console.log(result);
-    result = MergeService.word_diff(str2, str3);
-    console.log(result);
+    let result = MergeService.char_diff(str1, str2);
+    result = MergeService.char_diff(str1, str3);
+    console.log(result[0]);
   });
 
   it('Merge two strings', async () => {
     const str1 = 'some sentence that be merged carefully';
-    const str2 = 'some long sentence that should be merged carefully';
-    const str3 = 'some sentence that anonimously be merged carefully';
+    const str2 =
+      'first some long sentenca that should be merged carefully and something more';
+    const str3 =
+      'i mean some sentence that anonimously be merged carefully and another else';
 
     let result = MergeService.mergeContent(str1, [str2, str3]);
-    console.log(result);
+    expect(result).toBe(
+      'first i mean some long sentenca that should anonimously be merged carefully and something more and another else'
+    );
   });
 });
