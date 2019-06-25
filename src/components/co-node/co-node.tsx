@@ -122,7 +122,7 @@ export class CONode {
 
     const containerClasses = [focusClasses, 'container'].join(" ")
 
-    const contentBlock = <div class='row'>
+    const contentBlock = <div class='row h-12'>
                             <div 
                               onBlur={event => {
                                 this.isFocused = false;

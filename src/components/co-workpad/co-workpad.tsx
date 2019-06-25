@@ -99,7 +99,7 @@ export class Workpad {
     return (
       <div class='workpad container'>
         
-        <header class='container bg-red-700 mb-4'
+        <header class='container bg-red-700 mb-4 h-12'
           onBlur={event => { if (this.titleHasChange) this.updateDocumentTitle(event['path'][0].innerText) }}
           contentEditable>
             <div class='py-4 px-2  text-white mb-8 w-full'>{this.tree[this.rootDocumentId].content}</div>
