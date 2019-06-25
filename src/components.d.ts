@@ -41,8 +41,20 @@ export namespace Components {
   interface CoLogin {}
   interface CoLoginAttributes extends StencilHTMLAttributes {}
 
-  interface CoMenu {}
-  interface CoMenuAttributes extends StencilHTMLAttributes {}
+  interface CoMenu {
+    'index': number;
+    'parentId': string;
+    'reference': string;
+  }
+  interface CoMenuAttributes extends StencilHTMLAttributes {
+    'index'?: number;
+    'onShowInputChangePerspective'?: (event: CustomEvent) => void;
+    'onShowInputCommit'?: (event: CustomEvent) => void;
+    'onShowInputMerge'?: (event: CustomEvent) => void;
+    'onShowInputNewPerspective'?: (event: CustomEvent) => void;
+    'parentId'?: string;
+    'reference'?: string;
+  }
 
   interface CoNode {
     'indexInParent': number;

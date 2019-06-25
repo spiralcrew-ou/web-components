@@ -1,2 +1,7 @@
 @import url('../../globals/style.css');
-@import url('../../globals/_variables.scss');
+
+.menuContainer {
+    display:grid;
+    grid-template-columns: 93% 7%
+}
+

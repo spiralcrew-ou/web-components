@@ -2,10 +2,8 @@ import {
   Component, State, Prop, Element, Listen, Event, EventEmitter
 } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
-import {  commitGlobal, setContent } from '../../actions';
+import {  commitGlobal, setContent,openMenu } from '../../actions';
 
-// const commited = 'text-gray-800 p-2 mx-8 font-light bg-red-100 break-words'
-// const unCommited = 'text-gray-800 p-2 mx-8 font-light break-words'
 @Component({
   tag: 'co-workpad',
   styleUrl: 'co-workpad.scss',
@@ -39,10 +37,11 @@ export class Workpad {
   
   commitGlobal: Action
   setContent: Action
+  openMenu: Action
 
   async componentWillLoad() {
     this.store.mapDispatchToProps(this, {
-      
+      openMenu,
       commitGlobal,
       setContent,
       
@@ -57,6 +56,7 @@ export class Workpad {
       }
     })
     this.isStarting.emit(false)
+    
     
   }
 
@@ -87,52 +87,38 @@ export class Workpad {
   }
 
 
+
   updateDocumentTitle(newContent) {
     this.setContent(this.tree[this.rootDocumentId].id, newContent)
   }
 
   render() {
-
     if (this.isRunning)
       return (<co-loading></co-loading>)
 
     return (
       <div class='workpad container'>
-
-        <header
-          class='bg-red-700  py-4 px-2  text-white mb-8'
+        
+        <header class='container bg-red-700 mb-4 h-12'
           onBlur={event => { if (this.titleHasChange) this.updateDocumentTitle(event['path'][0].innerText) }}
-          contentEditable>{this.tree[this.rootDocumentId].content}</header>
+          contentEditable>
+            <div class='py-4 px-2  text-white mb-8 w-full'>{this.tree[this.rootDocumentId].content}</div>
+            <div>
+              <img id={'menuRef' + this.documentId} class='w-6 h-6' src='../../assets/img/menu_white.svg'></img>
+            </div>
+          </header>
 
         <content>
           {this.openInputCommit ? <co-input-commit></co-input-commit> : ''}
           {this.openInputNewPerspective ? <co-input-new-perspective></co-input-new-perspective> : ''}
           {this.openInputChangePerspective ? <co-input-change-perspective></co-input-change-perspective> : ''}
           {this.openInputMerge ? <co-input-merge></co-input-merge> : ''}
-          {this.showMenuOption ? <co-menu></co-menu> : ''}
+        
           <co-node class='container' node-id={this.documentId}>
           </co-node>
 
         </content>
-        <footer class='text-color-white flex justify-end  border-t'>
-
-          <button
-            class='m-2 p-2 border border-red-700 text-red-700 uppercase text-base font-thin'
-            onClick={() => this.showInputCommit.emit(true)} > Commit</button>
-
-          <button
-            onClick={() => this.showInputNewPerspective.emit(true)}
-            class='m-2 p-2 border border-red-700 text-red-700 uppercase text-base font-thin'
-          > New Perspective</button>
-          <button
-            onClick={() => this.showInputChangePerspective.emit(true)}
-            class='m-2 p-2 border border-red-700 text-red-700 uppercase text-base font-thin'
-          > Change Perspective</button>
-          <button
-            onClick={() => this.showInputMerge.emit(true)}
-            class='m-2 p-2 border border-red-700 text-red-700 uppercase text-base font-thin'
-          > Merge</button>
-        </footer>
+       
       </div>
     )
   }

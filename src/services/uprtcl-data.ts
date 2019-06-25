@@ -6,7 +6,8 @@ import {
   TextNode,
   Perspective,
   Context,
-  Commit
+  Commit,
+  TextNodeTree
 } from './../types';
 import { NodeType } from './../actions';
 import { MergeService } from './merge/merge.service';
@@ -26,6 +27,33 @@ export class UprtclData {
       type: 'paragraph',
       links: []
     };
+  }
+
+  public async toTextNodeTree(perspectiveId: string): Promise<TextNodeTree> {
+    let draft = await this.getDraft(perspectiveId)
+    let data = draft;
+    if (!draft) {
+      data = await this.getPerspectiveData(perspectiveId);
+    }
+
+    if (!data) {
+      return null;
+    }
+
+    let textNodeTree:TextNodeTree = {
+      id: perspectiveId,
+      text: data.text,
+      type: data.type,
+      links: []
+    }
+
+    /** sync to keep order */
+    for (let ix = 0; ix < data.links.length; ix++) {
+      let subNode = await this.toTextNodeTree(data.links[ix].link);
+      textNodeTree.links.push(subNode);
+    }
+
+    return textNodeTree;
   }
 
   /** Gets a PerspectiveFull object with the head, context and draft objects nested.
