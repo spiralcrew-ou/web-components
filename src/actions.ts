@@ -295,7 +295,10 @@ export const commitGlobal = (blockId: string, message: string = '') => {
   return async (dispatch, getState) => {
 
     let block:Block = getState().workpad.tree[blockId]
-    let provider = block.serviceProvider;
+
+    /** create the data in the perspective provider by default */
+    let perspective = await uprtclData.uprtcl.getPerspective(blockId);
+    let provider = perspective.origin;
     
     await uprtclData.commit(
       provider,
