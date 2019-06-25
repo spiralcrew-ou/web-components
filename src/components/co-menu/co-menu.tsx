@@ -22,12 +22,10 @@ export class COMenu {
   @Prop({ context: 'store' }) store: Store;
 
   @Prop() reference: string 
-  @State() parentId: string
-  @State() index;
+  @Prop() parentId: string
+  @Prop() index: number
   @State() block: Block
-  @State() calledBy: string
-  @State() isClose: boolean = false
-
+  
   @Event({ eventName: 'showInputCommit', bubbles: true }) showInputCommit: EventEmitter
 
 
@@ -51,7 +49,8 @@ export class COMenu {
 
     this.store.mapStateToProps(this, state => {
       return {
-        block: state.workpad.tree[this.reference]
+        block: state.workpad.tree[this.reference],
+
       }
     })
   }

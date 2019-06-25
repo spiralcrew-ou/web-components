@@ -357,7 +357,7 @@ export const closeMenu = () => {
 
 export const perspectiveToCommit = (perspectiveId) => {
   return dispatch => {
-    dispatch({type: 'PERSPECTIVE_TO_CREATE',perspectiveId: perspectiveId})
+    dispatch({type: 'PERSPECTIVE_TO_COMMIT',perspectiveId: perspectiveId})
   }
 }
 

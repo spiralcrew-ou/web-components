@@ -136,7 +136,11 @@ export class CONode {
                               {this.block.content}
                             </div>
                             
-                            <co-menu  class={this.nodeId}  reference={this.nodeId} node-id={this.nodeId} >
+                            <co-menu  
+                              class={this.nodeId}  
+                              reference={this.nodeId} 
+                              parent-id={this.parentId}
+                              index={this.indexInParent} >
                             </co-menu>
                           </div>
     

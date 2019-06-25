@@ -45,10 +45,14 @@ export namespace Components {
   interface CoLoginAttributes extends StencilHTMLAttributes {}
 
   interface CoMenu {
+    'index': number;
+    'parentId': string;
     'reference': string;
   }
   interface CoMenuAttributes extends StencilHTMLAttributes {
+    'index'?: number;
     'onShowInputCommit'?: (event: CustomEvent) => void;
+    'parentId'?: string;
     'reference'?: string;
   }
 
