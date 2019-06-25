@@ -101,6 +101,16 @@ export class CONode {
     }
   }
 
+  handleContent() {
+    const conode = this._element.shadowRoot.getElementById(this.block.id);
+    if (conode && conode.innerHTML===this.block.content)
+      conode.innerHTML = this.block.content
+    else
+    
+    return this.block.content
+     
+  }
+
   
 
 
@@ -121,6 +131,7 @@ export class CONode {
 
     const contentBlock = <div class='row h-12'>
                             <div 
+                              key={this.nodeId}
                               onBlur={event => {
                                 this.isFocused = false;
                                 this.updateBlockContent(event,event['path'][0].innerText)
@@ -130,7 +141,7 @@ export class CONode {
                               data-placeholder = {'More options, press "/" '}
                               id={this.nodeId} 
                               contentEditable>
-                              {this.block.content}
+                              {this.handleContent()}
                             </div>
                             
                             <co-menu  
