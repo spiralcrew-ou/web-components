@@ -17,6 +17,7 @@ describe('Merge service tests', () => {
   let contextId: string;
   let perspective: string;
   let commit: string;
+  let dataId: string;
 
   beforeEach(async () => {
     uprtcl = new MockUprtcl();
@@ -25,7 +26,9 @@ describe('Merge service tests', () => {
     contextId = await uprtcl.createContext(sampleContext());
     perspective = await uprtcl.createPerspective(samplePerspective(contextId));
 
-    commit = await uprtcl.createCommit(sampleCommit('data'));
+    dataId = await data.createData(sampleData('data'));
+
+    commit = await uprtcl.createCommit(sampleCommit(dataId));
     await uprtcl.updateHead(perspective, commit);
   });
 
