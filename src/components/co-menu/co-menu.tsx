@@ -79,23 +79,30 @@ export class COMenu {
     this.close()
   }
 
-  render() {
+  renderTypographyMenu() {
+    
+  }
 
+  render() {
+    const isRootDocument = this.block.id === this.rootId
     return (
         <div class='mainContainer'>
           <div id={this.block.id} class='hidden  m-4 w-64 border-2 shadow-md p-2 rounded-lg font-thin z-10 bg-white'>
             <div class='menuContainer'>
              
-                <div class='block my-1' onClick={() => {
+              {!isRootDocument ? <div class='block my-1' onClick={() => {
                   this.setBlockStyle(NodeType.title)
-                }}> This is a title</div>
-                <img class='w-8 h-8 ' src='../../assets/img/uppercase.svg'></img>
+                }}> This is a title</div> :  ''}
+                
+
+              {!isRootDocument ? <img class='w-8 h-8 ' src='../../assets/img/uppercase.svg'></img> : ''}
               
 
-              <div class='my-1' onClick={() => {
+              {!isRootDocument ? <div class='my-1' onClick={() => {
                 this.setBlockStyle(NodeType.paragraph)
-              }}>this is a paragraph</div>
-              <img class='w-8 h-8 ' src='../../assets/img/lowercase.svg'></img>
+              }}>this is a paragraph</div>: ''}
+
+              {!isRootDocument ? <img class='w-8 h-8 ' src='../../assets/img/lowercase.svg'></img> : ''}
 
               <div class='my-1' onClick={() => {
                 this.callPull()
@@ -136,6 +143,7 @@ export class COMenu {
                 this.showInputInfo.emit(true)
                 this.close()
               }}> Info</div>
+              
               <img class='w-6 h-6 inline-block ' src='../../assets/img/merge.svg'></img>
 
               <div class='my-1' onClick={() => this.close()}>Close</div>

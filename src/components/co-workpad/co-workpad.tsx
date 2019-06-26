@@ -113,9 +113,12 @@ export class Workpad {
           onBlur={event => { if (this.titleHasChange) this.updateDocumentTitle(event['path'][0].innerText) }}
           contentEditable>
             <div class='py-4 px-2  text-white mb-8 w-full'>{this.tree[this.rootDocumentId].content}</div>
-            <div>
-              <img id={'menuRef' + this.documentId} class='w-6 h-6' src='../../assets/img/menu_white.svg'></img>
-            </div>
+            <co-menu  
+              class={this.rootDocumentId}  
+              reference={this.rootDocumentId} 
+              parent-id={null}
+              index={0} >
+            </co-menu>
           </header>
 
         <content>
@@ -127,6 +130,8 @@ export class Workpad {
         
           <co-node class='container' nodeid={this.rootDocumentId}>
           </co-node>
+
+          
 
         </content>
        
