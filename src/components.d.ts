@@ -76,6 +76,9 @@ export namespace Components {
     'temp'?: string;
   }
 
+  interface CoSourceCode {}
+  interface CoSourceCodeAttributes extends StencilHTMLAttributes {}
+
   interface CoWaitingApp {}
   interface CoWaitingAppAttributes extends StencilHTMLAttributes {}
 
@@ -142,6 +145,7 @@ declare global {
     'CoLogin': Components.CoLogin;
     'CoMenu': Components.CoMenu;
     'CoNode': Components.CoNode;
+    'CoSourceCode': Components.CoSourceCode;
     'CoWaitingApp': Components.CoWaitingApp;
     'CoWorkpad': Components.CoWorkpad;
     'CoWorkspaceSelector': Components.CoWorkspaceSelector;
@@ -160,6 +164,7 @@ declare global {
     'co-login': Components.CoLoginAttributes;
     'co-menu': Components.CoMenuAttributes;
     'co-node': Components.CoNodeAttributes;
+    'co-source-code': Components.CoSourceCodeAttributes;
     'co-waiting-app': Components.CoWaitingAppAttributes;
     'co-workpad': Components.CoWorkpadAttributes;
     'co-workspace-selector': Components.CoWorkspaceSelectorAttributes;
@@ -223,6 +228,12 @@ declare global {
     new (): HTMLCoNodeElement;
   };
 
+  interface HTMLCoSourceCodeElement extends Components.CoSourceCode, HTMLStencilElement {}
+  var HTMLCoSourceCodeElement: {
+    prototype: HTMLCoSourceCodeElement;
+    new (): HTMLCoSourceCodeElement;
+  };
+
   interface HTMLCoWaitingAppElement extends Components.CoWaitingApp, HTMLStencilElement {}
   var HTMLCoWaitingAppElement: {
     prototype: HTMLCoWaitingAppElement;
@@ -269,6 +280,7 @@ declare global {
     'co-login': HTMLCoLoginElement
     'co-menu': HTMLCoMenuElement
     'co-node': HTMLCoNodeElement
+    'co-source-code': HTMLCoSourceCodeElement
     'co-waiting-app': HTMLCoWaitingAppElement
     'co-workpad': HTMLCoWorkpadElement
     'co-workspace-selector': HTMLCoWorkspaceSelectorElement
@@ -287,6 +299,7 @@ declare global {
     'co-login': HTMLCoLoginElement;
     'co-menu': HTMLCoMenuElement;
     'co-node': HTMLCoNodeElement;
+    'co-source-code': HTMLCoSourceCodeElement;
     'co-waiting-app': HTMLCoWaitingAppElement;
     'co-workpad': HTMLCoWorkpadElement;
     'co-workspace-selector': HTMLCoWorkspaceSelectorElement;

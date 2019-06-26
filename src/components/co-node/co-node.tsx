@@ -71,11 +71,14 @@ export class CONode {
     if (event.key === 'Enter') {
       event.preventDefault();
       event.stopPropagation();
-      this.newBlock(
-        this.nodeid, 
-        '', 
-        this.parentid, 
-        this.indexinparent);  
+      console.log(this.rootId,this.nodeid)
+      if (this.rootId!=this.nodeid) { 
+        this.newBlock(
+          this.nodeid, 
+          '', 
+          this.parentid, 
+          this.indexinparent);  
+      }
     }
   }
 
@@ -138,7 +141,7 @@ export class CONode {
       titleClasses,
       paragraphClasses].join(" ")
 
-    const containerClasses = [focusClasses, 'container'].join(" ")
+    const containerClasses = [focusClasses].join(" ")
 
     const contentBlock = <div class='row h-12'>
                             <div 
