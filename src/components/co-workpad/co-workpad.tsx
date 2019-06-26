@@ -33,6 +33,11 @@ export class Workpad {
   @Event({ eventName: 'showInputMerge', bubbles: true }) showInputMerge: EventEmitter
   @State() openInputMerge: boolean
 
+  @Event({ eventName: 'showInputInfo', bubbles: true }) showInputInfo: EventEmitter
+  @State() openInputInfo: boolean
+
+  
+
 
   
   commitGlobal: Action
@@ -86,6 +91,11 @@ export class Workpad {
     this.openInputMerge = event.detail
   }
 
+  @Listen('showInputInfo')
+  showInputInfoHandler(event: CustomEvent) {
+    this.openInputInfo = event.detail
+  }
+
 
 
   updateDocumentTitle(newContent) {
@@ -116,6 +126,7 @@ export class Workpad {
           {this.openInputNewPerspective ? <co-input-new-perspective></co-input-new-perspective> : ''}
           {this.openInputChangePerspective ? <co-input-change-perspective></co-input-change-perspective> : ''}
           {this.openInputMerge ? <co-input-merge></co-input-merge> : ''}
+          {this.openInputInfo ? <co-input-info></co-input-info> : ''}
         
           <co-node class='container' nodeid={this.rootDocumentId}>
           </co-node>

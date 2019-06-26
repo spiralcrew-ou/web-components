@@ -609,17 +609,7 @@ export class UprtclData {
 
     // Compare the remote
     if (cachedHead && headId && !await this.isAncestorOf(cachedHead, headId)) {
-      const perspective = await this.uprtcl.getPerspective(
-        perspectiveId
-      );
-      const uprtclService = this.uprtcl.getServiceProvider(
-        perspective.origin
-      );
-      const dataService = this.data.getServiceProvider(
-        perspective.origin
-      );
-
-      const merge = new MergeService(uprtclService, dataService);
+      const merge = new MergeService(this.uprtcl, this.data);
       const mergeCommitId = await merge.mergeCommits([cachedHead, headId]);
       await this.uprtcl.updateHead(perspectiveId, mergeCommitId);
       return mergeCommitId;
@@ -629,7 +619,6 @@ export class UprtclData {
   }
 
   public async pull(perspectiveId: string): Promise<void> {
-    debugger
     const newHeadId = await this.pullHead(perspectiveId);
     await this.pullToDraft(perspectiveId, newHeadId);
   }

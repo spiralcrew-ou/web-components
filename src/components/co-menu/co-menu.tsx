@@ -6,10 +6,7 @@ import {
   pull,
   NodeType,
   Block,
-  perspectiveToCreate,
-  perspectiveToCommit,
-  perspectiveToChange,
-  perspectiveToMerge
+  setPerspectiveToAct
 } from '../../actions';
 
 import Popper from 'popper.js'
@@ -33,25 +30,20 @@ export class COMenu {
   @Event({ eventName: 'showInputNewPerspective', bubbles: true }) showInputNewPerspective: EventEmitter
   @Event({ eventName: 'showInputChangePerspective', bubbles: true }) showInputChangePerspective: EventEmitter
   @Event({ eventName: 'showInputMerge', bubbles: true }) showInputMerge: EventEmitter
+  @Event({ eventName: 'showInputInfo', bubbles: true }) showInputInfo: EventEmitter
 
   setStyle: Action
   pull: Action
 
   renderingWorkpad: Action
-  perspectiveToCreate: Action
-  perspectiveToCommit: Action
-  perspectiveToChange: Action
-  perspectiveToMerge: Action
-
+  setPerspectiveToAct: Action
+  
   componentWillLoad() {
     this.store.mapDispatchToProps(this, {
       setStyle,
       renderingWorkpad,
       pull,
-      perspectiveToCreate,
-      perspectiveToCommit,
-      perspectiveToChange,
-      perspectiveToMerge
+      setPerspectiveToAct
     })
 
     this.store.mapStateToProps(this, state => {
@@ -112,31 +104,38 @@ export class COMenu {
               <img class='w-8 h-8 ' src='../../assets/img/net.svg'></img>
 
               <div class='my-1' onClick={() => {
-                this.perspectiveToCommit(this.block.id)
+                this.setPerspectiveToAct(this.block.id)
                 this.showInputCommit.emit(true)
                 this.close()
               }}> Commit</div>
               <img class='w-6 h-6 inline-block ' src='../../assets/img/net.svg'></img>
 
               <div class='my-1' onClick={() => {
-                this.perspectiveToCreate(this.block.id)
+                this.setPerspectiveToAct(this.block.id)
                 this.showInputNewPerspective.emit(true)
                 this.close()
               }}> New Perspective</div>
               <img class='w-6 h-6 inline-block ' src='../../assets/img/new_perspective.svg'></img>
 
               <div class='my-1' onClick={() => {
-                this.perspectiveToChange(this.block.id)
+                this.setPerspectiveToAct(this.block.id)
                 this.showInputChangePerspective.emit(true)
                 this.close()
               }}> Change Perspective</div>
               <img class='w-6 h-6 inline-block ' src='../../assets/img/switch.svg'></img>
 
               <div class='my-1' onClick={() => {
-                this.perspectiveToMerge(this.block.id)
+                this.setPerspectiveToAct(this.block.id)
                 this.showInputMerge.emit(true)
                 this.close()
               }}> Merge</div>
+              <img class='w-6 h-6 inline-block ' src='../../assets/img/merge.svg'></img>
+
+              <div class='my-1' onClick={() => {
+                this.setPerspectiveToAct(this.block.id)
+                this.showInputInfo.emit(true)
+                this.close()
+              }}> Info</div>
               <img class='w-6 h-6 inline-block ' src='../../assets/img/merge.svg'></img>
 
               <div class='my-1' onClick={() => this.close()}>Close</div>

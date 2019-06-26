@@ -60,7 +60,7 @@ export class COInputChangePerspective {
       <content>
         <select onChange={event => this.handleSelected(event)}>
           <option value="">select</option>
-          {this.contextPerspectives.map(perspective => {
+          {this.contextPerspectives.filter(p => p.id != this.rootId).map(perspective => {
             return (<option value={perspective.id}>{perspective.name} - {perspective.origin} - {perspective.creatorId}</option>)
           })}
         </select>

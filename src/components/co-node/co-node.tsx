@@ -108,7 +108,6 @@ export class CONode {
     
     
     this.block = this.tree[this.nodeid]
-
     const isDocTitle = this.block.id === this.rootId
     const blockClasses = 'text-gray-800 p-2 leading-relaxed'
     const focusClasses = this.isFocused ? 'bg-gray-200' :  ''
