@@ -3,7 +3,7 @@ import { Store, Action } from '@stencil/redux';
 import {
   setStyle,
   renderingWorkpad,
-  pull,
+  pullPerspective,
   NodeType,
   Block,
   setPerspectiveToAct
@@ -33,7 +33,7 @@ export class COMenu {
   @Event({ eventName: 'showInputInfo', bubbles: true }) showInputInfo: EventEmitter
 
   setStyle: Action
-  pull: Action
+  pullPerspective: Action
 
   renderingWorkpad: Action
   setPerspectiveToAct: Action
@@ -42,7 +42,7 @@ export class COMenu {
     this.store.mapDispatchToProps(this, {
       setStyle,
       renderingWorkpad,
-      pull,
+      pullPerspective,
       setPerspectiveToAct
     })
 
@@ -55,7 +55,7 @@ export class COMenu {
   }
 
   callPull() {
-    this.pull(this.rootId);
+    this.pullPerspective(this.rootId);
   }
 
   open() {

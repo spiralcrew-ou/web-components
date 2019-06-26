@@ -10,8 +10,9 @@ import { DiscoveryService } from '../discovery.service';
 import { CachedMultiplatform } from './cached.multiplatform';
 import { UprtclLocal } from '../local/uprtcl.local';
 import { ipldService } from '../ipld';
+import { userService } from '../user/user.service.imp';
 
-const currentAuthorId = 'textsdf:26';
+const currentAuthorId = userService.getUsername();
 
 export class UprtclMultiplatform extends CachedMultiplatform<UprtclService>
   implements UprtclService {

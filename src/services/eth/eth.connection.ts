@@ -1,4 +1,5 @@
 import * as UprtclContractArtifact from './Uprtcl.json';
+import { userService } from './../user/user.service.imp'
 
 export class EthereumConnection {
   web3: any;
@@ -19,6 +20,7 @@ export class EthereumConnection {
                 this.web3 = w3w.getWeb3js();
                 this.web3.transactionConfirmationBlocks = 1;
                 this.account = w3w.getAccount();
+                userService.setUsername(this.account);
                 this.uprtclInstance = new this.web3.eth.Contract(
                   UprtclContractArtifact.abi,
                   UprtclContractArtifact.networks[w3w.getNetworkId()].address);
@@ -42,12 +44,14 @@ export class EthereumConnection {
     return new Promise(async (resolve, reject) => {
       
       let gasEstimated = await this.uprtclInstance.methods[funcName](...pars).estimateGas()
-      
-      this.uprtclInstance.methods[funcName](...pars)
-      .send({ 
+      let sendPars = { 
         from: this.account,
         gas: Math.ceil(gasEstimated * 1.1)
-      })
+      }
+      console.log(`[ETH] CALLING ${funcName}`, pars, sendPars);
+      
+      this.uprtclInstance.methods[funcName](...pars)
+      .send(sendPars)
       .once('transactionHash', (transactionHash) => {
         console.log(`[ETH] TX HASH ${funcName} `, { transactionHash, pars });
       })

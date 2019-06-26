@@ -6,6 +6,7 @@ import { Diff, DiffMatchPatch, DiffOp } from 'diff-match-patch-ts';
 
 import * as lodash from 'lodash';
 import findMostRecentCommonAncestor from './common.ancestor';
+import { userService } from '../user/user.service.imp';
 
 const diff = new DiffMatchPatch();
 
@@ -53,7 +54,7 @@ export class MergeService {
     const newDataId = await this.data.createData(newData);
 
     const mergeCommit: Commit = {
-      creatorId: 'anon',
+      creatorId: userService.getUsername(),
       dataId: newDataId,
       parentsIds: commitsIds,
       message: 'merge commits',

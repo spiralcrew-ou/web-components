@@ -1,11 +1,12 @@
 import { UprtclService } from '../uprtcl.service';
 import { Context, Perspective, Commit } from '../../types';
 import { CidConfig } from '../cid.config';
+import { userService } from '../user/user.service.imp';
 
 type Dictionary<T> = { [key: string]: T };
 
 export function sampleContext(
-  creatorId = 'anon',
+  creatorId = userService.getUsername(),
   nonce = 0,
   timestamp = Date.now()
 ): Context {
@@ -16,7 +17,7 @@ export function samplePerspective(
   contextId: string,
   name = 'perspective',
   origin = 'someOrigin',
-  creatorId = 'anon',
+  creatorId = userService.getUsername(),
   timestamp = Date.now()
 ): Perspective {
   return { timestamp, name, creatorId, contextId, origin };
@@ -26,7 +27,7 @@ export function sampleCommit(
   dataId: string,
   parentsIds: string[] = [],
   message = 'message',
-  creatorId = 'anon',
+  creatorId = userService.getUsername(),
   timestamp = Date.now()
 ): Commit {
   return { parentsIds, message, timestamp, dataId, creatorId };

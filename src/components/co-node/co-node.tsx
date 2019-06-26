@@ -2,7 +2,7 @@ import {
   Component, State, Prop, Element, Listen, Event, EventEmitter
 } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
-import { newBlock, removeBlock, reloadTree, setContent, openMenu, Block, renderingWorkpad } from '../../actions';
+import { newBlock, removeBlock, indentLeft, reloadTree, setContent, openMenu, Block, renderingWorkpad } from '../../actions';
 // import Popper from 'popper.js';
 
 @Component({
@@ -30,6 +30,7 @@ export class CONode {
   
   newBlock: Action
   removeBlock: Action
+  indentLeft: Action
   reloadTree: Action
   setContent: Action
   openMenu: Action
@@ -40,6 +41,7 @@ export class CONode {
     this.store.mapDispatchToProps(this, {
       newBlock,
       removeBlock,
+      indentLeft,
       reloadTree,
       setContent,
       openMenu,
@@ -81,6 +83,13 @@ export class CONode {
   onKeyUp(event: KeyboardEvent) {
     event.stopPropagation();
     if (event.key === 'Backspace') {
+
+      /** https://stackoverflow.com/a/54333903/1943661 */
+      var sel = document.getSelection();
+      sel['modify']("extend", "backward", "paragraphboundary");
+      var pos = sel.toString().length;
+      sel.collapseToEnd();
+  
       if (event['path'][0].innerText === '') {
         if (!this.emptyOnce) {
           this.emptyOnce = true;
@@ -89,7 +98,16 @@ export class CONode {
         }
         /**TODO: First node. 
           */
+      } else {
+        if (pos === 0) {
+          if (this.parentid && (this.parentid !== this.rootId)) {
+            /** indentn left up to level 1 */
+            console.log('Indent Left')
+            this.indentLeft(this.block.id, this.parentid, this.indexinparent);
+          }          
+        }
       }
+
     } else {
       this.emptyOnce = false;
     }
