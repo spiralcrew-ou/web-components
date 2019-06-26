@@ -59,6 +59,9 @@ export class CONode {
   componentDidLoad() {
     const conode = this._element.shadowRoot.getElementById(this.block.id);
     if (conode) conode.focus();
+
+    const element = this._element.shadowRoot.getElementById(this.nodeid);
+    if (element) element.innerHTML = this.block.content
   }
 
   @Listen('keydown')
@@ -91,9 +94,6 @@ export class CONode {
       this.emptyOnce = false;
     }
 
-    if(event.key === '/'){
-      this.openMenu(this.nodeid, this.parentid, this.indexinparent);
-    }
   }
 
   async updateBlockContent(_event:FocusEvent, _newContent) { 
@@ -104,14 +104,10 @@ export class CONode {
     }
   }
 
-  componentWillUpdate(){
-    // console.log('componente será actualizado' )
-  }
-
   render() {
-    //console.log(this.tree)
+    
+    
     this.block = this.tree[this.nodeid]
-    //console.log(this.block,this.nodeid,this.tree)
     const isDocTitle = this.block.id === this.rootId
     const blockClasses = 'text-gray-800 p-2 leading-relaxed'
     const focusClasses = this.isFocused ? 'bg-gray-200' :  ''
@@ -128,6 +124,7 @@ export class CONode {
 
     const contentBlock = <div class='row h-12'>
                             <div 
+                              key={this.nodeid}
                               onBlur={event => {
                                 this.isFocused = false;
                                 this.updateBlockContent(event,event['path'][0].innerText)
@@ -137,7 +134,7 @@ export class CONode {
                               data-placeholder = {'More options, press "/" '}
                               id={this.nodeid} 
                               contentEditable>
-                              {this.block.content}
+                             {this.block.content}
                             </div>
                             
                             <co-menu  

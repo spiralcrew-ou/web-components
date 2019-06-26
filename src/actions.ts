@@ -115,10 +115,9 @@ export const setContent = (blockId: string, content: string) => {
 
     let block = getState().workpad.tree[blockId];
     block = mapPerspectiveToBlock(perspectiveFull);
-    const tree = getState().workpad.tree
+    const tree = Object.assign({},getState().workpad.tree)
     tree[blockId] = block
-    dispatch({ type: 'SET_CONTENT', tree: Object.assign({},tree) });
-    dispatch(renderingWorkpad(false))
+    dispatch({ type: 'SET_CONTENT', tree });
   };
 };
 
