@@ -114,7 +114,7 @@ export class Workpad {
           {this.openInputChangePerspective ? <co-input-change-perspective></co-input-change-perspective> : ''}
           {this.openInputMerge ? <co-input-merge></co-input-merge> : ''}
         
-          <co-node class='container' node-id={this.documentId}>
+          <co-node class='container' nodeid={this.rootDocumentId}>
           </co-node>
 
         </content>

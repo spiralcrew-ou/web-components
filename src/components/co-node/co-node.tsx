@@ -14,11 +14,13 @@ export class CONode {
   @Element() _element: HTMLElement;
 
   @Prop({ context: 'store' }) store: Store;
-  @Prop() nodeId: string;
-  @Prop() parentId: string;
-  @Prop() indexInParent: number;
+  @Prop() temp: string
+  @Prop() nodeid: string;
+  @Prop() parentid: string;
+  @Prop() indexinparent: number;
 
-  @State() block : Block;
+  block : Block;
+  @State() tree
   @State() isFocused: boolean = false;
   @Event({ eventName: 'isRunning', bubbles: true }) isRunning: EventEmitter
   
@@ -45,13 +47,14 @@ export class CONode {
     })
     this.store.mapStateToProps(this,(state) => {
       return {
-        tree: state.workpad.tree,
+        tree: Object.assign({},state.workpad.tree),
         rootId: state.workpad.rootId,
-        block: state.workpad.tree[this.nodeId]
+        block: state.workpad.tree[this.nodeid]
       }
     })
-
+    
   }
+
 
   componentDidLoad() {
     const conode = this._element.shadowRoot.getElementById(this.block.id);
@@ -64,10 +67,10 @@ export class CONode {
       event.preventDefault();
       event.stopPropagation();
       this.newBlock(
-        this.nodeId, 
+        this.nodeid, 
         '', 
-        this.parentId, 
-        this.indexInParent);  
+        this.parentid, 
+        this.indexinparent);  
     }
   }
 
@@ -79,7 +82,7 @@ export class CONode {
         if (!this.emptyOnce) {
           this.emptyOnce = true;
         } else {
-          this.removeBlock(this.parentId, this.indexInParent);
+          this.removeBlock(this.parentid, this.indexinparent);
         }
         /**TODO: First node. 
           */
@@ -89,7 +92,7 @@ export class CONode {
     }
 
     if(event.key === '/'){
-      this.openMenu(this.nodeId, this.parentId, this.indexInParent);
+      this.openMenu(this.nodeid, this.parentid, this.indexinparent);
     }
   }
 
@@ -101,10 +104,14 @@ export class CONode {
     }
   }
 
-  
-
+  componentWillUpdate(){
+    console.log('componente será actualizado' )
+  }
 
   render() {
+    //console.log(this.tree)
+    this.block = this.tree[this.nodeid]
+    console.log(this.block,this.nodeid,this.tree)
     const isDocTitle = this.block.id === this.rootId
     const blockClasses = 'text-gray-800 p-2 leading-relaxed'
     const focusClasses = this.isFocused ? 'bg-gray-200' :  ''
@@ -128,16 +135,16 @@ export class CONode {
                               onFocus={() => {this.isFocused = true}}
                               class= {classes} 
                               data-placeholder = {'More options, press "/" '}
-                              id={this.nodeId} 
+                              id={this.nodeid} 
                               contentEditable>
                               {this.block.content}
                             </div>
                             
                             <co-menu  
-                              class={this.nodeId}  
-                              reference={this.nodeId} 
-                              parent-id={this.parentId}
-                              index={this.indexInParent} >
+                              class={this.nodeid}  
+                              reference={this.nodeid} 
+                              parent-id={this.parentid}
+                              index={this.indexinparent} >
                             </co-menu>
                           </div>
     
@@ -148,9 +155,9 @@ export class CONode {
         {this.block.children.map((childId, index) => {
            return(
             <co-node 
-              node-id={childId} 
-              parent-id={this.block.id} 
-              index-in-parent={index}>
+              nodeid={childId} 
+              parentid={this.block.id} 
+              indexinparent={index}>
             </co-node>
           )
         })}

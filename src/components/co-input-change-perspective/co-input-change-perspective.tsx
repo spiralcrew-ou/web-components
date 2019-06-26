@@ -48,9 +48,9 @@ export class COInputChangePerspective {
     this.updateContextPerspectives(this.rootId);
   }
 
-  checkout() {
+  async checkout() {
     this.renderingWorkpad(true);
-    this.checkoutPerspective(this.newPerspectiveId);
+    await this.checkoutPerspective(this.newPerspectiveId);
     this.showInputChangePerspective.emit(false)
   }
 

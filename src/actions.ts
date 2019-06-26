@@ -347,7 +347,6 @@ export const checkoutPerspective = (
   
     let _tree = {}
     setTreeWithPerspectiveRec(perspectiveFull, _tree);
-
     dispatch({ 
       type: "CHECKOUT_PERSPECTIVE", 
       rootId: perspectiveId,

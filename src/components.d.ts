@@ -57,15 +57,17 @@ export namespace Components {
   }
 
   interface CoNode {
-    'indexInParent': number;
-    'nodeId': string;
-    'parentId': string;
+    'indexinparent': number;
+    'nodeid': string;
+    'parentid': string;
+    'temp': string;
   }
   interface CoNodeAttributes extends StencilHTMLAttributes {
-    'indexInParent'?: number;
-    'nodeId'?: string;
+    'indexinparent'?: number;
+    'nodeid'?: string;
     'onIsRunning'?: (event: CustomEvent) => void;
-    'parentId'?: string;
+    'parentid'?: string;
+    'temp'?: string;
   }
 
   interface CoWaitingApp {}
