@@ -435,7 +435,7 @@ export const setPerspectiveToAct = (perspectiveId) => {
   }
 }
 
-export const updateContextPerspectives = (perspectiveId:string) => {
+export const setPerspectiveToActAndUpdateContextPerspectives = (perspectiveId:string) => {
   return async dispatch => {
     let perspective: PerspectiveFull = await uprtclData.getPerspectiveFull(perspectiveId, 0);
     let contextPerspectives = await uprtclData.uprtcl.getContextPerspectives(perspective.context.id);

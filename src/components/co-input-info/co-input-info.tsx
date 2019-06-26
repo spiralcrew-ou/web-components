@@ -1,7 +1,6 @@
 import { Component, State, Prop, Event, EventEmitter } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
 import {
-  updateContextPerspectives,
   renderingWorkpad
 } from '../../actions';
 import { Perspective, PerspectiveFull } from '../../types';
@@ -11,37 +10,31 @@ import { Perspective, PerspectiveFull } from '../../types';
   styleUrl: 'co-input-info.scss',
   shadow: true
 })
-export class COInputMerge {
+export class COInputInfo {
 
   @Prop({ context: 'store' }) store: Store;
 
   @State() show: boolean = true
   @State() perspective: PerspectiveFull
-  @State() rootId: string
   @State() contextPerspectives: Perspective[]
 
   @Event({ eventName: 'showInputInfo', bubbles: true }) showInputInfo: EventEmitter
 
-  updateContextPerspectives: Action
-  mergePerspective: Action
-  checkoutPerspective: Action
   renderingWorkpad: Action
 
-  async componentWillLoad() {
+  
+  componentWillLoad() {
     this.store.mapDispatchToProps(this, {
-      updateContextPerspectives,
       renderingWorkpad
     })
 
     this.store.mapStateToProps(this, state => {
       return {
-        rootId: state.workpad.rootId,
         contextPerspectives: state.workpad.contextPerspectives,
-        perspective: state.workpad.perspective
+        perspective: state.workpad.perspective,
+        loadingPerspective: state.workpad.loadingPerspective
       }
     })
-
-    await this.updateContextPerspectives(this.rootId);
   }
 
   renderInput() {
@@ -58,7 +51,7 @@ export class COInputMerge {
         </div>
         <div>
           <b>other perspectives:</b><br/>
-          {this.contextPerspectives.filter(p => p.id != this.rootId).map(perspective => {
+          {this.contextPerspectives.filter(p => p.id != this.perspective.id).map(perspective => {
             return (<div>
                       - {perspective.id}<br/>
                         {perspective.name} - {perspective.origin} - {perspective.creatorId}

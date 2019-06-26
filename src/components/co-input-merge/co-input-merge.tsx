@@ -1,7 +1,6 @@
 import { Component, State, Prop, Event, EventEmitter } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
 import {
-  updateContextPerspectives,
   checkoutPerspective,
   mergePerspective,
   renderingWorkpad
@@ -24,7 +23,6 @@ export class COInputMerge {
 
   @Event({ eventName: 'showInputChangePerspective', bubbles: true }) showInputChangePerspective: EventEmitter
 
-  updateContextPerspectives: Action
   mergePerspective: Action
   checkoutPerspective: Action
   renderingWorkpad: Action
@@ -35,7 +33,6 @@ export class COInputMerge {
 
   componentWillLoad() {
     this.store.mapDispatchToProps(this, {
-      updateContextPerspectives,
       mergePerspective,
       checkoutPerspective,
       renderingWorkpad
@@ -47,8 +44,6 @@ export class COInputMerge {
         contextPerspectives: state.workpad.contextPerspectives
       }
     })
-
-    this.updateContextPerspectives(this.rootId);
   }
 
   async merge() {

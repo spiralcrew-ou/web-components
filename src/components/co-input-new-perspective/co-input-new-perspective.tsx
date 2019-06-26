@@ -2,7 +2,7 @@ import { Component, State, Event, EventEmitter, Prop } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
 import { newPerspective } from './../../actions';
 import { c1ServiceProvider, ethServiceProvider } from '../../services';
-
+import { PerspectiveFull } from './../../types';
 
 @Component({
   tag: 'co-input-new-perspective',
@@ -15,7 +15,7 @@ export class COInputNewPerspective {
   @State() show: boolean = true
   @State() name: string
   @State() providerSelected: string
-  @State() rootId: string;
+  @State() perspective: PerspectiveFull;
 
   @Event({ eventName: 'showInputNewPerspective', bubbles: true }) showInputNewPerspective: EventEmitter
 
@@ -36,14 +36,16 @@ export class COInputNewPerspective {
 
     this.store.mapStateToProps(this, (state) => {
       return {
-        rootId: state.workpad.rootId
+        perspective: state.workpad.perspective
       }
     })
   }
 
-  createNewPerspective() {
-    this.newPerspective(this.rootId, this.name, this.providerSelected);
-    this.showInputNewPerspective.emit(false)
+  async createNewPerspective() {
+    if (this.name && this.name !== '') {
+      await this.newPerspective(this.perspective.id, this.name, this.providerSelected);
+      this.showInputNewPerspective.emit(false)
+    }
   }
 
 

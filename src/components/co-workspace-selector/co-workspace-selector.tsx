@@ -9,7 +9,7 @@ import { c1ServiceProvider, ethServiceProvider } from '../../services';
   export class COWorkspaceSelector {
 
     @State() isStarting: boolean
-    @State() defaultServiceProvider: string 
+    @State() defaultServiceProvider: string = c1ServiceProvider;
 
     availableServiceProviders: string[] = [
         c1ServiceProvider,

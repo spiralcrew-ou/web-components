@@ -37,9 +37,6 @@ export class Workpad {
   @State() openInputInfo: boolean
 
   
-
-
-  
   commitGlobal: Action
   setContent: Action
   openMenu: Action
@@ -60,9 +57,8 @@ export class Workpad {
         isRunning: state.workpad.isRendering
       }
     })
+    
     this.isStarting.emit(false)
-    
-    
   }
 
   @Listen('keyup')
