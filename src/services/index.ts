@@ -22,7 +22,7 @@ export const c1Enabled = true;
 export const ethEnabled = false;
 
 export const holochainServiceProvider =
-  'holochain://Qmag7yGbYSMhkzDZLnSJkc4pzNWpHLtfP5o2jL8jGF4W5w';
+  'holochain://QmTxSxPovQyWBkTRrM1gFAbtVZUAcS1oMvzkGqihbufKSs';
 
 export const c1ServiceProvider = 'https://www.collectiveone.org/uprtcl/1';
 
