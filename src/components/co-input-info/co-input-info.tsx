@@ -59,7 +59,10 @@ export class COInputMerge {
         <div>
           <b>other perspectives:</b><br/>
           {this.contextPerspectives.filter(p => p.id != this.rootId).map(perspective => {
-            return (<div>{perspective.name} - {perspective.origin} - {perspective.creatorId}</div>)
+            return (<div>
+                      - {perspective.id}<br/>
+                        {perspective.name} - {perspective.origin} - {perspective.creatorId}
+                    </div>)
           })}
         </div>
       </content>
