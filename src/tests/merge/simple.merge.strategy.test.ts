@@ -1,19 +1,19 @@
-import { UprtclService } from '../uprtcl.service';
+import { UprtclService } from '../../services/uprtcl.service';
 import {
   MockUprtcl,
   sampleContext,
   samplePerspective,
   sampleCommit
-} from './uprtcl.mock';
-import { MergeService } from './merge.service';
+} from '../mocks/uprtcl.mock';
+import { SimpleMergeStrategy } from '../../services/merge/simple.merge.strategy';
 import { TextNode } from '../../types';
-import { DataService } from '../data.service';
-import { MockData, sampleData } from './data.mock';
+import { DataService } from '../../services/data.service';
+import { MockData, sampleData } from '../mocks/data.mock';
 
 describe('Merge service tests', () => {
   let uprtcl: UprtclService;
   let data: DataService;
-  let merge: MergeService;
+  let merge: SimpleMergeStrategy;
   let contextId: string;
   let perspective: string;
   let commit: string;
@@ -22,7 +22,7 @@ describe('Merge service tests', () => {
   beforeEach(async () => {
     uprtcl = new MockUprtcl();
     data = new MockData();
-    merge = new MergeService(uprtcl, data);
+    merge = new SimpleMergeStrategy(uprtcl, data);
     contextId = await uprtcl.createContext(sampleContext());
     perspective = await uprtcl.createPerspective(samplePerspective(contextId));
 
@@ -36,10 +36,10 @@ describe('Merge service tests', () => {
     const original = 'originalData';
     const newData = 'newData';
 
-    const result1 = MergeService.mergeResult(original, [original, original]);
+    const result1 = merge.mergeResult(original, [original, original]);
     expect(result1).toEqual(original);
 
-    const result2 = MergeService.mergeResult(original, [original, newData]);
+    const result2 = merge.mergeResult(original, [original, newData]);
     expect(result2).toEqual(newData);
   });
 
@@ -61,7 +61,7 @@ describe('Merge service tests', () => {
     };
 
     // Check reordering links merge
-    let result = MergeService.mergeData(original, [newData1, newData2]);
+    let result = await merge.mergeData(original, [newData1, newData2]);
     let expectedResult: TextNode = {
       text: '1hi2',
       type: 'title',
@@ -75,7 +75,7 @@ describe('Merge service tests', () => {
       links: [{ link: 'link2' }, { link: 'link1' }],
       type: 'paragraph'
     };
-    result = MergeService.mergeData(original, [newData1, newData2]);
+    result = await merge.mergeData(original, [newData1, newData2]);
     expectedResult = {
       text: '1hi2',
       type: 'title',
@@ -99,7 +99,7 @@ describe('Merge service tests', () => {
       ],
       type: 'title'
     };
-    result = MergeService.mergeData(original, [newData1, newData2]);
+    result = await merge.mergeData(original, [newData1, newData2]);
     expectedResult = {
       text: 'hi2',
       type: 'title',
@@ -116,7 +116,7 @@ describe('Merge service tests', () => {
     const str3 =
       'i mean some sentencb that anonimously be merged carefully and another else';
 
-    let result = MergeService.mergeContent(str1, [str2, str3]);
+    let result = await merge.mergeContent(str1, [str2, str3]);
     expect(result).toBe(
       'first i mean some long sentencab that should anonimously be merged carefully and something more and another else'
     );
@@ -142,4 +142,5 @@ describe('Merge service tests', () => {
     const mergedData = await data.getData(mergeCommit.dataId);
     expect(mergedData.text).toEqual('data and some more or other things');
   });
+
 });

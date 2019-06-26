@@ -1,9 +1,9 @@
-import { UprtclService } from '../uprtcl.service';
+import { UprtclService } from '../../services/uprtcl.service';
 import {
   MockUprtcl,
   sampleCommit
-} from './uprtcl.mock';
-import findMostRecentCommonAncestor from './common.ancestor';
+} from '../mocks/uprtcl.mock';
+import findMostRecentCommonAncestor from '../../services/merge/common.ancestor';
 
 describe('Find Most Recent Common Ancestor tests', () => {
   let uprtcl: UprtclService;

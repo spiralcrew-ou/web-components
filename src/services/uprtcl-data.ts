@@ -172,7 +172,11 @@ export class UprtclData {
    *
    * @returns The id of the new **perspective**.
    */
-  async initContext(serviceProvider: string, content: string, _timestamp: number = Date.now()): Promise<string> {
+  async initContext(
+    serviceProvider: string,
+    content: string,
+    _timestamp: number = Date.now()
+  ): Promise<string> {
     const context: Context = {
       creatorId: 'anon',
       nonce: 0,
@@ -554,18 +558,17 @@ export class UprtclData {
     ancestorId: string,
     commitId: string
   ): Promise<boolean> {
-    
-    if (ancestorId === commitId) return true
+    if (ancestorId === commitId) return true;
 
     const commit = await this.uprtcl.getCommit(commitId);
-    
+
     if (commit.parentsIds.includes(ancestorId)) {
       return true;
     } else {
       /** recursive call */
-      for(let ix = 0; ix < commit.parentsIds.length; ix++) {
-        if (this.isAncestorOf(commit.parentsIds[ix], commitId)) {
-          return
+      for (let ix = 0; ix < commit.parentsIds.length; ix++) {
+        if (await this.isAncestorOf(ancestorId, commit.parentsIds[ix])) {
+          return true;
         }
       }
     }
@@ -573,11 +576,14 @@ export class UprtclData {
     return false;
   }
 
-  private async pullToDraft(perspectiveId: string, headId: string): Promise<any> {
+  private async pullToDraft(
+    perspectiveId: string,
+    headId: string
+  ): Promise<any> {
     // Retrieve the commit with which the draft was created of the perspective
     const draftCommit = await this.draft.getDraft(perspectiveId);
 
-    if (draftCommit && (headId !== draftCommit.commitId)) {
+    if (draftCommit && headId !== draftCommit.commitId) {
       // Head and cached head are different, we need to merge its contents together
       const head = await this.uprtcl.getCommit(headId);
       const newData = await this.data.getData<TextNode>(head.dataId);
@@ -608,7 +614,11 @@ export class UprtclData {
     const headId = await this.uprtcl.getHead(perspectiveId);
 
     // Compare the remote
-    if (cachedHead && headId && !await this.isAncestorOf(cachedHead, headId)) {
+    if (
+      cachedHead &&
+      headId &&
+      !(await this.isAncestorOf(cachedHead, headId))
+    ) {
       const merge = new MergeService(this.uprtcl, this.data);
       const mergeCommitId = await merge.mergeCommits([cachedHead, headId]);
       await this.uprtcl.updateHead(perspectiveId, mergeCommitId);

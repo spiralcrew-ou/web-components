@@ -305,9 +305,6 @@ export const pull = (blockId: string) => {
 
 export const mergePerspective = (toPerspective: string, fromPerspectiveId: string) => {
   return async (dispatch, getState) => {
-
-    debugger
-    
     const tree = getState().workpad.tree;
     const block: Block = tree[toPerspective];
 

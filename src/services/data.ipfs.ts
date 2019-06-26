@@ -16,8 +16,7 @@ export class DataIpfs implements DataService {
 
   constructor(options: object) {
     this.ipfsClient = new IpfsClient(options);
-    this.cidConfig = new CidConfig(
-      'base58btc', 1, 'raw', 'sha2-256');
+    this.cidConfig = new CidConfig('base58btc', 1, 'raw', 'sha2-256');
   }
 
   async getData(dataId: string): Promise<any> {
@@ -31,10 +30,10 @@ export class DataIpfs implements DataService {
     let dataIdOrg = data.id;
 
     let dataPlain = {
-      'text': data.text,
-      'type': data.type,
-      'links': data.links,
-    }
+      text: data.text,
+      type: data.type,
+      links: data.links
+    };
 
     const dataId = await this.ipfsClient.addObject(dataPlain, this.cidConfig);
     console.log('[IPFS] createData', data, dataId);
@@ -42,7 +41,7 @@ export class DataIpfs implements DataService {
     if (dataIdOrg) {
       if (dataIdOrg != dataId) {
         throw new Error(`Data ID computed by IPFS ${dataId} is 
-        not the same as the input one ${dataIdOrg}`)
+        not the same as the input one ${dataIdOrg}`);
       }
     }
 

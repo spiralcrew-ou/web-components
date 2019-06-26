@@ -16,10 +16,6 @@ export class DataCollectiveOne implements DataService {
     return this.cidConfig;
   }
 
-  setCidConfig(): CidConfig {
-    throw new Error('Collectiveone Cid version is fixed for the moment');
-  }
-
   async getData(dataId: string): Promise<any> {
     return http.get<DataC1If>(`/data/${dataId}`).then(dataC1 => {
       switch (dataC1.type) {
