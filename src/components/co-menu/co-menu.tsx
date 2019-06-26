@@ -3,6 +3,7 @@ import { Store, Action } from '@stencil/redux';
 import {
   setStyle,
   renderingWorkpad,
+  pull,
   NodeType,
   Block,
   perspectiveToCreate,
@@ -26,14 +27,15 @@ export class COMenu {
   @Prop() parentId: string
   @Prop() index: number
   @State() block: Block
+  @State() rootId: string
 
   @Event({ eventName: 'showInputCommit', bubbles: true }) showInputCommit: EventEmitter
   @Event({ eventName: 'showInputNewPerspective', bubbles: true }) showInputNewPerspective: EventEmitter
   @Event({ eventName: 'showInputChangePerspective', bubbles: true }) showInputChangePerspective: EventEmitter
   @Event({ eventName: 'showInputMerge', bubbles: true }) showInputMerge: EventEmitter
 
-
   setStyle: Action
+  pull: Action
 
   renderingWorkpad: Action
   perspectiveToCreate: Action
@@ -45,6 +47,7 @@ export class COMenu {
     this.store.mapDispatchToProps(this, {
       setStyle,
       renderingWorkpad,
+      pull,
       perspectiveToCreate,
       perspectiveToCommit,
       perspectiveToChange,
@@ -54,11 +57,14 @@ export class COMenu {
     this.store.mapStateToProps(this, state => {
       return {
         block: state.workpad.tree[this.reference],
+        rootId: state.workpad.rootId,
       }
     })
   }
 
-
+  callPull() {
+    this.pull(this.rootId);
+  }
 
   open() {
     const menu = this._element.shadowRoot.getElementById(`${this.block.id}`) as any
@@ -98,6 +104,12 @@ export class COMenu {
                 this.setBlockStyle(NodeType.paragraph)
               }}>this is a paragraph</div>
               <img class='w-8 h-8 ' src='../../assets/img/lowercase.svg'></img>
+
+              <div class='my-1' onClick={() => {
+                this.callPull()
+                this.close()
+              }}> Pull</div>
+              <img class='w-8 h-8 ' src='../../assets/img/net.svg'></img>
 
               <div class='my-1' onClick={() => {
                 this.perspectiveToCommit(this.block.id)

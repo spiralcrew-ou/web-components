@@ -14,11 +14,13 @@ export class CONode {
   @Element() _element: HTMLElement;
 
   @Prop({ context: 'store' }) store: Store;
-  @Prop() nodeId: string;
-  @Prop() parentId: string;
-  @Prop() indexInParent: number;
+  @Prop() temp: string
+  @Prop() nodeid: string;
+  @Prop() parentid: string;
+  @Prop() indexinparent: number;
 
-  @State() block : Block;
+  block : Block;
+  @State() tree
   @State() isFocused: boolean = false;
   @Event({ eventName: 'isRunning', bubbles: true }) isRunning: EventEmitter
   
@@ -45,17 +47,21 @@ export class CONode {
     })
     this.store.mapStateToProps(this,(state) => {
       return {
-        tree: state.workpad.tree,
+        tree: Object.assign({},state.workpad.tree),
         rootId: state.workpad.rootId,
-        block: state.workpad.tree[this.nodeId]
+        block: state.workpad.tree[this.nodeid]
       }
     })
-
+    
   }
+
 
   componentDidLoad() {
     const conode = this._element.shadowRoot.getElementById(this.block.id);
     if (conode) conode.focus();
+
+    const element = this._element.shadowRoot.getElementById(this.nodeid);
+    if (element) element.innerHTML = this.block.content
   }
 
   @Listen('keydown')
@@ -64,10 +70,10 @@ export class CONode {
       event.preventDefault();
       event.stopPropagation();
       this.newBlock(
-        this.nodeId, 
+        this.nodeid, 
         '', 
-        this.parentId, 
-        this.indexInParent);  
+        this.parentid, 
+        this.indexinparent);  
     }
   }
 
@@ -79,7 +85,7 @@ export class CONode {
         if (!this.emptyOnce) {
           this.emptyOnce = true;
         } else {
-          this.removeBlock(this.parentId, this.indexInParent);
+          this.removeBlock(this.parentid, this.indexinparent);
         }
         /**TODO: First node. 
           */
@@ -88,9 +94,6 @@ export class CONode {
       this.emptyOnce = false;
     }
 
-    if(event.key === '/'){
-      this.openMenu(this.nodeId, this.parentId, this.indexInParent);
-    }
   }
 
   async updateBlockContent(_event:FocusEvent, _newContent) { 
@@ -101,20 +104,11 @@ export class CONode {
     }
   }
 
-  handleContent() {
-    const conode = this._element.shadowRoot.getElementById(this.block.id);
-    if (conode && conode.innerHTML===this.block.content)
-      conode.innerHTML = this.block.content
-    else
-    
-    return this.block.content
-     
-  }
-
-  
-
-
   render() {
+    
+    
+    this.block = this.tree[this.nodeid]
+
     const isDocTitle = this.block.id === this.rootId
     const blockClasses = 'text-gray-800 p-2 leading-relaxed'
     const focusClasses = this.isFocused ? 'bg-gray-200' :  ''
@@ -131,7 +125,7 @@ export class CONode {
 
     const contentBlock = <div class='row h-12'>
                             <div 
-                              key={this.nodeId}
+                              key={this.nodeid}
                               onBlur={event => {
                                 this.isFocused = false;
                                 this.updateBlockContent(event,event['path'][0].innerText)
@@ -139,16 +133,16 @@ export class CONode {
                               onFocus={() => {this.isFocused = true}}
                               class= {classes} 
                               data-placeholder = {'More options, press "/" '}
-                              id={this.nodeId} 
+                              id={this.nodeid} 
                               contentEditable>
-                              {this.handleContent()}
+                             {this.block.content}
                             </div>
                             
                             <co-menu  
-                              class={this.nodeId}  
-                              reference={this.nodeId} 
-                              parent-id={this.parentId}
-                              index={this.indexInParent} >
+                              class={this.nodeid}  
+                              reference={this.nodeid} 
+                              parent-id={this.parentid}
+                              index={this.indexinparent} >
                             </co-menu>
                           </div>
     
@@ -159,9 +153,9 @@ export class CONode {
         {this.block.children.map((childId, index) => {
            return(
             <co-node 
-              node-id={childId} 
-              parent-id={this.block.id} 
-              index-in-parent={index}>
+              nodeid={childId} 
+              parentid={this.block.id} 
+              indexinparent={index}>
             </co-node>
           )
         })}

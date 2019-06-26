@@ -4,7 +4,7 @@ import { UprtclService } from '../uprtcl.service';
 import { DataService } from '../data.service';
 import { Diff, DiffMatchPatch, DiffOp } from 'diff-match-patch-ts';
 
-import * as _ from 'lodash';
+import * as lodash from 'lodash';
 import findMostRecentCommonAncestor from './common.ancestor';
 
 const diff = new DiffMatchPatch();
@@ -219,7 +219,7 @@ export class MergeService {
 
   static mergeResult<T>(original: T, modifications: Array<T>): T {
     const changes = modifications.filter(
-      modification => !_.isEqual(original, modification)
+      modification => !lodash.isEqual(original, modification)
     );
 
     switch (changes.length) {
@@ -229,7 +229,7 @@ export class MergeService {
       case 1:
         return changes[0];
       default:
-        if (changes.every(change => _.isEqual(changes[0], change))) {
+        if (changes.every(change => lodash.isEqual(changes[0], change))) {
           return changes[0];
         }
         throw new Error('conflict when trying to merge');

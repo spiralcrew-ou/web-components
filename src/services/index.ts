@@ -71,8 +71,8 @@ if (ethEnabled) {
   };
 }
 
-export const uprtclMultiplatform = new UprtclMultiplatform(uprtclConfig);
-export const dataMultiplatform = new DataMultiplatform(dataConfig);
+export const uprtclMultiplatform = new UprtclMultiplatform(uprtclConfig, c1ServiceProvider);
+export const dataMultiplatform = new DataMultiplatform(dataConfig, c1ServiceProvider);
 export const draftService = new DraftLocal<{
   commitId: string;
   draft: TextNode;

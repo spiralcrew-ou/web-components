@@ -30,7 +30,7 @@ export class UprtclData {
   }
 
   public async toTextNodeTree(perspectiveId: string): Promise<TextNodeTree> {
-    let draft = await this.getDraft(perspectiveId)
+    let draft = await this.getDraft(perspectiveId);
     let data = draft;
     if (!draft) {
       data = await this.getPerspectiveData(perspectiveId);
@@ -40,12 +40,12 @@ export class UprtclData {
       return null;
     }
 
-    let textNodeTree:TextNodeTree = {
+    let textNodeTree: TextNodeTree = {
       id: perspectiveId,
       text: data.text,
       type: data.type,
       links: []
-    }
+    };
 
     /** sync to keep order */
     for (let ix = 0; ix < data.links.length; ix++) {
@@ -172,13 +172,16 @@ export class UprtclData {
    *
    * @returns The id of the new **perspective**.
    */
-  async initContext(serviceProvider: string, content: string): Promise<string> {
+  async initContext(serviceProvider: string, content: string, _timestamp: number = Date.now()): Promise<string> {
     const context: Context = {
       creatorId: 'anon',
       nonce: 0,
-      timestamp: 0
+      timestamp: _timestamp
     };
-    const contextId = await this.uprtcl.createContext(serviceProvider, context);
+    const contextId = await this.uprtcl.createContextIn(
+      serviceProvider,
+      context
+    );
 
     return this.initPerspective(serviceProvider, contextId, content);
   }
@@ -207,7 +210,7 @@ export class UprtclData {
       timestamp: Date.now()
     };
 
-    const perspectiveId = await this.uprtcl.createPerspective(
+    const perspectiveId = await this.uprtcl.createPerspectiveIn(
       serviceProvider,
       perspective
     );
@@ -433,7 +436,7 @@ export class UprtclData {
         links: newLinks
       };
 
-      const newDataId = await this.data.createData<TextNode>(
+      const newDataId = await this.data.createDataIn<TextNode>(
         serviceProvider,
         newNode
       );
@@ -446,7 +449,7 @@ export class UprtclData {
         timestamp: Date.now()
       };
 
-      newCommitId = await this.uprtcl.createCommit(serviceProvider, commit);
+      newCommitId = await this.uprtcl.createCommitIn(serviceProvider, commit);
     }
 
     const newPerspective: Perspective = {
@@ -457,7 +460,7 @@ export class UprtclData {
       timestamp: Date.now()
     };
 
-    const newPerspectiveId = await this.uprtcl.createPerspective(
+    const newPerspectiveId = await this.uprtcl.createPerspectiveIn(
       serviceProvider,
       newPerspective
     );
@@ -506,12 +509,13 @@ export class UprtclData {
       await Promise.all(createInLinks);
     }
 
-    /** this perspective commit is done if draft is not null */    
+    /** this perspective commit is done if draft is not null */
+
     if (!draft) {
       return;
     }
-    
-    const dataId = await this.data.createData(serviceProvider, draft);
+
+    const dataId = await this.data.createDataIn(serviceProvider, draft);
     /** delete draft */
     await this.draft.removeDraft(perspectiveId);
 
@@ -525,7 +529,7 @@ export class UprtclData {
       parentsIds: parentsIds,
       timestamp: timestamp
     };
-    const commitId = await this.uprtcl.createCommit(serviceProvider, commit);
+    const commitId = await this.uprtcl.createCommitIn(serviceProvider, commit);
 
     await this.uprtcl.updateHead(perspectiveId, commitId);
   }
@@ -550,19 +554,30 @@ export class UprtclData {
     ancestorId: string,
     commitId: string
   ): Promise<boolean> {
-    const commit = await uprtclMultiplatform.getCommit(commitId);
+    
+    if (ancestorId === commitId) return true
+
+    const commit = await this.uprtcl.getCommit(commitId);
+    
     if (commit.parentsIds.includes(ancestorId)) {
       return true;
     } else {
-      return false;
+      /** recursive call */
+      for(let ix = 0; ix < commit.parentsIds.length; ix++) {
+        if (this.isAncestorOf(commit.parentsIds[ix], commitId)) {
+          return
+        }
+      }
     }
+
+    return false;
   }
 
-  private async pullDraft(perspectiveId: string, headId: string): Promise<any> {
+  private async pullToDraft(perspectiveId: string, headId: string): Promise<any> {
     // Retrieve the commit with which the draft was created of the perspective
     const draftCommit = await this.draft.getDraft(perspectiveId);
 
-    if (headId !== draftCommit.commitId) {
+    if (draftCommit && (headId !== draftCommit.commitId)) {
       // Head and cached head are different, we need to merge its contents together
       const head = await this.uprtcl.getCommit(headId);
       const newData = await this.data.getData<TextNode>(head.dataId);
@@ -589,33 +604,42 @@ export class UprtclData {
   }
 
   private async pullHead(perspectiveId: string): Promise<string> {
-    const cachedHead = await uprtclMultiplatform.getCachedHead(perspectiveId);
-    const headId = await uprtclMultiplatform.getHead(perspectiveId);
+    const cachedHead = await this.uprtcl.getCachedHead(perspectiveId);
+    const headId = await this.uprtcl.getHead(perspectiveId);
 
     // Compare the remote
-    if (!(await this.isAncestorOf(cachedHead, headId))) {
-      const perspective = await uprtclMultiplatform.getPerspective(
+    if (cachedHead && headId && !await this.isAncestorOf(cachedHead, headId)) {
+      const perspective = await this.uprtcl.getPerspective(
         perspectiveId
       );
-      const uprtclService = uprtclMultiplatform.getServiceProvider(
+      const uprtclService = this.uprtcl.getServiceProvider(
         perspective.origin
       );
-      const dataService = dataMultiplatform.getServiceProvider(
+      const dataService = this.data.getServiceProvider(
         perspective.origin
       );
 
       const merge = new MergeService(uprtclService, dataService);
       const mergeCommitId = await merge.mergeCommits([cachedHead, headId]);
-      await uprtclMultiplatform.updateHead(perspectiveId, mergeCommitId);
+      await this.uprtcl.updateHead(perspectiveId, mergeCommitId);
       return mergeCommitId;
     }
 
     return headId;
   }
 
-  public async pull(perspectiveId: string): Promise<any> {
+  public async pull(perspectiveId: string): Promise<void> {
+    debugger
     const newHeadId = await this.pullHead(perspectiveId);
-    await this.pullDraft(perspectiveId, newHeadId);
+    await this.pullToDraft(perspectiveId, newHeadId);
+  }
+
+  public async merge(
+    toPerspective: string,
+    fromPerspectives: string[]
+  ): Promise<string> {
+    const merge = new MergeService(uprtclMultiplatform, dataMultiplatform);
+    return merge.mergePerspectives(toPerspective, fromPerspectives);
   }
 }
 
