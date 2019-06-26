@@ -59,6 +59,8 @@ export const workpadReducer = (state = { ...initialState.workpad }, action) => {
       return {...state,...action}
     case 'CHECKOUT_PERSPECTIVE':
       return {...state,...action}
+    case 'MERGE_MADE':
+        return {...state,...action}
     
     default:
       return state

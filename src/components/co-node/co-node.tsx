@@ -105,13 +105,13 @@ export class CONode {
   }
 
   componentWillUpdate(){
-    console.log('componente será actualizado' )
+    // console.log('componente será actualizado' )
   }
 
   render() {
     //console.log(this.tree)
     this.block = this.tree[this.nodeid]
-    console.log(this.block,this.nodeid,this.tree)
+    //console.log(this.block,this.nodeid,this.tree)
     const isDocTitle = this.block.id === this.rootId
     const blockClasses = 'text-gray-800 p-2 leading-relaxed'
     const focusClasses = this.isFocused ? 'bg-gray-200' :  ''

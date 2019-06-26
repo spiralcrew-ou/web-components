@@ -27,7 +27,7 @@ export namespace Components {
 
   interface CoInputMerge {}
   interface CoInputMergeAttributes extends StencilHTMLAttributes {
-    'onShowInputMerge'?: (event: CustomEvent) => void;
+    'onShowInputChangePerspective'?: (event: CustomEvent) => void;
   }
 
   interface CoInputNewPerspective {}

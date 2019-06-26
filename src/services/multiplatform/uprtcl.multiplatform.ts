@@ -11,7 +11,7 @@ import { CachedMultiplatform } from './cached.multiplatform';
 import { UprtclLocal } from '../local/uprtcl.local';
 import { ipldService } from '../ipld';
 
-const currentAuthorId = 'textsdf:09';
+const currentAuthorId = 'textsdf:25';
 
 export class UprtclMultiplatform extends CachedMultiplatform<UprtclService>
   implements UprtclService {
