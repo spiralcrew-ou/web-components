@@ -395,42 +395,19 @@ export const closeMenu = () => {
   }
 }
 
-export const perspectiveToCommit = (perspectiveId) => {
-  return dispatch => {
-    dispatch({type: 'PERSPECTIVE_TO_COMMIT',perspectiveId: perspectiveId})
-  }
-}
-
-export const perspectiveToCreate = (perspectiveOriginId: string) => {
-  return dispatch => {
-    dispatch({type: 'PERSPECTIVE_TO_CREATE',perspectiveId: perspectiveOriginId})
-  }
-}
-
-export const perspectiveToChange = (perspectiveOriginId: string) => {
-  return dispatch => {
-    dispatch({type: 'PERSPECTIVE_TO_CHANGE',perspectiveId: perspectiveOriginId})
-  }
-}
-
-export const updateContextPerspectives = (perspectiveOriginId:string) => {
+export const setPerspectiveToAct = (perspectiveId) => {
   return async dispatch => {
-    let perspective = await uprtclData.uprtcl.getPerspective(perspectiveOriginId);
-    let contextPerspectives = await uprtclData.uprtcl.getContextPerspectives(perspective.contextId);
-
-    dispatch({type: 'UPDATE_CONTEXT_PERSPECTIVES', perspectiveId:perspectiveOriginId, contextPerspectives })
+    let perspective: PerspectiveFull = await uprtclData.getPerspectiveFull(perspectiveId, 0);
+    dispatch({type: 'SET_PERSPECTIVE_TO_ACT', perspective})
   }
 }
 
-export const perspectiveToMerge = (perspectiveOriginId:string) => {
-  return dispatch => {
-    dispatch({type: 'PERSPECTIVE_TO_MERGE',perspectiveId:perspectiveOriginId })
-  }
-}
+export const updateContextPerspectives = (perspectiveId:string) => {
+  return async dispatch => {
+    let perspective: PerspectiveFull = await uprtclData.getPerspectiveFull(perspectiveId, 0);
+    let contextPerspectives = await uprtclData.uprtcl.getContextPerspectives(perspective.context.id);
 
-export const perspectiveToPull = (perspectiveOriginId:string) => {
-  return dispatch => {
-    dispatch({type: 'PERSPECTIVE_TO_PULL',perspectiveId:perspectiveOriginId })
+    dispatch({type: 'UPDATE_CONTEXT_PERSPECTIVES', perspective, contextPerspectives })
   }
 }
 

@@ -11,7 +11,7 @@ const initialState = {
     tree: {},
     block: {},
     isRendering: false,
-    perspectiveId: null,
+    perspective: null,
     contextPerspectives: []
   },
   menu: {
@@ -47,13 +47,7 @@ export const workpadReducer = (state = { ...initialState.workpad }, action) => {
         return {...state,...action}
     case 'RENDERING_WORKPAD':
       return {...state,...action}
-    case 'PERSPECTIVE_TO_COMMIT':
-      return {...state,...action}
-    case 'PERSPECTIVE_TO_CREATE':
-      return {...state,...action}
-    case 'PERSPECTIVE_TO_CHANGE':
-      return {...state,...action}
-    case 'PERSPECTIVE_TO_MERGE':
+    case 'SET_PERSPECTIVE_TO_ACT':
       return {...state,...action}
     case 'UPDATE_CONTEXT_PERSPECTIVES':
       return {...state,...action}
