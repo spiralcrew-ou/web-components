@@ -48,7 +48,7 @@ export class IpldService {
       cidConfig.base
     );
 
-    console.log('cid generated', object, cidConfig, cid.toString());
+    // console.log('cid generated', object, cidConfig, cid.toString());
 
     return cid.toString();
   }
