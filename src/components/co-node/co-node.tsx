@@ -143,7 +143,7 @@ export class CONode {
 
     const containerClasses = [focusClasses].join(" ")
 
-    const contentBlock = <div class='row min-h-2'>
+    const contentBlock = <div class='row min-h-2 ml-2'>
                             <div 
                               key={this.nodeid}
                               onBlur={event => {
@@ -152,7 +152,7 @@ export class CONode {
                               }}
                               onFocus={() => {this.isFocused = true}}
                               class= {classes} 
-                              data-placeholder = {'More options, press "/" '}
+                              data-placeholder = {'Please write here '}
                               id={this.nodeid} 
                               contentEditable>
                              {this.block.content}
