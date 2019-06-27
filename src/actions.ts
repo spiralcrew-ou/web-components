@@ -135,7 +135,8 @@ export const newBlock = (blockId: string, _content: string, parentId: string, in
           initNode.serviceProvider,
           initNode.id,
           0,
-          _content
+          _content,
+          NodeType.paragraph
         );
         break;
 
@@ -149,7 +150,8 @@ export const newBlock = (blockId: string, _content: string, parentId: string, in
           parent.serviceProvider,
           parent.id,
           index + 1,
-          ''
+          '',
+          NodeType.paragraph
         );
         break;
 

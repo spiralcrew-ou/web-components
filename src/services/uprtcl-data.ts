@@ -22,10 +22,10 @@ export class UprtclData {
    *
    * @param _content Text used to initialize the text node
    */
-  public initEmptyTextNode(_content: string): TextNode {
+  public initEmptyTextNode(_content: string, _type: NodeType): TextNode {
     return {
       text: _content,
-      type: NodeType.paragraph,
+      type: _type,
       links: []
     };
   }
@@ -173,7 +173,12 @@ export class UprtclData {
    *
    * @returns The id of the new **perspective**.
    */
-  async initContext(serviceProvider: string, content: string, _timestamp: number = Date.now()): Promise<string> {
+  async initContext(
+    serviceProvider: string, 
+    content: string, 
+    type: NodeType, 
+    _timestamp: number = Date.now()): Promise<string> {
+
     const context: Context = {
       creatorId: userService.getUsername(),
       nonce: 0,
@@ -184,7 +189,7 @@ export class UprtclData {
       context
     );
 
-    return this.initPerspective(serviceProvider, contextId, content);
+    return this.initPerspective(serviceProvider, contextId, content, type);
   }
 
   /** Creates a new perspective, and a draft combo
@@ -201,7 +206,8 @@ export class UprtclData {
   async initPerspective(
     serviceProvider: string,
     contextId: string,
-    content: string
+    content: string,
+    type: NodeType
   ): Promise<string> {
     const perspective: Perspective = {
       contextId: contextId,
@@ -216,7 +222,7 @@ export class UprtclData {
       perspective
     );
 
-    await this.setDraft(perspectiveId, this.initEmptyTextNode(content));
+    await this.setDraft(perspectiveId, this.initEmptyTextNode(content, type));
 
     return perspectiveId;
   }
@@ -241,9 +247,10 @@ export class UprtclData {
     serviceProvider: string,
     perspectiveId: string,
     index: number,
-    content: string
+    content: string,
+    type: NodeType
   ): Promise<string> {
-    const newPerspectiveId = await this.initContext(serviceProvider, content);
+    const newPerspectiveId = await this.initContext(serviceProvider, content, type);
     await this.insertPerspective(perspectiveId, newPerspectiveId, index);
     return newPerspectiveId;
   }
@@ -339,7 +346,7 @@ export class UprtclData {
 
     await this.setDraft(
       perspectiveId,
-      data ? data : this.initEmptyTextNode('')
+      data ? data : this.initEmptyTextNode('', NodeType.paragraph)
     );
 
     return this.getDraft(perspectiveId);
@@ -583,7 +590,7 @@ export class UprtclData {
       const head = await this.uprtcl.getCommit(headId);
       const newData = await this.data.getData<TextNode>(head.dataId);
 
-      let oldData = this.initEmptyTextNode('');
+      let oldData = this.initEmptyTextNode('', NodeType.paragraph);
       if (draftCommit.commitId) {
         const oldCommit = await this.uprtcl.getCommit(draftCommit.commitId);
         oldData = await this.data.getData(oldCommit.dataId);
