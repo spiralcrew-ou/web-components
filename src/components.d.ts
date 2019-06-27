@@ -47,11 +47,13 @@ export namespace Components {
   interface CoLoginAttributes extends StencilHTMLAttributes {}
 
   interface CoMenu {
+    'color': string;
     'index': number;
     'parentId': string;
     'reference': string;
   }
   interface CoMenuAttributes extends StencilHTMLAttributes {
+    'color'?: string;
     'index'?: number;
     'onShowInputChangePerspective'?: (event: CustomEvent) => void;
     'onShowInputCommit'?: (event: CustomEvent) => void;

@@ -114,9 +114,10 @@ export class Workpad {
           contentEditable>
             <div class='py-4 px-2  text-white mb-8 w-full'>{this.tree[this.rootDocumentId].content}</div>
             <co-menu  
-              class={this.rootDocumentId}  
+              class={` ${this.rootDocumentId}  `}
               reference={this.rootDocumentId} 
               parent-id={null}
+              color='white'
               index={0} >
             </co-menu>
           </header>

@@ -25,6 +25,7 @@ export class COMenu {
   @Prop() index: number
   @State() block: Block
   @State() rootId: string
+  @Prop() color: string 
 
   @Event({ eventName: 'showInputCommit', bubbles: true }) showInputCommit: EventEmitter
   @Event({ eventName: 'showInputNewPerspective', bubbles: true }) showInputNewPerspective: EventEmitter
@@ -151,7 +152,8 @@ export class COMenu {
               
             </div>
           </div>
-          <img id={`caller${this.reference}`} onClick={() => this.open()} class='w-6 h-6' src='../../assets/img/menu.svg'></img>
+
+          <img id={`caller${this.reference}`} onClick={() => this.open()} class='w-6 h-6' src={`../../assets/img/menu_${this.color ? this.color : 'gray'}.svg`}></img>
         </div>
         )
       }
