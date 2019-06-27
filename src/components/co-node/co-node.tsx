@@ -159,7 +159,7 @@ export class CONode {
                             </div>
                             
                             <co-menu  
-                              class={this.nodeid}  
+                              class={`menu ${this.nodeid}`}  
                               reference={this.nodeid} 
                               parent-id={this.parentid}
                               index={this.indexinparent} >
