@@ -153,7 +153,7 @@ export class COMenu {
             </div>
           </div>
 
-          <img id={`caller${this.reference}`} onClick={() => this.open()} class='w-6 h-6' src={`../../assets/img/menu_${this.color ? this.color : 'gray'}.svg`}></img>
+          <img id={`caller${this.reference}`} onClick={() => this.open()} class='w-4 h-4' src={`../../assets/img/menu_${this.color ? this.color : 'gray'}.svg`}></img>
         </div>
         )
       }
