@@ -1,6 +1,8 @@
 import { Component, State, Event, EventEmitter, Prop } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
 import { commitGlobal } from './../../actions';
+import { PerspectiveFull } from './../../types';
+
 @Component({
   tag: 'co-input-commit',
   styleUrl: 'co-input-commit.scss',
@@ -11,7 +13,7 @@ export class COWorkspaceSelector {
   @Prop({ context: 'store' }) store: Store;
   @State() show: boolean = true;
   @State() message: string;
-  @State() rootId: string;
+  @State() perspective: PerspectiveFull;
 
   @Event({ eventName: 'showInputCommit', bubbles: true }) showInputCommit: EventEmitter
 
@@ -24,7 +26,7 @@ export class COWorkspaceSelector {
     
     this.store.mapStateToProps(this, (state) => {
       return {
-        rootId: state.workpad.rootId
+        perspective: state.workpad.perspective
       }
     })
   }
@@ -34,8 +36,8 @@ export class COWorkspaceSelector {
   }
 
   commit() {
-    console.log('[INPUT-COMMIT] calling commit global', {rootId: this.rootId});
-    this.commitGlobal(this.rootId);
+    console.log('[INPUT-COMMIT] calling on', this.perspective);
+    this.commitGlobal(this.perspective.id);
     this.showInputCommit.emit(false);
   }
 
@@ -49,8 +51,6 @@ export class COWorkspaceSelector {
           class='ml-2 px-2 w-11/12 my-2 py-2 border-gray-600 border-b'
           placeholder='message (optional)'>
         </input>
-
-
       </content>
       <footer class='flex text-red-700 justify-end'>
         <button class='uppercase m-2 font-thin object-none ' onClick={() => this.showInputCommit.emit(false)}>Cancel</button>

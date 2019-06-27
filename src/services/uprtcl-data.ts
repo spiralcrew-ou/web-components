@@ -14,6 +14,8 @@ import { MergeStrategy } from './merge/merge.strategy';
 import { RecursiveContextMergeStrategy } from './merge/recursive-context.merge.strategry';
 import { DraftRecursiveContentMergeStrategy } from './merge/draft.recursive-content.merge.strategy';
 
+import { userService } from './user/user.service.imp';
+
 export class UprtclData {
   uprtcl = uprtclMultiplatform;
   data = dataMultiplatform;
@@ -185,7 +187,7 @@ export class UprtclData {
     _timestamp: number = Date.now()
   ): Promise<string> {
     const context: Context = {
-      creatorId: 'anon',
+      creatorId: userService.getUsername(),
       nonce: 0,
       timestamp: _timestamp
     };
@@ -216,7 +218,7 @@ export class UprtclData {
     const perspective: Perspective = {
       contextId: contextId,
       name: 'master',
-      creatorId: 'anon',
+      creatorId: userService.getUsername(),
       origin: serviceProvider,
       timestamp: Date.now()
     };
@@ -417,7 +419,7 @@ export class UprtclData {
     const headId = await this.uprtcl.getHead(perspectiveId);
     const head = headId ? await this.uprtcl.getCommit(headId) : null;
     const data = head ? await this.data.getData<TextNode>(head.dataId) : null;
-
+    
     /** global perspectives are created bottom-up in the tree of
      * perspectives */
     const links = data ? data.links : [];
@@ -453,7 +455,7 @@ export class UprtclData {
       );
 
       const commit: Commit = {
-        creatorId: 'anon',
+        creatorId: userService.getUsername(),
         dataId: newDataId,
         message: `creating new global perspective ${name}`,
         parentsIds: headId ? [headId] : [],
@@ -466,7 +468,7 @@ export class UprtclData {
     const newPerspective: Perspective = {
       contextId: perspective.contextId,
       name: name,
-      creatorId: 'anon',
+      creatorId: userService.getUsername(),
       origin: serviceProvider,
       timestamp: Date.now()
     };
@@ -534,7 +536,7 @@ export class UprtclData {
     const parentsIds = headId ? [headId] : [];
 
     const commit: Commit = {
-      creatorId: 'anon',
+      creatorId: userService.getUsername(),
       dataId: dataId,
       message: message,
       parentsIds: parentsIds,

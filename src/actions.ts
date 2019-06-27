@@ -114,10 +114,9 @@ export const setContent = (blockId: string, content: string) => {
 
     let block = getState().workpad.tree[blockId];
     block = mapPerspectiveToBlock(perspectiveFull);
-    const tree = getState().workpad.tree
+    const tree = Object.assign({},getState().workpad.tree)
     tree[blockId] = block
-    dispatch({ type: 'SET_CONTENT', tree: Object.assign({},tree) });
-    dispatch(renderingWorkpad(false))
+    dispatch({ type: 'SET_CONTENT', tree });
   };
 };
 
@@ -264,6 +263,40 @@ export const removeBlock = (parentId: string, index: number) => {
   }
 };
 
+/**   
+ * If the block is of type title, and its parent is not the rootId (meaning
+ * the block is at level two or below), it makes the block (together with its children)
+ * a younger sybling of the title parent
+ */
+export const indentLeft = (blockId: string, parentId: string, index: number) => {
+  return async (dispatch, getState) => {
+
+    const tree = getState().workpad.tree;
+    const rootId = getState().workpad.rootId;
+
+    if ((parentId === rootId) || (blockId === rootId)) return;
+    
+    /** level 2 or more */
+    const block: Block = tree[blockId];
+
+    if (block.style !== NodeType.title) return;
+
+    let grandParentId = Object.keys(tree).find(key => tree[key].children.includes(parentId));
+    let parentIx = tree[grandParentId].children.findIndex(id => id === parentId);
+    
+    if (!grandParentId) return;
+    if (parentIx == -1) return;
+
+    /** remove this block from parent */
+    await uprtclData.removePerspective(parentId, index);
+
+    /** add it to the  this block from parent */
+    await uprtclData.insertPerspective(grandParentId, blockId, parentIx + 1);
+
+    dispatch(reloadTree());
+  }
+};
+
 
  /** Commits the draft of the block specified by blockId and recursively
 f all its children. Send the rootId to commit the entire document.
@@ -289,7 +322,7 @@ export const commitGlobal = (blockId: string, message: string = '') => {
   };
 };
 
-export const pull = (blockId: string) => {
+export const pullPerspective = (blockId: string) => {
   return async (dispatch, getState) => {
 
     await uprtclData.pull(blockId)
@@ -391,42 +424,19 @@ export const closeMenu = () => {
   }
 }
 
-export const perspectiveToCommit = (perspectiveId) => {
-  return dispatch => {
-    dispatch({type: 'PERSPECTIVE_TO_COMMIT',perspectiveId: perspectiveId})
-  }
-}
-
-export const perspectiveToCreate = (perspectiveOriginId: string) => {
-  return dispatch => {
-    dispatch({type: 'PERSPECTIVE_TO_CREATE',perspectiveId: perspectiveOriginId})
-  }
-}
-
-export const perspectiveToChange = (perspectiveOriginId: string) => {
-  return dispatch => {
-    dispatch({type: 'PERSPECTIVE_TO_CHANGE',perspectiveId: perspectiveOriginId})
-  }
-}
-
-export const updateContextPerspectives = (perspectiveOriginId:string) => {
+export const setPerspectiveToAct = (perspectiveId) => {
   return async dispatch => {
-    let perspective = await uprtclData.uprtcl.getPerspective(perspectiveOriginId);
-    let contextPerspectives = await uprtclData.uprtcl.getContextPerspectives(perspective.contextId);
-
-    dispatch({type: 'UPDATE_CONTEXT_PERSPECTIVES', perspectiveId:perspectiveOriginId, contextPerspectives })
+    let perspective: PerspectiveFull = await uprtclData.getPerspectiveFull(perspectiveId, 0);
+    dispatch({type: 'SET_PERSPECTIVE_TO_ACT', perspective})
   }
 }
 
-export const perspectiveToMerge = (perspectiveOriginId:string) => {
-  return dispatch => {
-    dispatch({type: 'PERSPECTIVE_TO_MERGE',perspectiveId:perspectiveOriginId })
-  }
-}
+export const setPerspectiveToActAndUpdateContextPerspectives = (perspectiveId:string) => {
+  return async dispatch => {
+    let perspective: PerspectiveFull = await uprtclData.getPerspectiveFull(perspectiveId, 0);
+    let contextPerspectives = await uprtclData.uprtcl.getContextPerspectives(perspective.context.id);
 
-export const perspectiveToPull = (perspectiveOriginId:string) => {
-  return dispatch => {
-    dispatch({type: 'PERSPECTIVE_TO_PULL',perspectiveId:perspectiveOriginId })
+    dispatch({type: 'UPDATE_CONTEXT_PERSPECTIVES', perspective, contextPerspectives })
   }
 }
 

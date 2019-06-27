@@ -1,6 +1,9 @@
 import { Component, State, Listen, Method } from '@stencil/core';
 import { c1ServiceProvider, ethServiceProvider } from '../../services';
 
+
+import { uprtclMultiplatform } from '../../services/index'
+
 @Component({
     tag: 'co-workspace-selector',
     styleUrl: 'co-workspace-selector.scss',
@@ -8,8 +11,11 @@ import { c1ServiceProvider, ethServiceProvider } from '../../services';
   })
   export class COWorkspaceSelector {
 
-    @State() isStarting: boolean
-    @State() defaultServiceProvider: string 
+    @State() isStarting: boolean = true
+    @State() ethLoading: boolean = true
+    @State() defaultServiceProvider: string = ethServiceProvider;
+
+    selectorEnabled: boolean = false;
 
     availableServiceProviders: string[] = [
         c1ServiceProvider,
@@ -33,14 +39,17 @@ import { c1ServiceProvider, ethServiceProvider } from '../../services';
         this.selectWorkspaceType(e.target['selectedOptions'][0].value);
     }
 
-    componentWillLoad() {
+    async componentWillLoad() {
         console.log(`[WORSPACE SELECTOR] Avaliable services:`, this.availableServiceProviders);
+        await uprtclMultiplatform.serviceProviders[ethServiceProvider].service['ethereum'].ready();
+        console.log(`[WORSPACE SELECTOR] Ethereum ready`);
+        this.ethLoading = false
     }
 
     renderWorkpad() {
-        return <div>
-        {this.isStarting ? <co-waiting-app></co-waiting-app> : ''}
-        <co-workspace 
+        return <div class='waiting'>
+        {(this.isStarting || this.ethLoading)? <co-waiting-app></co-waiting-app> : ''}
+        <co-workspace
             default-service={this.defaultServiceProvider}
             avaialable-services={this.availableServiceProviders}>
         </co-workspace>
@@ -59,7 +68,12 @@ import { c1ServiceProvider, ethServiceProvider } from '../../services';
         </div>
     }
 
-    render = () => !this.defaultServiceProvider ? this.renderWelcome() : this.renderWorkpad()
-    
+    render = () => {
+        if (this.selectorEnabled) {
+            return !this.defaultServiceProvider ? this.renderWelcome() : this.renderWorkpad()
+        } else {
+            return this.renderWorkpad()
+        }
+    }
   }
 

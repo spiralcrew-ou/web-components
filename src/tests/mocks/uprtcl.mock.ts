@@ -1,7 +1,8 @@
 import { UprtclService } from '../../services/uprtcl.service';
 import { Context, Perspective, Commit, TextNode } from '../../types';
-import { CidConfig } from '../../services/cid.config';
 import { BaseMock } from './base.mock';
+import { userService } from '../../services/user/user.service.imp';
+import { CidConfig } from '../../services/cid.config';
 
 type Dictionary<T> = { [key: string]: T };
 
@@ -20,7 +21,7 @@ export interface Content {
 }
 
 export function sampleContext(
-  creatorId = 'anon',
+  creatorId = userService.getUsername(),
   nonce = 0,
   timestamp = Date.now()
 ): Context {
@@ -31,7 +32,7 @@ export function samplePerspective(
   contextId: string,
   name = 'perspective',
   origin = 'someOrigin',
-  creatorId = 'anon',
+  creatorId = userService.getUsername(),
   timestamp = Date.now()
 ): Perspective {
   return { timestamp, name, creatorId, contextId, origin };
@@ -41,7 +42,7 @@ export function sampleCommit(
   dataId: string,
   parentsIds: string[] = [],
   message = 'message',
-  creatorId = 'anon',
+  creatorId = userService.getUsername(),
   timestamp = Date.now()
 ): Commit {
   return { parentsIds, message, timestamp, dataId, creatorId };

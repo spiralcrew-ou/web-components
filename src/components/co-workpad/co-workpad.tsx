@@ -2,7 +2,7 @@ import {
   Component, State, Prop, Element, Listen, Event, EventEmitter
 } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
-import {  commitGlobal, setContent,openMenu } from '../../actions';
+import {  commitGlobal, setContent,openMenu, newBlock } from '../../actions';
 
 @Component({
   tag: 'co-workpad',
@@ -33,18 +33,21 @@ export class Workpad {
   @Event({ eventName: 'showInputMerge', bubbles: true }) showInputMerge: EventEmitter
   @State() openInputMerge: boolean
 
+  @Event({ eventName: 'showInputInfo', bubbles: true }) showInputInfo: EventEmitter
+  @State() openInputInfo: boolean
 
   
   commitGlobal: Action
   setContent: Action
   openMenu: Action
+  newBlock: Action
 
   async componentWillLoad() {
     this.store.mapDispatchToProps(this, {
       openMenu,
       commitGlobal,
       setContent,
-      
+      newBlock
     })
    
     this.store.mapStateToProps(this, state => {
@@ -55,9 +58,8 @@ export class Workpad {
         isRunning: state.workpad.isRendering
       }
     })
+    
     this.isStarting.emit(false)
-    
-    
   }
 
   @Listen('keyup')
@@ -86,6 +88,11 @@ export class Workpad {
     this.openInputMerge = event.detail
   }
 
+  @Listen('showInputInfo')
+  showInputInfoHandler(event: CustomEvent) {
+    this.openInputInfo = event.detail
+  }
+
 
 
   updateDocumentTitle(newContent) {
@@ -97,15 +104,20 @@ export class Workpad {
       return (<co-loading></co-loading>)
 
     return (
-      <div class='workpad container'>
+      <div class='workpad'>
         
-        <header class='container bg-red-700 mb-4 h-12'
+        <header class='bg-red-700 mb-4 h-12 pl-2'
           onBlur={event => { if (this.titleHasChange) this.updateDocumentTitle(event['path'][0].innerText) }}
           contentEditable>
             <div class='py-4 px-2  text-white mb-8 w-full'>{this.tree[this.rootDocumentId].content}</div>
-            <div>
-              <img id={'menuRef' + this.documentId} class='w-6 h-6' src='../../assets/img/menu_white.svg'></img>
-            </div>
+            <co-menu  
+              show
+              class={` ${this.rootDocumentId}  `}
+              reference={this.rootDocumentId} 
+              parent-id={null}
+              color='white'
+              index={0} >
+            </co-menu>
           </header>
 
         <content>
@@ -113,9 +125,14 @@ export class Workpad {
           {this.openInputNewPerspective ? <co-input-new-perspective></co-input-new-perspective> : ''}
           {this.openInputChangePerspective ? <co-input-change-perspective></co-input-change-perspective> : ''}
           {this.openInputMerge ? <co-input-merge></co-input-merge> : ''}
+          {this.openInputInfo ? <co-input-info></co-input-info> : ''}
         
-          <co-node class='container' nodeid={this.rootDocumentId}>
+          <co-node  nodeid={this.rootDocumentId}>
           </co-node>
+
+          <div class='clickZone h-16' onClick={() => this.newBlock(this.rootDocumentId,'',null,-1)}/>
+
+          
 
         </content>
        

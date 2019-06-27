@@ -12,6 +12,8 @@ import { UprtclCollectiveOne } from './c1/uprtcl.c1';
 import { DiscoveryCollectiveOne } from './c1/discovery.c1';
 
 import { UprtclEthereum } from './eth/uprtcl.eth';
+// import { DiscoveryEthereum } from './eth/discovery.eth';
+
 
 import { DataIpfs } from './data.ipfs';
 import { DraftLocal } from './local/draft.local';
@@ -19,16 +21,19 @@ import { TextNode } from './../types';
 
 export const holochainEnabled = false;
 export const c1Enabled = true;
-export const ethEnabled = false;
+export const ethEnabled = true;
 
 export const holochainServiceProvider =
   'holochain://QmTxSxPovQyWBkTRrM1gFAbtVZUAcS1oMvzkGqihbufKSs';
 
-export const c1ServiceProvider = 'https://www.collectiveone.org/uprtcl/1';
+export const c1ServiceProvider = 
+  'https://www.collectiveone.org/uprtcl/1';
 
-export const ethServiceProvider = 'eth://smartContract';
+export const ethServiceProvider = 
+  'eth://71ABb6Dbf02a568Eafb25E638836434E507E09a8';
 
-const ethLocation = 'ws://127.0.0.1:8545';
+
+const ethLocation = null;//'ws://127.0.0.1:8545';
 const ipfsConfig = {
   host: 'ipfs.infura.io',
   port: 5001,

@@ -1,0 +1,32 @@
+@import '../../globals/style.css';
+
+.form {
+    display: grid;
+    grid-template-rows: 1fr 4fr 1fr;
+    grid-gap: 10px
+}
+
+input:focus{
+    outline: none;
+}
+
+button:focus{
+    outline: none;
+}
+
+content { 
+    display: grid;
+    grid-template-columns: 15% 85%;
+    grid-gap: 10px;
+}
+
+p {
+    margin-bottom: 8px;
+}
+
+.otherPerspectives { 
+    display: grid;
+    grid-template-columns: 50% 50%;
+    grid-gap: 10px
+}
+

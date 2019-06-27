@@ -5,7 +5,7 @@ import { CidCompatible } from '../cid.service';
 
 export class CachedMultiplatform<T extends CidCompatible> extends Multiplatform<
   T
-> {
+  > {
   cacheService: T;
 
   taskQueue = new TaskQueue();
@@ -59,10 +59,13 @@ export class CachedMultiplatform<T extends CidCompatible> extends Multiplatform<
 
     const object = await this.cached(
       getter,
-      () => this.discover(hash, getter, linksSelector),
+      async () => {
+        const object = await this.discover(hash, getter, linksSelector);
+        if (object) object['id'] = hash;
+        return object;
+      },
       cloner
     );
-    object['id'] = hash;
     return object;
   }
 

@@ -1,11 +1,10 @@
 import { Component, State, Prop, Event, EventEmitter } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
 import {
-  updateContextPerspectives,
   checkoutPerspective,
   renderingWorkpad
 } from '../../actions';
-import { Perspective } from './../../types';
+import { Perspective, PerspectiveFull } from './../../types';
 
 @Component({
   tag: 'co-input-change-perspective',
@@ -18,7 +17,7 @@ export class COInputChangePerspective {
 
   @State() show: boolean = true
   @State() newPerspectiveId: string
-  @State() rootId: string
+  @State() perspective: PerspectiveFull
   @State() contextPerspectives: Perspective[]
 
   @Event({ eventName: 'showInputChangePerspective', bubbles: true }) showInputChangePerspective: EventEmitter
@@ -33,19 +32,16 @@ export class COInputChangePerspective {
 
   componentWillLoad() {
     this.store.mapDispatchToProps(this, {
-      updateContextPerspectives,
       checkoutPerspective,
       renderingWorkpad
     })
 
     this.store.mapStateToProps(this, state => {
       return {
-        rootId: state.workpad.rootId,
+        perspective: state.workpad.perspective,
         contextPerspectives: state.workpad.contextPerspectives
       }
     })
-
-    this.updateContextPerspectives(this.rootId);
   }
 
   async checkout() {
@@ -60,7 +56,7 @@ export class COInputChangePerspective {
       <content>
         <select onChange={event => this.handleSelected(event)}>
           <option value="">select</option>
-          {this.contextPerspectives.map(perspective => {
+          {this.contextPerspectives.filter(p => p.id != this.perspective.id).map(perspective => {
             return (<option value={perspective.id}>{perspective.name} - {perspective.origin} - {perspective.creatorId}</option>)
           })}
         </select>
