@@ -4,7 +4,7 @@ import {
 } from '../../services';
 import { Store, Action } from '@stencil/redux';
 import { configureStore } from '../../store.js';
-import { UprtclData } from '../../services/uprtcl-data';
+import { uprtclData } from '../../services/uprtcl-data';
 import {setSelectedProvider,initTree,reloadTree} from '../../actions';
 
 @Component({
@@ -21,7 +21,7 @@ export class COWorkspace {
 
   // Multiplatform service is already instantiated, get a reference to it
   uprtcl = uprtclMultiplatform;
-  uprtclData = new UprtclData();
+  uprtclData = uprtclData;
 
   setSelectedProvider: Action
   initTree: Action

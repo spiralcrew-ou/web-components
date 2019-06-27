@@ -10,12 +10,19 @@ import {
   TextNodeTree
 } from './../types';
 import { NodeType } from './../actions';
-import { MergeService } from './merge/simple.merge.strategy';
+import { MergeStrategy } from './merge/merge.strategy';
+import { RecursiveContextMergeStrategy } from './merge/recursive-context.merge.strategry';
+import { DraftRecursiveContentMergeStrategy } from './merge/draft.recursive-content.merge.strategy';
 
 export class UprtclData {
   uprtcl = uprtclMultiplatform;
   data = dataMultiplatform;
   draft = draftService;
+  mergeService: MergeStrategy<TextNode>;
+
+  constructor(mergeService: MergeStrategy<TextNode>) {
+    this.mergeService = mergeService;
+  }
 
   /** Single point to initialize empty text nodes
    *
@@ -86,7 +93,7 @@ export class UprtclData {
     const draft = await this.getDraft(perspectiveId);
     perspectiveFull.draft = await this.getTextNodeFull(draft, levels);
 
-    const headId = await this.uprtcl.getCachedHead(perspectiveId);
+    const headId = await this.uprtcl.getHead(perspectiveId);
     perspectiveFull.head = await this.getCommitFull(headId, levels);
 
     return perspectiveFull;
@@ -319,7 +326,7 @@ export class UprtclData {
    * @returns The data object.
    */
   async getPerspectiveData(perspectiveId: string) {
-    const headId = await this.uprtcl.getCachedHead(perspectiveId);
+    const headId = await this.uprtcl.getHead(perspectiveId);
     const head = headId ? await this.uprtcl.getCommit(headId) : null;
     return head ? this.data.getData<TextNode>(head.dataId) : null;
   }
@@ -407,7 +414,7 @@ export class UprtclData {
   ): Promise<string> {
     /** get perspective and include first level links */
     const perspective = await this.uprtcl.getPerspective(perspectiveId);
-    const headId = await this.uprtcl.getCachedHead(perspectiveId);
+    const headId = await this.uprtcl.getHead(perspectiveId);
     const head = headId ? await this.uprtcl.getCommit(headId) : null;
     const data = head ? await this.data.getData<TextNode>(head.dataId) : null;
 
@@ -523,7 +530,7 @@ export class UprtclData {
     /** delete draft */
     await this.draft.removeDraft(perspectiveId);
 
-    const headId = await this.uprtcl.getCachedHead(perspectiveId);
+    const headId = await this.uprtcl.getHead(perspectiveId);
     const parentsIds = headId ? [headId] : [];
 
     const commit: Commit = {
@@ -544,7 +551,7 @@ export class UprtclData {
   }
 
   public async setDraft(perspectiveId: string, draft: TextNode): Promise<void> {
-    const headId = await this.uprtcl.getCachedHead(perspectiveId);
+    const headId = await this.uprtcl.getHead(perspectiveId);
 
     const commitDraft = {
       commitId: headId,
@@ -594,7 +601,12 @@ export class UprtclData {
         oldData = await this.data.getData(oldCommit.dataId);
       }
 
-      const newDraft = MergeService.mergeData(oldData, [
+      const draftMerge = new DraftRecursiveContentMergeStrategy(
+        this.uprtcl,
+        this.data,
+        this.draft
+      );
+      const newDraft = await draftMerge.mergeData(oldData, [
         newData,
         draftCommit.draft
       ]);
@@ -610,8 +622,8 @@ export class UprtclData {
   }
 
   private async pullHead(perspectiveId: string): Promise<string> {
-    const cachedHead = await this.uprtcl.getCachedHead(perspectiveId);
-    const headId = await this.uprtcl.getHead(perspectiveId);
+    const cachedHead = await this.uprtcl.getHead(perspectiveId);
+    const headId = await this.uprtcl.getRemoteHead(perspectiveId);
 
     // Compare the remote
     if (
@@ -619,8 +631,10 @@ export class UprtclData {
       headId &&
       !(await this.isAncestorOf(cachedHead, headId))
     ) {
-      const merge = new MergeService(this.uprtcl, this.data);
-      const mergeCommitId = await merge.mergeCommits([cachedHead, headId]);
+      const mergeCommitId = await this.mergeService.mergeCommits([
+        cachedHead,
+        headId
+      ]);
       await this.uprtcl.updateHead(perspectiveId, mergeCommitId);
       return mergeCommitId;
     }
@@ -637,9 +651,10 @@ export class UprtclData {
     toPerspective: string,
     fromPerspectives: string[]
   ): Promise<string> {
-    const merge = new MergeService(uprtclMultiplatform, dataMultiplatform);
-    return merge.mergePerspectives(toPerspective, fromPerspectives);
+    return this.mergeService.mergePerspectives(toPerspective, fromPerspectives);
   }
 }
 
-export const uprtclData = new UprtclData();
+export const uprtclData = new UprtclData(
+  new RecursiveContextMergeStrategy(uprtclMultiplatform, dataMultiplatform)
+);

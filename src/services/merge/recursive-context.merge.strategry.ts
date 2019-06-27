@@ -133,13 +133,31 @@ export class RecursiveContextMergeStrategy extends SimpleMergeStrategy {
     return links;
   }
 
-  private async mergePerspectiveChildren(
-    perspectiveId: string
-  ): Promise<string> {
-    const perspective = this.allPerspectives[perspectiveId];
+  protected async getPerspectiveData(perspectiveId: string): Promise<TextNode> {
     let headId = await this.uprtcl.getHead(perspectiveId);
     const commit = await this.uprtcl.getCommit(headId);
-    const data = await this.data.getData(commit.dataId);
+    return this.data.getData(commit.dataId);
+  }
+
+  protected async updatePerspectiveData(
+    perspectiveId,
+    node: TextNode
+  ): Promise<void> {
+    let headId = await this.uprtcl.getHead(perspectiveId);
+    const newDataId = await this.data.createData(node);
+    const commit: Commit = {
+      creatorId: 'anon',
+      dataId: newDataId,
+      parentsIds: [headId],
+      message: 'Update perspective by merge',
+      timestamp: Date.now()
+    };
+    headId = await this.uprtcl.createCommit(commit);
+    await this.uprtcl.updateHead(perspectiveId, headId);
+  }
+
+  private async mergePerspectiveChildren(perspectiveId: string): Promise<void> {
+    const data = await this.getPerspectiveData(perspectiveId);
 
     const rawLinks = data.links.map(link => link.link);
 
@@ -150,18 +168,8 @@ export class RecursiveContextMergeStrategy extends SimpleMergeStrategy {
         ...data,
         links: mergedLinks.map(link => ({ link }))
       };
-      const newDataId = await this.data.createData(node);
-      const commit: Commit = {
-        creatorId: 'anon',
-        dataId: newDataId,
-        parentsIds: [headId],
-        message: 'merge commits',
-        timestamp: Date.now()
-      };
-      headId = await this.uprtcl.createCommit(commit);
-      await this.uprtcl.updateHead(perspective.id, headId);
-    }
 
-    return headId;
+      await this.updatePerspectiveData(perspectiveId, node);
+    }
   }
 }

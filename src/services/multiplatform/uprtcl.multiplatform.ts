@@ -12,7 +12,7 @@ import { UprtclLocal } from '../local/uprtcl.local';
 import { ipldService } from '../ipld';
 import { CidConfig } from '../cid.config';
 
-const currentAuthorId = 'guille:13';
+const currentAuthorId = 'guille:15';
 
 export class UprtclMultiplatform extends CachedMultiplatform<UprtclService>
   implements UprtclService {
@@ -199,18 +199,18 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService>
     );
   }
 
-  async getCachedHead(perspectiveId: string): Promise<string> {
+  async getHead(perspectiveId: string): Promise<string> {
     const isHeadCached = await (<UprtclLocal>this.cacheService).headExists(
       perspectiveId
     );
     if (isHeadCached) {
       return this.cacheService.getHead(perspectiveId);
     } else {
-      return this.getHead(perspectiveId);
+      return this.getRemoteHead(perspectiveId);
     }
   }
 
-  async getHead(perspectiveId: string): Promise<string> {
+  async getRemoteHead(perspectiveId: string): Promise<string> {
     const perspective = await this.getPerspective(perspectiveId);
 
     if (perspective == null) {

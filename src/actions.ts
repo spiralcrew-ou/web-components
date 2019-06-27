@@ -1,4 +1,4 @@
-import { UprtclData } from "./services/uprtcl-data";
+import { uprtclData } from "./services/uprtcl-data";
 import { PerspectiveFull, TextNodeFull } from "./types";
 
 export enum NodeType {
@@ -14,7 +14,6 @@ export interface Block {
   serviceProvider: string
 }
 
-const uprtclData = new UprtclData();
 
 /** ----- SUPPORT FUNCTIONS ------ */
 
