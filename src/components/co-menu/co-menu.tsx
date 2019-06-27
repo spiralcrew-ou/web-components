@@ -26,6 +26,7 @@ export class COMenu {
   @Prop() index: number
   @State() block: Block
   @State() rootId: string
+  @State() ethAccount: string
   @Prop() color: string
   @Prop() show: boolean 
 
@@ -55,6 +56,7 @@ export class COMenu {
       return {
         block: state.workpad.tree[this.reference],
         rootId: state.workpad.rootId,
+        ethAccount: state.support.ethAccount
       }
     })
   }
@@ -84,6 +86,9 @@ export class COMenu {
     this.close()
   }
 
+  canWrite(): boolean {
+    return !this.block.serviceProvider.startsWith('eth://') || this.ethAccount === this.block.creatorId; 
+  }
 
   render() {
     
@@ -94,17 +99,17 @@ export class COMenu {
         <div id={this.block.id} class='hidden  m-4 w-64 border-2 shadow-md p-2 rounded-lg font-thin z-10 bg-white'>
           <div class='menuContainer px-2'>
 
-            <div class='row' onClick={() => {this.setBlockStyle(NodeType.title)}}>
+            <div class={'row' + (this.canWrite() ? '' : ' disabled')} onClick={() => {this.setBlockStyle(NodeType.title)}}>
               {!isRootDocument ? <div class='block my-1'> This is a title</div> : ''}
               {!isRootDocument ? <img class='w-8 h-8 ' src='../../assets/img/uppercase.svg'></img> : ''}
             </div>
 
-            <div class='row pb-2 border-b' onClick={() => { this.setBlockStyle(NodeType.paragraph)}}>
+            <div class={'row pb-2 border-b' + (this.canWrite() ? '' : ' disabled')} onClick={() => { this.setBlockStyle(NodeType.paragraph)}}>
               {!isRootDocument ? <div class='my-1' >this is a paragraph</div> : ''}
               {!isRootDocument ? <img class='w-8 h-8 ' src='../../assets/img/lowercase.svg'></img> : ''}
             </div>
 
-            <div class='row pt-2' onClick={() => {
+            <div class={'row pt-2' + (this.canWrite() ? '' : ' disabled')} onClick={() => {
                 this.callPull()
                 this.close()
               }}>
@@ -112,7 +117,7 @@ export class COMenu {
               <img class='w-8 h-8 ' src='../../assets/img/pull.svg'></img>
             </div>
 
-              <div class='row' onClick={async () => {
+              <div class={'row' + (this.canWrite() ? '' : ' disabled')} onClick={async () => {
                 await this.setPerspectiveToAct(this.block.id)
                 this.showInputCommit.emit(true)
                 this.close()
@@ -139,7 +144,7 @@ export class COMenu {
               <img class='w-6 h-6 inline-block ' src='../../assets/img/switch.svg'></img>
             </div>
 
-              <div class='row pb-2' onClick={async () => {
+              <div class={'row pb-2' + (this.canWrite() ? '' : ' disabled')} onClick={async () => {
                 await this.setPerspectiveToActAndUpdateContextPerspectives(this.block.id)
                 this.showInputMerge.emit(true)
                 this.close()

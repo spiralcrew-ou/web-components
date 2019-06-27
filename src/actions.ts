@@ -12,6 +12,7 @@ export interface Block {
   content: string;
   style: NodeType;
   serviceProvider: string;
+  creatorId: string;
 }
 
 /** ----- SUPPORT FUNCTIONS ------ */
@@ -37,7 +38,8 @@ const mapPerspectiveToBlock = (perspectiveFull: PerspectiveFull): Block => {
     status: perspectiveFull.draft != null ? 'DRAFT' : 'COMMITED',
     content: data ? data.text : '',
     style: data ? NodeType[data.type] : NodeType.paragraph,
-    serviceProvider: perspectiveFull.origin
+    serviceProvider: perspectiveFull.origin,
+    creatorId: perspectiveFull.creatorId
   };
 
   return block;
