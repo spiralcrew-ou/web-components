@@ -15,10 +15,6 @@ export class UprtclCollectiveOne implements UprtclService {
     return this.cidConfig;
   }
 
-  setCidConfig(): CidConfig {
-    throw new Error('Collectiveone Cid version is fixed for the moment');
-  }
-
   async getContext(contextId: string): Promise<Context> {
     return await http.get<Context>(`/ctx/${contextId}`);
   }

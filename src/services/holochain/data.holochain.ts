@@ -17,10 +17,6 @@ export class DataHolochain<T = any> implements DataService<T> {
     return this.cidConfig;
   }
 
-  setCidConfig(): CidConfig {
-    throw new Error('Holochain Cid version is fixed for the moment');
-  }
-
   async getData(dataId: string): Promise<T> {
     const response = await this.proxyZome.call('get_proxied_entry', {
       address: dataId

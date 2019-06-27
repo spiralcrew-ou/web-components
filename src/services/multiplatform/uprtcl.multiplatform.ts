@@ -10,18 +10,12 @@ import { DiscoveryService } from '../discovery.service';
 import { CachedMultiplatform } from './cached.multiplatform';
 import { UprtclLocal } from '../local/uprtcl.local';
 import { ipldService } from '../ipld';
+import { CidConfig } from '../cid.config';
+
 import { userService } from '../user/user.service.imp';
 
 export class UprtclMultiplatform extends CachedMultiplatform<UprtclService>
   implements UprtclService {
-
-  getCidConfig(): import("../cid.config").CidConfig {
-    throw new Error('Method not implemented.');
-  }
-  setCidConfig(_cidConfig: import("../cid.config").CidConfig): void {
-    throw new Error('Method not implemented.');
-  }
-
   linksFromPerspective(perspective: Perspective) {
     return [perspective.contextId];
   }
@@ -63,7 +57,10 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService>
     );
 
     /** Force the root context object to exist in the service provider */
-    let rootContextId1 = await this.createContextIn(serviceProvider, userContext);
+    let rootContextId1 = await this.createContextIn(
+      serviceProvider,
+      userContext
+    );
 
     if (rootContextId !== rootContextId1) {
       throw new Error(
@@ -144,8 +141,8 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService>
   }
 
   createContextIn(serviceProvider: string, context: Context): Promise<string> {
-    this.cacheService.setCidConfig(
-      this.serviceProviders[serviceProvider].service.getCidConfig()
+    (<UprtclLocal>this.cacheService).setCidConfig(
+      this.getServiceProvider(serviceProvider).getCidConfig()
     );
     return this.optimisticCreate(
       serviceProvider,
@@ -163,8 +160,8 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService>
     serviceProvider: string,
     perspective: Perspective
   ): Promise<string> {
-    this.cacheService.setCidConfig(
-      this.serviceProviders[serviceProvider].service.getCidConfig()
+    (<UprtclLocal>this.cacheService).setCidConfig(
+      this.getServiceProvider(serviceProvider).getCidConfig()
     );
 
     const initHead = async (perspectiveId: string) => {
@@ -194,8 +191,8 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService>
   }
 
   createCommitIn(serviceProvider: string, commit: Commit): Promise<string> {
-    this.cacheService.setCidConfig(
-      this.serviceProviders[serviceProvider].service.getCidConfig()
+    (<UprtclLocal>this.cacheService).setCidConfig(
+      this.getServiceProvider(serviceProvider).getCidConfig()
     );
     return this.optimisticCreate(
       serviceProvider,
@@ -205,18 +202,18 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService>
     );
   }
 
-  async getCachedHead(perspectiveId: string): Promise<string> {
+  async getHead(perspectiveId: string): Promise<string> {
     const isHeadCached = await (<UprtclLocal>this.cacheService).headExists(
       perspectiveId
     );
     if (isHeadCached) {
       return this.cacheService.getHead(perspectiveId);
     } else {
-      return this.getHead(perspectiveId);
+      return this.getRemoteHead(perspectiveId);
     }
   }
 
-  async getHead(perspectiveId: string): Promise<string> {
+  async getRemoteHead(perspectiveId: string): Promise<string> {
     const perspective = await this.getPerspective(perspectiveId);
 
     if (perspective == null) {
@@ -250,5 +247,9 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService>
       `Update head of ${perspectiveId}`,
       perspectiveId
     );
+  }
+
+  getCidConfig(): CidConfig {
+    throw new Error('Method not implemented.');
   }
 }

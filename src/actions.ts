@@ -1,4 +1,4 @@
-import { UprtclData } from "./services/uprtcl-data";
+import { uprtclData } from "./services/uprtcl-data";
 import { PerspectiveFull, TextNodeFull } from "./types";
 
 export enum NodeType {
@@ -14,7 +14,6 @@ export interface Block {
   serviceProvider: string
 }
 
-const uprtclData = new UprtclData();
 
 /** ----- SUPPORT FUNCTIONS ------ */
 
@@ -340,9 +339,6 @@ export const pullPerspective = (blockId: string) => {
 
 export const mergePerspective = (toPerspective: string, fromPerspectiveId: string) => {
   return async (dispatch, getState) => {
-
-    debugger
-    
     const tree = getState().workpad.tree;
     const block: Block = tree[toPerspective];
 

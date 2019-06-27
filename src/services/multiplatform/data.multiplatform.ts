@@ -3,15 +3,10 @@ import { DataService } from '../data.service';
 import { CachedMultiplatform } from './cached.multiplatform';
 import { DataLocal } from '../local/data.local';
 import { Dictionary } from './../../types';
+import { CidConfig } from '../cid.config';
 
 export class DataMultiplatform extends CachedMultiplatform<DataService>
   implements DataService {
-  getCidConfig(): import("../cid.config").CidConfig {
-    throw new Error('Method not implemented.');
-  }
-  setCidConfig(_cidConfig: import("../cid.config").CidConfig): void {
-    throw new Error('Method not implemented.');
-  }
   
   linksFromTextNode = node => node.links.map(link => link.link);
 
@@ -39,7 +34,7 @@ export class DataMultiplatform extends CachedMultiplatform<DataService>
   }
   
   createDataIn<T>(serviceProvider: string, data: T): Promise<string> {
-    this.cacheService.setCidConfig(
+    (<DataLocal<T>>this.cacheService).setCidConfig(
       this.serviceProviders[serviceProvider].service.getCidConfig()
     );
     /** prevent old ids conflicts */
@@ -50,5 +45,9 @@ export class DataMultiplatform extends CachedMultiplatform<DataService>
       (service, object) => service.createData(object),
       this.linksFromTextNode(data)
     );
+  }
+
+  getCidConfig(): CidConfig {
+    throw new Error('Method not implemented.');
   }
 }

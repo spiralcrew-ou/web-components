@@ -1,9 +1,24 @@
-import { UprtclService } from '../uprtcl.service';
-import { Context, Perspective, Commit } from '../../types';
-import { CidConfig } from '../cid.config';
-import { userService } from '../user/user.service.imp';
+import { UprtclService } from '../../services/uprtcl.service';
+import { Context, Perspective, Commit, TextNode } from '../../types';
+import { BaseMock } from './base.mock';
+import { userService } from '../../services/user/user.service.imp';
+import { CidConfig } from '../../services/cid.config';
 
 type Dictionary<T> = { [key: string]: T };
+
+export type Node = [string, NodeTree];
+
+export interface NodeTree extends Array<Node> {}
+
+export type History = [Commit, HistoryArray];
+export interface HistoryArray extends Array<History> {}
+
+export interface Content {
+  perspective: Perspective;
+  context: Context;
+  commit: Commit;
+  data: TextNode;
+}
 
 export function sampleContext(
   creatorId = userService.getUsername(),
@@ -33,7 +48,7 @@ export function sampleCommit(
   return { parentsIds, message, timestamp, dataId, creatorId };
 }
 
-export class MockUprtcl implements UprtclService {
+export class MockUprtcl extends BaseMock implements UprtclService {
   contexts: Dictionary<Context> = {};
   perspectives: Dictionary<Perspective> = {};
   commits: Dictionary<Commit> = {};
@@ -42,18 +57,15 @@ export class MockUprtcl implements UprtclService {
   getCidConfig(): CidConfig {
     throw new Error('Method not implemented.');
   }
-  setCidConfig(_cidConfig: CidConfig): void {
-    throw new Error('Method not implemented.');
-  }
 
   getContext(contextId: string): Promise<Context> {
-    return Promise.resolve(this.contexts[contextId]);
+    return this.get(this.contexts[contextId]);
   }
   getPerspective(perspectiveId: string): Promise<Perspective> {
-    return Promise.resolve(this.perspectives[perspectiveId]);
+    return this.get(this.perspectives[perspectiveId]);
   }
   getCommit(commitId: string): Promise<Commit> {
-    return Promise.resolve(this.commits[commitId]);
+    return this.get(this.commits[commitId]);
   }
 
   getContextPerspectives(contextId: string): Promise<Perspective[]> {
@@ -67,22 +79,26 @@ export class MockUprtcl implements UprtclService {
     );
   }
   createContext(context: Context): Promise<string> {
-    const id = 'context' + Object.keys(this.contexts).length + 1;
-    this.contexts[id] = context;
+    const id = 'context' + (Object.keys(this.contexts).length + 1);
+    this.contexts[id] = { ...context, id };
+    this.log('[UPRCTL] Created context:', this.contexts[id]);
     return Promise.resolve(id);
   }
   createPerspective(perspective: Perspective): Promise<string> {
-    const id = 'perspective' + Object.keys(this.perspectives).length + 1;
-    this.perspectives[id] = perspective;
+    const id = 'perspective' + (Object.keys(this.perspectives).length + 1);
+    this.perspectives[id] = { ...perspective, id };
+    this.log('[UPRCTL] Created perspective:', this.perspectives[id]);
     return Promise.resolve(id);
   }
   createCommit(commit: Commit): Promise<string> {
-    const id = 'commit' + Object.keys(this.commits).length + 1;
-    this.commits[id] = commit;
+    const id = 'commit' + (Object.keys(this.commits).length + 1);
+    this.commits[id] = { ...commit, id };
+    this.log('[UPRCTL] Created commit:', this.commits[id]);
     return Promise.resolve(id);
   }
   updateHead(perspectiveId: string, commitId: string): Promise<void> {
     this.heads[perspectiveId] = commitId;
+    this.log(`[UPRCTL] Updated head of ${perspectiveId}: ${commitId}`);
     return Promise.resolve();
   }
   getHead(perspectiveId: string): Promise<string> {

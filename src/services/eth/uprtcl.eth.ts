@@ -28,10 +28,6 @@ export class UprtclEthereum implements UprtclService {
   getCidConfig(): CidConfig {
     return this.cidConfig;
   }
-
-  setCidConfig(): CidConfig {
-    throw new Error('Ethereum Cid version is fixed for the moment');
-  }
   
   async getContext(contextId: string): Promise<Context> {
     let result = await this.ipfsClient.get<Context>(contextId);
