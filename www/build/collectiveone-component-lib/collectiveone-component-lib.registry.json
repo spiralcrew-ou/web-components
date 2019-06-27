@@ -1,0 +1,106 @@
+{
+  "namespace": "CollectiveoneComponentLib",
+  "fsNamespace": "collectiveone-component-lib",
+  "loader": "../collectiveone-component-lib.js",
+  "corePolyfilled": "es5-build-disabled.js",
+  "global": "collectiveone-component-lib.global.js",
+  "core": "collectiveone-component-lib.core.js",
+  "components": {
+    "co-input-change-perspective": {
+      "bundleIds": {
+        "$": "co-input-change-perspective"
+      },
+      "encapsulation": "shadow"
+    },
+    "co-input-commit": {
+      "bundleIds": {
+        "$": "co-input-change-perspective"
+      },
+      "encapsulation": "shadow"
+    },
+    "co-input-info": {
+      "bundleIds": {
+        "$": "co-input-change-perspective"
+      },
+      "encapsulation": "shadow"
+    },
+    "co-input-merge": {
+      "bundleIds": {
+        "$": "co-input-change-perspective"
+      },
+      "encapsulation": "shadow"
+    },
+    "co-input-new-perspective": {
+      "bundleIds": {
+        "$": "co-input-change-perspective"
+      },
+      "encapsulation": "shadow"
+    },
+    "co-loading": {
+      "bundleIds": {
+        "$": "co-input-change-perspective"
+      },
+      "encapsulation": "shadow"
+    },
+    "co-login": {
+      "bundleIds": {
+        "$": "co-login"
+      },
+      "encapsulation": "shadow"
+    },
+    "co-menu": {
+      "bundleIds": {
+        "$": "co-menu"
+      },
+      "encapsulation": "shadow"
+    },
+    "co-node": {
+      "bundleIds": {
+        "$": "co-input-change-perspective"
+      },
+      "encapsulation": "shadow"
+    },
+    "co-source-code": {
+      "bundleIds": {
+        "$": "co-source-code"
+      },
+      "encapsulation": "shadow"
+    },
+    "co-waiting-app": {
+      "bundleIds": {
+        "$": "co-waiting-app"
+      },
+      "encapsulation": "shadow"
+    },
+    "co-workpad": {
+      "bundleIds": {
+        "$": "co-input-change-perspective"
+      },
+      "encapsulation": "shadow"
+    },
+    "co-workspace": {
+      "bundleIds": {
+        "$": "co-workspace"
+      },
+      "encapsulation": "shadow"
+    },
+    "co-workspace-selector": {
+      "bundleIds": {
+        "$": "co-workspace"
+      },
+      "encapsulation": "shadow"
+    },
+    "text-block": {
+      "bundleIds": {
+        "$": "text-block"
+      },
+      "encapsulation": "shadow"
+    },
+    "uprtcl-toolbar": {
+      "bundleIds": {
+        "$": "uprtcl-toolbar"
+      },
+      "encapsulation": "shadow"
+    }
+  }
+}
