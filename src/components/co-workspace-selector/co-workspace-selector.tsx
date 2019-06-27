@@ -38,9 +38,9 @@ import { c1ServiceProvider, ethServiceProvider } from '../../services';
     }
 
     renderWorkpad() {
-        return <div>
+        return <div class='waiting'>
         {this.isStarting ? <co-waiting-app></co-waiting-app> : ''}
-        <co-workspace 
+        <co-workspace
             default-service={this.defaultServiceProvider}
             avaialable-services={this.availableServiceProviders}>
         </co-workspace>
