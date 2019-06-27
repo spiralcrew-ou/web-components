@@ -86,17 +86,15 @@ export class Multiplatform<T extends CidCompatible> {
     linksSelector: (object: O) => string[] = () => [],
     idSelector: (object: O) => string = o => o['id']
   ): Promise<O> {
-    // Try to retrieve the object  
+    // Try to retrieve the object
     const object = await getter(this.serviceProviders[source].service);
 
     if (object) {
       const discoveryPromises = [];
       if (!(object instanceof Array)) {
-
         // Object retrieved successfully, discover the known sources of the links the object points to
         const links = linksSelector(object);
         await this.discoverLinksSources(source, links);
-
       } else {
         // If object is an array, we should add to the known sources each element of the array
         discoveryPromises.concat(
@@ -154,22 +152,20 @@ export class Multiplatform<T extends CidCompatible> {
     linksSelector: (object: O) => string[] = () => []
   ): Promise<O> {
     if (typeof hash !== 'string') {
-      console.log('[MULTIPLATFORM] Trying to discover null object')
+      console.log('[MULTIPLATFORM] Trying to discover null object');
       return null;
     }
 
     // Retrieve the known sources from the local store
     const knownSources = await this.knownSources.getKnownSources(hash);
-    console.log(`[MULTIPLATFORM] Known sources for ${hash}:`, knownSources)
+    console.log(`[MULTIPLATFORM] Known sources for ${hash}:`, knownSources);
 
     if (!knownSources) {
-      const object = await this.getFromAllSources(
-        hash,
-        getter,
-        linksSelector)
-      
-      if (object.length > 0) return object[0];
-      
+      const objects = await this.getFromAllSources(hash, getter, linksSelector);
+
+      const object = objects.find(o => !!o);
+
+      if (object) return object;
     } else {
       // Iterate through the known sources until a source successfully returns the object
       for (const source of knownSources) {
