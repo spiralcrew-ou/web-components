@@ -26,6 +26,7 @@ export class COMenu {
   @State() block: Block
   @State() rootId: string
   @Prop() color: string
+  @Prop() show: boolean 
 
   @Event({ eventName: 'showInputCommit', bubbles: true }) showInputCommit: EventEmitter
   @Event({ eventName: 'showInputNewPerspective', bubbles: true }) showInputNewPerspective: EventEmitter
@@ -82,6 +83,9 @@ export class COMenu {
 
 
   render() {
+    if (!this.show)
+      return 
+      
     const isRootDocument = this.block.id === this.rootId
     return (
       <div class='mainContainer px-2'>

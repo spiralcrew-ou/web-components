@@ -3,7 +3,6 @@ import {
 } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
 import { newBlock, removeBlock, indentLeft, reloadTree, setContent, openMenu, Block, renderingWorkpad } from '../../actions';
-// import Popper from 'popper.js';
 
 @Component({
   tag: 'co-node',
@@ -159,6 +158,7 @@ export class CONode {
                             </div>
                             
                             <co-menu  
+                              show= {this.isFocused}
                               class={`menu ${this.nodeid}`}  
                               reference={this.nodeid} 
                               parent-id={this.parentid}

@@ -51,6 +51,7 @@ export namespace Components {
     'index': number;
     'parentId': string;
     'reference': string;
+    'show': boolean;
   }
   interface CoMenuAttributes extends StencilHTMLAttributes {
     'color'?: string;
@@ -62,6 +63,7 @@ export namespace Components {
     'onShowInputNewPerspective'?: (event: CustomEvent) => void;
     'parentId'?: string;
     'reference'?: string;
+    'show'?: boolean;
   }
 
   interface CoNode {
