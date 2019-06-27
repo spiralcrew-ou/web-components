@@ -103,16 +103,18 @@ export class Workpad {
       return (<co-loading></co-loading>)
 
     return (
-      <div class='workpad container'>
+      <div class='workpad'>
         
-        <header class='container bg-red-700 mb-4 h-12'
+        <header class='bg-red-700 mb-4 h-12 pl-2'
           onBlur={event => { if (this.titleHasChange) this.updateDocumentTitle(event['path'][0].innerText) }}
           contentEditable>
             <div class='py-4 px-2  text-white mb-8 w-full'>{this.tree[this.rootDocumentId].content}</div>
             <co-menu  
-              class={this.rootDocumentId}  
+              show
+              class={` ${this.rootDocumentId}  `}
               reference={this.rootDocumentId} 
               parent-id={null}
+              color='white'
               index={0} >
             </co-menu>
           </header>
@@ -124,7 +126,7 @@ export class Workpad {
           {this.openInputMerge ? <co-input-merge></co-input-merge> : ''}
           {this.openInputInfo ? <co-input-info></co-input-info> : ''}
         
-          <co-node class='container' nodeid={this.rootDocumentId}>
+          <co-node  nodeid={this.rootDocumentId}>
           </co-node>
 
           

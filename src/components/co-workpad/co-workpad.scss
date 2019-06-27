@@ -8,7 +8,7 @@
 
 .workpad {
     display: grid;
-    grid-template-rows: 1fr 90% 1fr
+    grid-template-rows: 1fr 90% 1fr;
 }
 
 button:focus{
@@ -23,6 +23,11 @@ header {
 header div:first-child {
     margin: auto
 }
+
 header div:nth-child(2n) {
     margin: auto;
+}
+
+co-menu {
+    margin:auto
 }

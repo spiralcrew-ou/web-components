@@ -38,27 +38,23 @@ export class COInputInfo {
   }
 
   renderInput() {
-    return <div class='container m-4 w-1/2 h-1/2 border-2 shadow-md p-2 rounded-lg font-thin z-10 fixed bg-white form text-gray-800 text-sm  '>
+    return <div class='container m-4 w-auto h-auto border-2 shadow-md p-2 rounded-lg font-thin z-10 fixed bg-white form text-gray-800 text-sm  '>
       <h2 class='text-3xl m-2'>Perspective Info</h2>
-      <content>
-        <div>
-          <div><b>name:</b><br/>{this.perspective.name}</div>
-          <div><b>id:</b><br/>{this.perspective.id}</div>
-          <div><b>origin:</b><br/>{this.perspective.origin}</div>
-          <div><b>context id:</b><br/>{this.perspective.context.id}</div>
-          <div><b>head id:</b><br/>{this.perspective.head ? this.perspective.head.id : null}</div>
-          <div><b>data id:</b><br/>{this.perspective.head ? this.perspective.head.data.id : null}</div>
-        </div>
-        <div>
+      <content class='ml-2'>
+          <b>name:</b><p>{this.perspective.name}</p>
+          <b>id:</b><p>{this.perspective.id}</p>
+          <b>origin:</b><p>{this.perspective.origin}</p>
+          <b>context id:</b><p>{this.perspective.context.id}</p>
+          <b>head id:</b><p>{this.perspective.head ? this.perspective.head.id : null}</p>
+          <b>data id:</b><p>{this.perspective.head ? this.perspective.head.data.id : null}</p>
           <b>other perspectives:</b><br/>
-          {this.contextPerspectives.filter(p => p.id != this.perspective.id).map(perspective => {
-            return (<div>
-                      - {perspective.id}<br/>
-                        {perspective.name} - {perspective.origin} - {perspective.creatorId}
+      </content>
+      {this.contextPerspectives.filter(p => p.id != this.perspective.id).map(perspective => {
+            return (<div class='otherPerspectives break-words'>
+                      <span class='ml-2'>{perspective.id}</span>
+                      <span >{perspective.name} - {perspective.origin}- {perspective.creatorId}</span>
                     </div>)
           })}
-        </div>
-      </content>
       <footer class='flex text-red-700 justify-end'>
         <button class='uppercase m-2 font-thin object-none ' onClick={() => this.showInputInfo.emit(false)}>Close</button>
       </footer>

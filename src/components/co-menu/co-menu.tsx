@@ -26,6 +26,8 @@ export class COMenu {
   @Prop() index: number
   @State() block: Block
   @State() rootId: string
+  @Prop() color: string
+  @Prop() show: boolean 
 
   @Event({ eventName: 'showInputCommit', bubbles: true }) showInputCommit: EventEmitter
   @Event({ eventName: 'showInputNewPerspective', bubbles: true }) showInputNewPerspective: EventEmitter
@@ -82,84 +84,94 @@ export class COMenu {
     this.close()
   }
 
-  renderTypographyMenu() {
-    
-  }
 
   render() {
+    
+      
     const isRootDocument = this.block.id === this.rootId
     return (
-        <div class='mainContainer'>
-          <div id={this.block.id} class='hidden  m-4 w-64 border-2 shadow-md p-2 rounded-lg font-thin z-10 bg-white'>
-            <div class='menuContainer'>
-             
-              {!isRootDocument ? <div class='block my-1' onClick={() => {
-                  this.setBlockStyle(NodeType.title)
-                }}> This is a title</div> :  ''}
-                
+      <div class='mainContainer px-2'>
+        <div id={this.block.id} class='hidden  m-4 w-64 border-2 shadow-md p-2 rounded-lg font-thin z-10 bg-white'>
+          <div class='menuContainer px-2'>
 
+            <div class='row' onClick={() => {this.setBlockStyle(NodeType.title)}}>
+              {!isRootDocument ? <div class='block my-1'> This is a title</div> : ''}
               {!isRootDocument ? <img class='w-8 h-8 ' src='../../assets/img/uppercase.svg'></img> : ''}
-              
+            </div>
 
-              {!isRootDocument ? <div class='my-1' onClick={() => {
-                this.setBlockStyle(NodeType.paragraph)
-              }}>this is a paragraph</div>: ''}
-
+            <div class='row pb-2 border-b' onClick={() => { this.setBlockStyle(NodeType.paragraph)}}>
+              {!isRootDocument ? <div class='my-1' >this is a paragraph</div> : ''}
               {!isRootDocument ? <img class='w-8 h-8 ' src='../../assets/img/lowercase.svg'></img> : ''}
+            </div>
 
-              <div class='my-1' onClick={() => {
+            <div class='row pt-2' onClick={() => {
                 this.callPull()
                 this.close()
-              }}> Pull</div>
-              <img class='w-8 h-8 ' src='../../assets/img/net.svg'></img>
+              }}>
+              <div class='py-1' > Pull</div>
+              <img class='w-8 h-8 ' src='../../assets/img/pull.svg'></img>
+            </div>
 
-              <div class='my-1' onClick={async () => {
+              <div class='row' onClick={async () => {
                 await this.setPerspectiveToAct(this.block.id)
                 this.showInputCommit.emit(true)
                 this.close()
-              }}> Commit</div>
+              }}>
+              <div class='py-1' > Commit</div>
               <img class='w-6 h-6 inline-block ' src='../../assets/img/net.svg'></img>
+            </div>
 
-              <div class='my-1' onClick={async () => {
+              <div class='row' onClick={async () => {
                 await this.setPerspectiveToAct(this.block.id)
                 this.showInputNewPerspective.emit(true)
                 this.close()
-              }}> New Perspective</div>
+              }}>
+              <div class='py-1' > New Perspective</div>
               <img class='w-6 h-6 inline-block ' src='../../assets/img/new_perspective.svg'></img>
+            </div>
 
-              <div class='my-1' onClick={async () => {
+              <div class='row' onClick={async () => {
                 await this.setPerspectiveToActAndUpdateContextPerspectives(this.block.id)
                 this.showInputChangePerspective.emit(true)
                 this.close()
-              }}> Change Perspective</div>
+              }}>
+              <div class='py-1' > Change Perspective</div>
               <img class='w-6 h-6 inline-block ' src='../../assets/img/switch.svg'></img>
+            </div>
 
-              <div class='my-1' onClick={async () => {
+              <div class='row pb-2' onClick={async () => {
                 await this.setPerspectiveToActAndUpdateContextPerspectives(this.block.id)
                 this.showInputMerge.emit(true)
                 this.close()
-              }}> Merge</div>
+              }}>
+              <div class='my-1' > Merge</div>
               <img class='w-6 h-6 inline-block ' src='../../assets/img/merge.svg'></img>
+            </div>
 
-              <div class='my-1' onClick={async () => {
+              <div class='row pt-2 border-t' onClick={async () => {
                 await this.setPerspectiveToActAndUpdateContextPerspectives(this.block.id)
                 this.showInputInfo.emit(true)
                 this.close()
               }}> Info</div>
               <img class='w-6 h-6 inline-block ' src='../../assets/img/merge.svg'></img>
 
-              <div class='my-1' onClick={async () => {
+              <div class='row' onClick={async () => {
                 window.location.href = `/?pid=${this.block.id}`
               }}> Go</div>
               <img class='w-6 h-6 inline-block ' src='../../assets/img/merge.svg'></img>
 
-              <div class='my-1' onClick={() => this.close()}>Close</div>
+            <div class='row' onClick={() => this.close()}>
+              <div class='my-1'>Close</div>
               <img class='w-10 h-10 inline-block' src='../../assets/img/close.svg'></img>
-              
             </div>
+
           </div>
-          <img id={`caller${this.reference}`} onClick={() => this.open()} class='w-6 h-6' src='../../assets/img/menu.svg'></img>
         </div>
-        )
-      }
-    }
+              { this.show ? 
+                <img id={`caller${this.reference}`} onClick={() => this.open()} class='w-4 h-4' src={`../../assets/img/menu_${this.color ? this.color : 'gray'}.svg`}></img>
+                : ''
+              }
+      </div>
+    )
+  }
+}

@@ -3,7 +3,6 @@ import {
 } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
 import { newBlock, removeBlock, indentLeft, reloadTree, setContent, openMenu, Block, renderingWorkpad } from '../../actions';
-// import Popper from 'popper.js';
 
 @Component({
   tag: 'co-node',
@@ -71,11 +70,14 @@ export class CONode {
     if (event.key === 'Enter') {
       event.preventDefault();
       event.stopPropagation();
-      this.newBlock(
-        this.nodeid, 
-        '', 
-        this.parentid, 
-        this.indexinparent);  
+      console.log(this.rootId,this.nodeid)
+      if (this.rootId!=this.nodeid) { 
+        this.newBlock(
+          this.nodeid, 
+          '', 
+          this.parentid, 
+          this.indexinparent);  
+      }
     }
   }
 
@@ -138,25 +140,26 @@ export class CONode {
       titleClasses,
       paragraphClasses].join(" ")
 
-    const containerClasses = [focusClasses, 'container'].join(" ")
+    const containerClasses = [focusClasses].join(" ")
 
-    const contentBlock = <div class='row h-12'>
+    const contentBlock = <div class='row min-h-2 ml-2'>
                             <div 
                               key={this.nodeid}
+                              onFocus={() => {this.isFocused = true}}
+                              class= {classes} 
                               onBlur={event => {
                                 this.isFocused = false;
                                 this.updateBlockContent(event,event['path'][0].innerText)
                               }}
-                              onFocus={() => {this.isFocused = true}}
-                              class= {classes} 
-                              data-placeholder = {'More options, press "/" '}
+                              data-placeholder = {'Please write here '}
                               id={this.nodeid} 
                               contentEditable>
                              {this.block.content}
                             </div>
                             
                             <co-menu  
-                              class={this.nodeid}  
+                              show
+                              class={`menu ${this.nodeid}`}  
                               reference={this.nodeid} 
                               parent-id={this.parentid}
                               index={this.indexinparent} >
