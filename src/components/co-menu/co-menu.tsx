@@ -157,13 +157,17 @@ export class COMenu {
                 await this.setPerspectiveToActAndUpdateContextPerspectives(this.block.id)
                 this.showInputInfo.emit(true)
                 this.close()
-              }}> Info</div>
-              <img class='w-6 h-6 inline-block ' src='../../assets/img/merge.svg'></img>
+              }}> <div class='my-1' > Info</div>
+              <img class='w-6 h-6 inline-block ' src='../../assets/img/info.svg'></img>
+              </div>
+
 
               <div class='row' onClick={async () => {
                 window.location.href = `/?pid=${this.block.id}`
-              }}> Go</div>
-              <img class='w-6 h-6 inline-block ' src='../../assets/img/merge.svg'></img>
+              }}> <div class='my-1' >Go</div>
+              <img class='w-6 h-6 inline-block ' src='../../assets/img/go.svg'></img>
+              </div>
+
 
             <div class='row' onClick={() => this.close()}>
               <div class='my-1'>Close</div>
