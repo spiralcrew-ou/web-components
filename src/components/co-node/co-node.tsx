@@ -143,7 +143,7 @@ export class CONode {
 
     const containerClasses = [focusClasses].join(" ")
 
-    const contentBlock = <div class='row h-12'>
+    const contentBlock = <div class='row min-h-2'>
                             <div 
                               key={this.nodeid}
                               onBlur={event => {
