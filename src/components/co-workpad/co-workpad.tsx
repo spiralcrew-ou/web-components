@@ -18,6 +18,7 @@ export class Workpad {
   @Prop() documentId: string
   @State() showMenuOption: boolean
   @State() isRunning: boolean = false
+  @State() pendingTasks: boolean = false
 
   @Event({ eventName: 'isStarting', bubbles: true }) isStarting: EventEmitter
 
@@ -55,7 +56,8 @@ export class Workpad {
         tree: state.workpad.tree,
         rootDocumentId: state.workpad.rootId,
         showMenuOption: !state.menu.isClose,
-        isRunning: state.workpad.isRendering
+        isRunning: state.workpad.isRendering,
+        pendingTasks: state.workpad.pendingTasks
       }
     })
     
@@ -109,7 +111,15 @@ export class Workpad {
         <header class='bg-red-700 mb-4 h-12 pl-2'
           onBlur={event => { if (this.titleHasChange) this.updateDocumentTitle(event['path'][0].innerText) }}
           contentEditable>
-            <div class='py-4 px-2  text-white mb-8 w-full'>{this.tree[this.rootDocumentId].content}</div>
+            <div class='py-4 px-2  text-white mb-8 w-full'>
+              {this.tree[this.rootDocumentId].content}
+            
+            </div>
+            
+            {this.pendingTasks ? ( 
+              <co-waiting-app class="pending-tasks-indicator"></co-waiting-app>
+            ) : '' }
+
             <co-menu  
               show
               class={` ${this.rootDocumentId}  `}

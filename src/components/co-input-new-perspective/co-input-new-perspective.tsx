@@ -14,7 +14,7 @@ export class COInputNewPerspective {
   @Prop({ context: 'store' }) store: Store;
   @State() show: boolean = true
   @State() name: string
-  @State() providerSelected: string
+  @State() providerSelected: string = c1ServiceProvider;
   @State() perspective: PerspectiveFull;
 
   @Event({ eventName: 'showInputNewPerspective', bubbles: true }) showInputNewPerspective: EventEmitter
@@ -61,7 +61,6 @@ export class COInputNewPerspective {
         </input>
 
         <select onChange={event => this.handleProviderSelected(event)}>
-          <option value={''}>Default</option>
           <option value={c1ServiceProvider}>CollectiveOne</option>
           <option value={ethServiceProvider}>ETH/IPFS</option>
         </select>

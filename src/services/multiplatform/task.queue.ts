@@ -23,6 +23,10 @@ export class TaskQueue {
   finishedTasks: Dictionary<boolean> = {};
   dependenciesQueue: Dictionary<Task> = {};
 
+  pendingListeners: Array<() => any> = [];
+  finishedListeners: Array<() => any> = [];
+  tasksPending: boolean = false;
+
   constructor(retryEnabled: boolean = true, retryInterval: number = 100) {
     this.retryEnabled = retryEnabled;
     this.retryInterval = retryInterval;
@@ -35,7 +39,7 @@ export class TaskQueue {
     }
 
     this.finishedTasks[task.id] = false;
-    
+
     if (navigator.onLine) {
       this.queue[task.id] = null;
       delete this.queue[task.id];
@@ -68,6 +72,11 @@ export class TaskQueue {
       console.log('scheduling task for later');
       this.dependenciesQueue[task.id] = task;
     } else {
+      if (!this.tasksPending) {
+        this.tasksPending = true;
+        this.pendingListeners.map(f => f());
+      }
+
       this.runTask(task);
     }
   }
@@ -109,7 +118,9 @@ export class TaskQueue {
 
       this.queue = { ...dependantTasks, ...this.queue };
 
-      this.scheduleTasksRun();
+      if (Object.keys(this.queue).length > 0) {
+        this.scheduleTasksRun();
+      }
     } catch (e) {
       if (this.retryEnabled && !navigator.onLine) {
         console.log(`Task failed, retrying when online`, task);
@@ -124,9 +135,24 @@ export class TaskQueue {
       } else {
         console.log(`Task failed, not retrying`, task);
         // Task succeeded, delete the task from the dictionary
+        this.finishedTasks[task.id] = true;
+
         this.queue[task.id] = null;
         delete this.queue[task.id];
       }
     }
+
+    if (Object.keys(this.finishedTasks).every(key => this.finishedTasks[key])) {
+      this.finishedListeners.map(f => f());
+      this.tasksPending = false;
+    }
+  }
+
+  public onTasksPending(callback: () => any): void {
+    this.pendingListeners.push(callback);
+  }
+
+  public onTasksFinished(callback: () => any): void {
+    this.finishedListeners.push(callback);
   }
 }

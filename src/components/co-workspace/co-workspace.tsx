@@ -5,7 +5,7 @@ import {
 import { Store, Action } from '@stencil/redux';
 import { configureStore } from '../../store.js';
 import { uprtclData } from '../../services/uprtcl-data';
-import {setSelectedProvider,initTree,reloadTree, NodeType} from '../../actions';
+import {setSelectedProvider,initTree,reloadTree, NodeType, watchTasks} from '../../actions';
 
 const enableInit = false;
 const defaultPerspective = 'zb2rhksTeHa1kFpbeyXNqnQ2vhDXn3s8VXWfrFE4GB3rTqkDe';
@@ -26,6 +26,7 @@ export class COWorkspace {
   uprtcl = uprtclMultiplatform;
   uprtclData = uprtclData;
 
+  watchTasks: Action
   setSelectedProvider: Action
   initTree: Action
   reloadTree: Action
@@ -50,10 +51,12 @@ export class COWorkspace {
   async componentWillLoad() {
     this.store.setStore(configureStore());
     this.store.mapDispatchToProps(this, {
+      watchTasks,
       setSelectedProvider,
       initTree,
       reloadTree,
     })
+    this.watchTasks();
     await this.setSelectedProvider(this.defaultService)
     
     let pid = new URLSearchParams(window.location.search).get("pid")

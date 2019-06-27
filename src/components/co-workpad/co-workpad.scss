@@ -31,3 +31,11 @@ header div:nth-child(2n) {
 co-menu {
     margin:auto
 }
+
+.pending-tasks-indicator {
+    position: absolute;
+    right: 40px;
+    margin-top: 14px;
+    --spinner-size: 20px;
+    --spinner-color: white;
+}
