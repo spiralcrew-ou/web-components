@@ -133,7 +133,7 @@ export class CONode {
     const focusClasses = this.isFocused ? 'bg-gray-200' :  ''
     const titleClasses = this.block.style === 'title' ? 'text-2xl' : ''
     const paragraphClasses =  this.block.style ==='paragraph' ? 'font-light px-2 py-2 ' : ''
-    const commitedClasses = ''
+    const commitedClasses = this.block.status === 'DRAFT' ? 'border-l border-red-800' : ''
     const classes = [
       blockClasses, 
       commitedClasses,
@@ -164,6 +164,7 @@ export class CONode {
                               parent-id={this.parentid}
                               index={this.indexinparent} >
                             </co-menu>
+                            
                           </div>
     
 

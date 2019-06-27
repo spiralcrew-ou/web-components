@@ -2,7 +2,7 @@ import {
   Component, State, Prop, Element, Listen, Event, EventEmitter
 } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
-import {  commitGlobal, setContent,openMenu } from '../../actions';
+import {  commitGlobal, setContent,openMenu, newBlock } from '../../actions';
 
 @Component({
   tag: 'co-workpad',
@@ -40,13 +40,14 @@ export class Workpad {
   commitGlobal: Action
   setContent: Action
   openMenu: Action
+  newBlock: Action
 
   async componentWillLoad() {
     this.store.mapDispatchToProps(this, {
       openMenu,
       commitGlobal,
       setContent,
-      
+      newBlock
     })
    
     this.store.mapStateToProps(this, state => {
@@ -128,6 +129,8 @@ export class Workpad {
         
           <co-node  nodeid={this.rootDocumentId}>
           </co-node>
+
+          <div class='clickZone h-16' onClick={() => this.newBlock(this.rootDocumentId,'',this.rootDocumentId,0)}/>
 
           
 
