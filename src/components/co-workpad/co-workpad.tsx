@@ -130,7 +130,7 @@ export class Workpad {
           <co-node  nodeid={this.rootDocumentId}>
           </co-node>
 
-          <div class='clickZone h-16' onClick={() => this.newBlock(this.rootDocumentId,'',this.rootDocumentId,0)}/>
+          <div class='clickZone h-16' onClick={() => this.newBlock(this.rootDocumentId,'',null,-1)}/>
 
           
 
