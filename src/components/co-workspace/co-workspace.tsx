@@ -8,7 +8,7 @@ import { uprtclData } from '../../services/uprtcl-data';
 import {setSelectedProvider,initTree,reloadTree, NodeType, watchTasks} from '../../actions';
 
 const enableInit = false;
-const defaultPerspective = 'zb2rhksTeHa1kFpbeyXNqnQ2vhDXn3s8VXWfrFE4GB3rTqkDe';
+const defaultPerspective = 'zb2rhjak9Ejm3cMjFhz8Gi5ME933N5jV5txRAZmS6vJJzATgR';
 
 @Component({
   tag: 'co-workspace',

@@ -1,7 +1,8 @@
 import { Component, State, Event, EventEmitter, Prop } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
 import { newPerspective } from './../../actions';
-import { c1ServiceProvider, ethServiceProvider, holochainServiceProvider } from '../../services';
+// import { c1ServiceProvider, ethServiceProvider, holochainServiceProvider } from '../../services';
+import { c1ServiceProvider, ethServiceProvider } from '../../services';
 import { PerspectiveFull } from './../../types';
 
 @Component({
@@ -63,7 +64,7 @@ export class COInputNewPerspective {
         <select onChange={event => this.handleProviderSelected(event)}>
           <option value={c1ServiceProvider}>CollectiveOne</option>
           <option value={ethServiceProvider}>ETH/IPFS</option>
-          <option value={holochainServiceProvider}>Holochain</option>
+          {/* <option value={holochainServiceProvider}>Holochain</option> */}
         </select>
 
       </content>

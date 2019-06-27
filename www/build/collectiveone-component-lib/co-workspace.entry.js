@@ -1,7 +1,7 @@
 const h = window.CollectiveoneComponentLib.h;
 
-import { o as global$1, u as uprtclMultiplatform, v as uprtclData, t as NodeType, w as watchTasks, x as setSelectedProvider, y as initTree, l as reloadTree, g as ethServiceProvider, e as c1ServiceProvider, h as holochainServiceProvider, z as setEthAccount } from './chunk-8354fdda.js';
-import { a as createCommonjsModule, b as commonjsGlobal, c as unwrapExports } from './chunk-84ac4f31.js';
+import { n as global$1, t as uprtclMultiplatform, u as uprtclData, s as NodeType, v as watchTasks, w as setSelectedProvider, x as initTree, k as reloadTree, g as ethServiceProvider, e as c1ServiceProvider, y as holochainServiceProvider, z as setEthAccount } from './chunk-6b8fe4e1.js';
+import { b as createCommonjsModule, c as commonjsGlobal, d as unwrapExports } from './chunk-84ac4f31.js';
 
 function symbolObservablePonyfill(root) {
 	var result;
@@ -783,7 +783,7 @@ const reducers = combineReducers({
 const configureStore = () => createStore(reducers, composeEnhancer(applyMiddleware(thunk, logger)));
 
 const enableInit = false;
-const defaultPerspective = 'zb2rhksTeHa1kFpbeyXNqnQ2vhDXn3s8VXWfrFE4GB3rTqkDe';
+const defaultPerspective = 'zb2rhjak9Ejm3cMjFhz8Gi5ME933N5jV5txRAZmS6vJJzATgR';
 class COWorkspace {
     constructor(_defaultServiceId) {
         // Multiplatform service is already instantiated, get a reference to it
