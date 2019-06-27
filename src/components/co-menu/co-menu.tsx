@@ -83,8 +83,7 @@ export class COMenu {
 
 
   render() {
-    if (!this.show)
-      return 
+    
       
     const isRootDocument = this.block.id === this.rootId
     return (
@@ -162,8 +161,10 @@ export class COMenu {
 
           </div>
         </div>
-
-        <img id={`caller${this.reference}`} onClick={() => this.open()} class='w-4 h-4' src={`../../assets/img/menu_${this.color ? this.color : 'gray'}.svg`}></img>
+              { this.show ? 
+                <img id={`caller${this.reference}`} onClick={() => this.open()} class='w-4 h-4' src={`../../assets/img/menu_${this.color ? this.color : 'gray'}.svg`}></img>
+                : ''
+              }
       </div>
     )
   }

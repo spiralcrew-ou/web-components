@@ -145,12 +145,12 @@ export class CONode {
     const contentBlock = <div class='row min-h-2 ml-2'>
                             <div 
                               key={this.nodeid}
+                              onFocus={() => {this.isFocused = true}}
+                              class= {classes} 
                               onBlur={event => {
                                 this.isFocused = false;
                                 this.updateBlockContent(event,event['path'][0].innerText)
                               }}
-                              onFocus={() => {this.isFocused = true}}
-                              class= {classes} 
                               data-placeholder = {'Please write here '}
                               id={this.nodeid} 
                               contentEditable>
@@ -158,7 +158,7 @@ export class CONode {
                             </div>
                             
                             <co-menu  
-                              show= {this.isFocused}
+                              show
                               class={`menu ${this.nodeid}`}  
                               reference={this.nodeid} 
                               parent-id={this.parentid}
