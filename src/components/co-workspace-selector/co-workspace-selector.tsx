@@ -15,7 +15,7 @@ import { uprtclMultiplatform } from '../../services/index'
     @State() ethLoading: boolean = true
     @State() defaultServiceProvider: string = ethServiceProvider;
 
-    selectorEnabled: boolean = true;
+    selectorEnabled: boolean = false;
 
     availableServiceProviders: string[] = [
         c1ServiceProvider,
