@@ -783,7 +783,7 @@ const reducers = combineReducers({
 const configureStore = () => createStore(reducers, composeEnhancer(applyMiddleware(thunk, logger)));
 
 const enableInit = false;
-const defaultPerspective = 'zb2rhjak9Ejm3cMjFhz8Gi5ME933N5jV5txRAZmS6vJJzATgR';
+const defaultPerspective = 'zb2rhbyDC8ZnYnmSNNYHzbmGrmFVFn91qsETDH1pdwhDLXPSw';
 class COWorkspace {
     constructor(_defaultServiceId) {
         // Multiplatform service is already instantiated, get a reference to it
