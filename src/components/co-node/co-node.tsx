@@ -21,6 +21,7 @@ export class CONode {
   block : Block;
   @State() tree
   @State() isFocused: boolean = false;
+  @State() ethAccount: string = '';
   @Event({ eventName: 'isRunning', bubbles: true }) isRunning: EventEmitter
   
 
@@ -50,7 +51,8 @@ export class CONode {
       return {
         tree: Object.assign({},state.workpad.tree),
         rootId: state.workpad.rootId,
-        block: state.workpad.tree[this.nodeid]
+        block: state.workpad.tree[this.nodeid],
+        ethAccount: state.support.ethAccount
       }
     })
     
@@ -124,6 +126,10 @@ export class CONode {
     }
   }
 
+  canWrite(): boolean {
+    return !this.block.serviceProvider.startsWith('eth://') || this.ethAccount === this.block.creatorId; 
+  }
+
   render() {
     
     
@@ -153,7 +159,7 @@ export class CONode {
                               }}
                               data-placeholder = {'Please write here '}
                               id={this.nodeid} 
-                              contentEditable>
+                              contentEditable={this.canWrite()}>
                              {this.block.content}
                             </div>
                             

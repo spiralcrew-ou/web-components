@@ -45,6 +45,7 @@ export class COInputInfo {
           <b>id:</b><p>{this.perspective.id}</p>
           <b>origin:</b><p>{this.perspective.origin}</p>
           <b>context id:</b><p>{this.perspective.context.id}</p>
+          <b>owner:</b><p>{this.perspective.creatorId}</p>
           <b>head id:</b><p>{this.perspective.head ? this.perspective.head.id : null}</p>
           <b>data id:</b><p>{this.perspective.head ? this.perspective.head.data.id : null}</p>
           <b>other perspectives:</b><br/>

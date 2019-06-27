@@ -2,7 +2,7 @@ import {
   Component, State, Prop, Element, Listen, Event, EventEmitter
 } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
-import {  commitGlobal, setContent,openMenu, newBlock } from '../../actions';
+import {  commitGlobal, setContent,openMenu, newBlock, Block } from '../../actions';
 
 @Component({
   tag: 'co-workpad',
@@ -19,6 +19,8 @@ export class Workpad {
   @State() showMenuOption: boolean
   @State() isRunning: boolean = false
   @State() pendingTasks: boolean = false
+  @State() ethAccount: string = ''
+  @State() block: Block
 
   @Event({ eventName: 'isStarting', bubbles: true }) isStarting: EventEmitter
 
@@ -57,7 +59,9 @@ export class Workpad {
         rootDocumentId: state.workpad.rootId,
         showMenuOption: !state.menu.isClose,
         isRunning: state.workpad.isRendering,
-        pendingTasks: state.workpad.pendingTasks
+        pendingTasks: state.workpad.pendingTasks,
+        ethAccount: state.support.ethAccount,
+        block: state.workpad.tree[this.documentId]
       }
     })
     
@@ -96,9 +100,14 @@ export class Workpad {
   }
 
 
-
   updateDocumentTitle(newContent) {
     this.setContent(this.tree[this.rootDocumentId].id, newContent)
+  }
+
+  canWrite(): boolean {
+    return this.block &&
+      (!this.block.serviceProvider.startsWith('eth://')
+       || this.ethAccount === this.block.creatorId); 
   }
 
   render() {
@@ -110,7 +119,7 @@ export class Workpad {
         
         <header class='bg-red-700 mb-4 h-12 pl-2'
           onBlur={event => { if (this.titleHasChange) this.updateDocumentTitle(event['path'][0].innerText) }}
-          contentEditable>
+          contentEditable={this.canWrite()}>
             <div class='py-4 px-2  text-white mb-8 w-full'>
               {this.tree[this.rootDocumentId].content}
             
