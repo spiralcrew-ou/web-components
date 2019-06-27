@@ -8,4 +8,3 @@ package-lock.json
 www/build
 coverage
 .env
-/www
