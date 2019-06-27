@@ -103,7 +103,7 @@ export class COWorkspace {
         }
       } else {
         console.log('[WORKSPACE] using default doc id' )
-        window.location.href = `/?pid=${defaultPerspective}`
+        window.location.href = `./?pid=${defaultPerspective}`
       }
     } else {
       console.log(`[WORKSPACE] PID found. Going to document ${pid}`)
