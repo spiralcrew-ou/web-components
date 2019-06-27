@@ -12,6 +12,8 @@ import { UprtclCollectiveOne } from './c1/uprtcl.c1';
 import { DiscoveryCollectiveOne } from './c1/discovery.c1';
 
 import { UprtclEthereum } from './eth/uprtcl.eth';
+// import { DiscoveryEthereum } from './eth/discovery.eth';
+
 
 import { DataIpfs } from './data.ipfs';
 import { DraftLocal } from './local/draft.local';

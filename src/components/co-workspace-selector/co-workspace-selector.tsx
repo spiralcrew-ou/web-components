@@ -11,8 +11,11 @@ import { uprtclMultiplatform } from '../../services/index'
   })
   export class COWorkspaceSelector {
 
-    @State() isStarting: boolean
+    @State() isStarting: boolean = true
+    @State() ethLoading: boolean = true
     @State() defaultServiceProvider: string = ethServiceProvider;
+
+    selectorEnabled: boolean = true;
 
     availableServiceProviders: string[] = [
         c1ServiceProvider,
@@ -39,11 +42,13 @@ import { uprtclMultiplatform } from '../../services/index'
     async componentWillLoad() {
         console.log(`[WORSPACE SELECTOR] Avaliable services:`, this.availableServiceProviders);
         await uprtclMultiplatform.serviceProviders[ethServiceProvider].service['ethereum'].ready();
+        console.log(`[WORSPACE SELECTOR] Ethereum ready`);
+        this.ethLoading = false
     }
 
     renderWorkpad() {
         return <div class='waiting'>
-        {this.isStarting ? <co-waiting-app></co-waiting-app> : ''}
+        {(this.isStarting || this.ethLoading)? <co-waiting-app></co-waiting-app> : ''}
         <co-workspace
             default-service={this.defaultServiceProvider}
             avaialable-services={this.availableServiceProviders}>
@@ -63,7 +68,12 @@ import { uprtclMultiplatform } from '../../services/index'
         </div>
     }
 
-    render = () => !this.defaultServiceProvider ? this.renderWelcome() : this.renderWorkpad()
-    
+    render = () => {
+        if (this.selectorEnabled) {
+            return !this.defaultServiceProvider ? this.renderWelcome() : this.renderWorkpad()
+        } else {
+            return this.renderWorkpad()
+        }
+    }
   }
 

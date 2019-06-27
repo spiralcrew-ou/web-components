@@ -162,15 +162,25 @@ export class Multiplatform<T extends CidCompatible> {
     const knownSources = await this.knownSources.getKnownSources(hash);
     console.log(`[MULTIPLATFORM] Known sources for ${hash}:`, knownSources)
 
-    // Iterate through the known sources until a source successfully returns the object
-    for (const source of knownSources) {
-      const object = await this.tryGetFromSource(
-        source,
+    if (!knownSources) {
+      const object = await this.getFromAllSources(
         hash,
         getter,
-        linksSelector
-      );
-      if (object) return object;
+        linksSelector)
+      
+      if (object.length > 0) return object[0];
+      
+    } else {
+      // Iterate through the known sources until a source successfully returns the object
+      for (const source of knownSources) {
+        const object = await this.tryGetFromSource(
+          source,
+          hash,
+          getter,
+          linksSelector
+        );
+        if (object) return object;
+      }
     }
 
     // All known sources failed, throw error

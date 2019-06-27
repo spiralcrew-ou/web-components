@@ -1,10 +1,11 @@
 import { DiscoveryService } from '../discovery.service';
+import { ethServiceProvider } from '../index';
 
 export class DiscoveryEthereum implements DiscoveryService {
   constructor() {}
 
   getOwnSource(): Promise<string> {
-    return Promise.resolve('eth://smartContract');
+    return Promise.resolve(ethServiceProvider);
   }
 
   async getKnownSources(hash: string): Promise<string[]> {
