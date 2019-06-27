@@ -78,6 +78,7 @@ export class HolochainConnection {
   }
 
   public parseEntryResult<T>(entry): EntryResult<T> {
+    if (!entry.result.Single.meta) return null;
     return {
       entry: {
         id: entry.result.Single.meta.address,

@@ -1,4 +1,11 @@
-import { Component, Element, Prop, State, Event, EventEmitter } from '@stencil/core';
+import {
+  Component,
+  Element,
+  Prop,
+  State,
+  Event,
+  EventEmitter
+} from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
 import {
   setStyle,
@@ -10,7 +17,7 @@ import {
   setPerspectiveToActAndUpdateContextPerspectives
 } from '../../actions';
 
-import Popper from 'popper.js'
+import Popper from 'popper.js';
 
 @Component({
   tag: 'co-menu',
@@ -21,28 +28,34 @@ export class COMenu {
   @Element() _element: HTMLElement;
   @Prop({ context: 'store' }) store: Store;
 
-  @Prop() reference: string
-  @Prop() parentId: string
-  @Prop() index: number
-  @State() block: Block
-  @State() rootId: string
-  @State() ethAccount: string
-  @Prop() color: string
-  @Prop() show: boolean 
+  @Prop() reference: string;
+  @Prop() parentId: string;
+  @Prop() index: number;
+  @State() block: Block;
+  @State() rootId: string;
+  @State() ethAccount: string;
+  @Prop() color: string;
+  @Prop() show: boolean;
+  @State() anyDraft: boolean;
 
-  @Event({ eventName: 'showInputCommit', bubbles: true }) showInputCommit: EventEmitter
-  @Event({ eventName: 'showInputNewPerspective', bubbles: true }) showInputNewPerspective: EventEmitter
-  @Event({ eventName: 'showInputChangePerspective', bubbles: true }) showInputChangePerspective: EventEmitter
-  @Event({ eventName: 'showInputMerge', bubbles: true }) showInputMerge: EventEmitter
-  @Event({ eventName: 'showInputInfo', bubbles: true }) showInputInfo: EventEmitter
+  @Event({ eventName: 'showInputCommit', bubbles: true })
+  showInputCommit: EventEmitter;
+  @Event({ eventName: 'showInputNewPerspective', bubbles: true })
+  showInputNewPerspective: EventEmitter;
+  @Event({ eventName: 'showInputChangePerspective', bubbles: true })
+  showInputChangePerspective: EventEmitter;
+  @Event({ eventName: 'showInputMerge', bubbles: true })
+  showInputMerge: EventEmitter;
+  @Event({ eventName: 'showInputInfo', bubbles: true })
+  showInputInfo: EventEmitter;
 
-  setStyle: Action
-  pullPerspective: Action
+  setStyle: Action;
+  pullPerspective: Action;
 
-  renderingWorkpad: Action
-  setPerspectiveToAct: Action
-  setPerspectiveToActAndUpdateContextPerspectives: Action
-  
+  renderingWorkpad: Action;
+  setPerspectiveToAct: Action;
+  setPerspectiveToActAndUpdateContextPerspectives: Action;
+
   componentWillLoad() {
     this.store.mapDispatchToProps(this, {
       setStyle,
@@ -50,15 +63,19 @@ export class COMenu {
       pullPerspective,
       setPerspectiveToAct,
       setPerspectiveToActAndUpdateContextPerspectives
-    })
+    });
 
     this.store.mapStateToProps(this, state => {
       return {
         block: state.workpad.tree[this.reference],
         rootId: state.workpad.rootId,
-        ethAccount: state.support.ethAccount
-      }
-    })
+        ethAccount: state.support.ethAccount,
+        anyDraft:
+          Object.keys(state.workpad.tree).filter(
+            blockId => state.workpad.tree[blockId].status === 'DRAFT'
+          ).length > 0
+      };
+    });
   }
 
   callPull() {
@@ -66,34 +83,37 @@ export class COMenu {
   }
 
   open() {
-    const menu = this._element.shadowRoot.getElementById(`${this.block.id}`) as any
-    const caller = this._element.shadowRoot.getElementById(`caller${this.block.id}`)
-    menu.style.display = 'block'
+    const menu = this._element.shadowRoot.getElementById(
+      `${this.block.id}`
+    ) as any;
+    const caller = this._element.shadowRoot.getElementById(
+      `caller${this.block.id}`
+    );
+    menu.style.display = 'block';
     new Popper(caller, menu, {
       placement: 'auto'
-    })
-
+    });
   }
 
   close() {
-    const menu = this._element.shadowRoot.getElementById(this.block.id) as any
-    menu.style.display = 'none'
+    const menu = this._element.shadowRoot.getElementById(this.block.id) as any;
+    menu.style.display = 'none';
   }
 
-
   setBlockStyle(newStyle: NodeType) {
-    this.setStyle(this.block.id, newStyle, this.parentId, this.index)
-    this.close()
+    this.setStyle(this.block.id, newStyle, this.parentId, this.index);
+    this.close();
   }
 
   canWrite(): boolean {
-    return !this.block.serviceProvider.startsWith('eth://') || this.ethAccount === this.block.creatorId; 
+    return (
+      !this.block.serviceProvider.startsWith('eth://') ||
+      this.ethAccount === this.block.creatorId
+    );
   }
 
   render() {
-    
-      
-    const isRootDocument = this.block.id === this.rootId
+    const isRootDocument = this.block.id === this.rootId;
     return (
       <div class='mainContainer px-2'>
         <div id={this.block.id} class='hidden  m-4 w-64 border-2 shadow-md p-2 rounded-lg font-thin z-10 bg-white'>
@@ -144,13 +164,30 @@ export class COMenu {
               <img class='w-6 h-6 inline-block ' src='./assets/img/switch.svg'></img>
             </div>
 
-              <div class={'row pb-2' + (this.canWrite() ? '' : ' disabled')} onClick={async () => {
-                await this.setPerspectiveToActAndUpdateContextPerspectives(this.block.id)
-                this.showInputMerge.emit(true)
-                this.close()
-              }}>
-              <div class='my-1' > Merge</div>
-              <img class='w-6 h-6 inline-block ' src='./assets/img/merge.svg'></img>
+            <div 
+              title={this.canWrite() && !this.anyDraft ? '': 'Please commit your changes before merging'}
+              class='row pb-2'>
+              <div
+                class={
+                  (this.canWrite() && !this.anyDraft ? '' : ' disabled')
+                }
+                onClick={async () => {
+                  await this.setPerspectiveToActAndUpdateContextPerspectives(
+                    this.block.id
+                  );
+                  this.showInputMerge.emit(true);
+                  this.close();
+                }}
+              >
+                <div class="my-1">
+                  Merge
+                </div>
+
+              </div>  
+              <img
+                class="w-6 h-6 inline-block "
+                src="./assets/img/merge.svg"
+              />
             </div>
 
               <div class='row pt-2 border-t' onClick={async () => {
@@ -168,7 +205,6 @@ export class COMenu {
               <img class='w-6 h-6 inline-block ' src='./assets/img/go.svg'></img>
               </div>
 
-
             <div class='row' onClick={() => this.close()}>
               <div class='my-1'>Close</div>
               <img class='w-10 h-10 inline-block' src='./assets/img/close.svg'></img>
@@ -181,6 +217,6 @@ export class COMenu {
                 : ''
               }
       </div>
-    )
+    );
   }
 }

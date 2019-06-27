@@ -28,6 +28,9 @@ export class DiscoveryLocal implements DiscoveryService {
 
   async removeKnownSource(hash: string, source: string): Promise<void> {
     let knownSources = await this.getKnownSources(hash);
+    
+    if (!knownSources) return;
+
     knownSources = knownSources.filter(s => s !== source);
     if (knownSources.length === 0){
       await this.uprtclExtensions.knownSources.delete(hash);

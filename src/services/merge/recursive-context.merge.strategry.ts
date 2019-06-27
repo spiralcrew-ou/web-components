@@ -1,5 +1,6 @@
 import { Perspective, TextNode, Commit } from '../../types';
 import { SimpleMergeStrategy } from './simple.merge.strategy';
+import { userService } from '../user/user.service.imp';
 
 type Dictionary<T> = { [key: string]: T };
 
@@ -84,12 +85,23 @@ export class RecursiveContextMergeStrategy extends SimpleMergeStrategy {
     originalLinks: string[],
     modificationsLinks: string[][]
   ): Promise<string[]> {
-    const pIdToCid = (perspectiveId: string) =>
-      this.allPerspectives[perspectiveId].contextId;
+    const pIdToCid = async (perspectiveId: string) => {
+      if (this.allPerspectives[perspectiveId]) {
+        return this.allPerspectives[perspectiveId].contextId;
+      } else {
+        const perspective = await this.uprtcl.getPerspective(perspectiveId);
+        return perspective.contextId;
+      }
+    };
 
-    const originalContexts = originalLinks.map(pIdToCid);
-    const modificationsContexts = modificationsLinks.map(links =>
+    const originalPromises = originalLinks.map(pIdToCid);
+    const modificationsPromises = modificationsLinks.map(links =>
       links.map(pIdToCid)
+    );
+
+    const originalContexts = await Promise.all(originalPromises);
+    const modificationsContexts = await Promise.all(
+      modificationsPromises.map(promises => Promise.all(promises))
     );
 
     const contextIdLinks = await super.mergeLinks(
@@ -146,7 +158,7 @@ export class RecursiveContextMergeStrategy extends SimpleMergeStrategy {
     let headId = await this.uprtcl.getHead(perspectiveId);
     const newDataId = await this.data.createData(node);
     const commit: Commit = {
-      creatorId: 'anon',
+      creatorId: userService.getUsername(),
       dataId: newDataId,
       parentsIds: [headId],
       message: 'Update perspective by merge',

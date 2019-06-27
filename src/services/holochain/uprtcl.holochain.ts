@@ -35,15 +35,21 @@ export class UprtclHolochain implements UprtclService {
   }
 
   getContext(contextId: string): Promise<Context> {
-    return this.getEntry(contextId).then(result => result.entry);
+    return this.getEntry(contextId).then(result =>
+      result ? result.entry : null
+    );
   }
 
   getPerspective(perspectiveId: string): Promise<Perspective> {
-    return this.getEntry(perspectiveId).then(result => result.entry);
+    return this.getEntry(perspectiveId).then(result =>
+      result ? result.entry : null
+    );
   }
 
   getCommit(commitId: string): Promise<Commit> {
-    return this.getEntry(commitId).then(result => result.entry);
+    return this.getEntry(commitId).then(result =>
+      result ? result.entry : null
+    );
   }
 
   async getContextPerspectives(contextId: string): Promise<Perspective[]> {
@@ -57,7 +63,7 @@ export class UprtclHolochain implements UprtclService {
     const perspectivesEntries: EntryResult<
       Perspective
     >[] = this.uprtclZome.parseEntriesResults(perspectivesResponse);
-    return perspectivesEntries.map(p => p.entry);
+    return perspectivesEntries.map(p => (p ? p.entry : null));
   }
 
   createContext(context: Context): Promise<string> {

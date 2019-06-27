@@ -68,16 +68,6 @@ export class Multiplatform<T extends CidCompatible> {
   }
 
   /**
-   * Removes the given known source from the given hash, if a discovery service from the source exists
-   */
-  private async removeKnownSource(source: string, hash: string): Promise<void> {
-    const discoverService = this.serviceProviders[source].discovery;
-    if (discoverService) {
-      await discoverService.removeKnownSource(hash, source);
-    }
-  }
-
-  /**
    * Gets the object identified with the given hash from the given source
    */
   protected async getFromSource<O>(
@@ -128,7 +118,7 @@ export class Multiplatform<T extends CidCompatible> {
 
       if (!object) {
         // The get call succeeded but didn't return the object, remove the source from the known sources
-        await this.removeKnownSource(source, hash);
+        await this.knownSources.removeKnownSource(source, hash);
       }
       return object;
     } catch (e) {
@@ -160,15 +150,9 @@ export class Multiplatform<T extends CidCompatible> {
     const knownSources = await this.knownSources.getKnownSources(hash);
     console.log(`[MULTIPLATFORM] Known sources for ${hash}:`, knownSources);
 
-    if (!knownSources) {
-      const objects = await this.getFromAllSources(hash, getter, linksSelector);
-
-      const object = objects.find(o => !!o);
-
-      if (object) return object;
-    } else {
+    if (knownSources) {
       // Iterate through the known sources until a source successfully returns the object
-      for (const source of knownSources) {
+      const promises = knownSources.map(async source => {
         const object = await this.tryGetFromSource(
           source,
           hash,
@@ -176,12 +160,64 @@ export class Multiplatform<T extends CidCompatible> {
           linksSelector
         );
         if (object) return object;
-      }
+        throw new Error('object not found');
+      });
+
+      const object = await this.raceToSuccess(promises);
+      if (object) return object;
     }
+
+    const object = await this.getFirstFromAllSources(
+      hash,
+      getter,
+      linksSelector
+    );
+
+    if (object) return object;
 
     // All known sources failed, throw error
     throw new Error(
       `Object with hash ${hash} not found in any of the known sources`
+    );
+  }
+
+  protected async getFirstFromAllSources<O>(
+    hash: string,
+    getter: (service: T) => Promise<O>,
+    linksSelector: (object: O) => string[] = () => []
+  ): Promise<O> {
+    if (typeof hash !== 'string') {
+      return null;
+    }
+
+    const promises = this.getServiceProviders().map(async serviceProvider => {
+      const object = await this.tryGetFromSource(
+        serviceProvider,
+        hash,
+        getter,
+        linksSelector
+      );
+
+      if (!object) throw new Error('object not retrieved from this source');
+
+      if (!(object instanceof Array)) {
+        await this.knownSources.addKnownSources(hash, [serviceProvider]);
+      }
+      return object;
+    });
+
+    return this.raceToSuccess(promises);
+  }
+
+  raceToSuccess<O>(promises: Array<Promise<O>>): Promise<O> {
+    let numRejected = 0;
+
+    return new Promise((resolve, reject) =>
+      promises.forEach(promise =>
+        promise.then(resolve).catch(() => {
+          if (++numRejected === promises.length) reject();
+        })
+      )
     );
   }
 

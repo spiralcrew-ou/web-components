@@ -26,6 +26,8 @@ export class TaskQueue {
   pendingListeners: Array<() => any> = [];
   finishedListeners: Array<() => any> = [];
   tasksPending: boolean = false;
+  pendingResolve = null;
+  pendingPromise: Promise<void> = null;
 
   constructor(retryEnabled: boolean = true, retryInterval: number = 100) {
     this.retryEnabled = retryEnabled;
@@ -75,6 +77,7 @@ export class TaskQueue {
       if (!this.tasksPending) {
         this.tasksPending = true;
         this.pendingListeners.map(f => f());
+        this.pendingPromise = new Promise(resolve => this.pendingResolve = resolve);
       }
 
       this.runTask(task);
@@ -145,6 +148,7 @@ export class TaskQueue {
     if (Object.keys(this.finishedTasks).every(key => this.finishedTasks[key])) {
       this.finishedListeners.map(f => f());
       this.tasksPending = false;
+      this.pendingResolve();
     }
   }
 
@@ -155,4 +159,8 @@ export class TaskQueue {
   public onTasksFinished(callback: () => any): void {
     this.finishedListeners.push(callback);
   }
+
+  public waitForAllTasks(): Promise<void> {
+    return this.tasksPending ? this.pendingPromise : Promise.resolve();
+  } 
 }

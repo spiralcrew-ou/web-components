@@ -46,7 +46,7 @@ export class COInputChangePerspective {
 
   async checkout() {
     this.renderingWorkpad(true);
-    await this.checkoutPerspective(this.newPerspectiveId);
+    window.location.href = `./?pid=${this.newPerspectiveId}`;
     this.showInputChangePerspective.emit(false)
   }
 

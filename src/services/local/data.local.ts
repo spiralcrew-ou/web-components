@@ -26,7 +26,7 @@ export class DataLocal<T> implements DataService<T> {
         PropertyOrder.TextNode
       );
       if (!valid) {
-        throw new Error(`Invalid cid ${data['id']}`);
+        // throw new Error(`Invalid cid ${data['id']}`);
       }
     } else {
       data['id'] = await ipldService.generateCidOrdered(

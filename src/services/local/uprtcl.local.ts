@@ -75,7 +75,7 @@ export class UprtclLocal extends Dexie implements UprtclService, CidCompatible {
         PropertyOrder.Context
       );
       if (!valid) {
-        throw new Error(`Invalid cid ${context.id}`);
+        // throw new Error(`Invalid cid ${context.id}`);
       }
     } else {
       context.id = await ipldService.generateCidOrdered(
@@ -95,7 +95,7 @@ export class UprtclLocal extends Dexie implements UprtclService, CidCompatible {
         PropertyOrder.Perspective
       );
       if (!valid) {
-        throw new Error(`Invalid cid ${perspective.id}`);
+        //throw new Error(`Invalid cid ${perspective.id}`);
       }
     } else {
       perspective.id = await ipldService.generateCidOrdered(
@@ -116,7 +116,7 @@ export class UprtclLocal extends Dexie implements UprtclService, CidCompatible {
         PropertyOrder.Commit
       );
       if (!valid) {
-        throw new Error(`Invalid cid ${commit.id}`);
+        //throw new Error(`Invalid cid ${commit.id}`);
       }
     } else {
       commit.id = await ipldService.generateCidOrdered(

@@ -8,6 +8,7 @@ import findMostRecentCommonAncestor from './common.ancestor';
 import { DiffUtils } from './diff.utils';
 import { Diff } from 'diff-match-patch-ts';
 import { UprtclUtils } from '../uprtcl.utils';
+import { userService } from '../user/user.service.imp';
 
 export class BaseMergeStrategy<T> implements MergeStrategy<T> {
   uprtcl: UprtclService;
@@ -31,11 +32,11 @@ export class BaseMergeStrategy<T> implements MergeStrategy<T> {
     const headsIds = await Promise.all(commitsIds);
 
     const toHeadId = headsIds.shift();
-
+    
     // Check for fast-forward
     if (
       headsIds.length === 1 &&
-      (await this.utils.isAncestorOf(headsIds[0], toHeadId))
+      (await this.utils.isAncestorOf(toHeadId, headsIds[0]))
     ) {
       // The head to merge to is a direct ancestor of the commit to merge from
       // Fast-forward the branch
@@ -79,7 +80,7 @@ export class BaseMergeStrategy<T> implements MergeStrategy<T> {
     // TODO: filter out the parents that are already ancestors
 
     const mergeCommit: Commit = {
-      creatorId: 'anon',
+      creatorId: userService.getUsername(),
       dataId: newDataId,
       parentsIds: commitsIds,
       message: 'merge commits',

@@ -363,8 +363,11 @@ export const mergePerspective = (
 
     await uprtclData.merge(toPerspective, [fromPerspectiveId]);
 
+    await uprtclData.uprtcl.taskQueue.waitForAllTasks();
+
     dispatch({ type: 'MERGE_MADE', block });
     dispatch(reloadTree());
+    window.location.href = `./?pid=${toPerspective}`;
   };
 };
 
@@ -396,6 +399,10 @@ export const newPerspective = (
       type: 'NEW_PERSPECTIVE',
       rootId: newPerspectiveId,
       tree: _tree
+    });
+
+    uprtclData.uprtcl.taskQueue.onTasksFinished(() => {
+      window.location.href = `./?pid=${newPerspectiveId}`;
     });
   };
 };

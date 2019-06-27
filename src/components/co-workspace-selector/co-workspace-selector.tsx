@@ -1,6 +1,6 @@
 import { Component, State, Listen, Method, Prop } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
-import { c1ServiceProvider, ethServiceProvider } from '../../services';
+import { c1ServiceProvider, ethServiceProvider, holochainServiceProvider } from '../../services';
 import { setEthAccount } from '../../actions';
 
 import { uprtclMultiplatform } from '../../services/index'
@@ -26,7 +26,8 @@ export class COWorkspaceSelector {
 
   availableServiceProviders: string[] = [
     c1ServiceProvider,
-    ethServiceProvider
+    ethServiceProvider,
+    holochainServiceProvider
   ]
 
   @Listen('isStarting')

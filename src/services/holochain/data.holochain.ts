@@ -22,6 +22,9 @@ export class DataHolochain<T = any> implements DataService<T> {
       address: dataId
     });
     const entry = await this.documentsZome.parseEntryResult<T>(response);
+
+    if (!entry) return null;
+
     const data = entry.entry;
     if (data['links']) {
       data['links'] = data['links'].map(link => ({ link }));

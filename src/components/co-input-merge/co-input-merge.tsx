@@ -21,7 +21,7 @@ export class COInputMerge {
   @State() rootId: string
   @State() contextPerspectives: Perspective[]
 
-  @Event({ eventName: 'showInputChangePerspective', bubbles: true }) showInputChangePerspective: EventEmitter
+  @Event({ eventName: 'showInputMerge', bubbles: true }) showInputMerge: EventEmitter
 
   mergePerspective: Action
   checkoutPerspective: Action
@@ -49,8 +49,7 @@ export class COInputMerge {
   async merge() {
     this.renderingWorkpad(true);
     await this.mergePerspective(this.rootId, this.perspectiveToMergeId);
-    await this.checkoutPerspective(this.rootId);
-    this.showInputChangePerspective.emit(false)
+    this.showInputMerge.emit(false)
   }
 
   renderInput() {
@@ -65,7 +64,7 @@ export class COInputMerge {
         </select>
       </content>
       <footer class='flex text-red-700 justify-end'>
-        <button class='uppercase m-2 font-thin object-none ' onClick={() => this.showInputChangePerspective.emit(false)}>Cancel</button>
+        <button class='uppercase m-2 font-thin object-none ' onClick={() => this.showInputMerge.emit(false)}>Cancel</button>
         <button class='uppercase m-2 font-thin object-none ' onClick={() => this.merge()}>Accept</button>
       </footer>
     </div>
