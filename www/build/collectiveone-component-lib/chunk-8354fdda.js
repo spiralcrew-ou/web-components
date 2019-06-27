@@ -18810,7 +18810,7 @@ var holochainclient = { connect: exports.connect };
 unwrapExports(lib);
 var lib_1 = lib.connect;
 
-const host = 'ws://3.130.73.99:80';
+const host = 'wss://3.130.73.99:80';
 // const host = 'ws://localhost:8888';
 class HolochainConnection {
     constructor(instanceId, zome) {
