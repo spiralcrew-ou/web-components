@@ -5,8 +5,7 @@ import {
   samplePerspective,
   sampleCommit,
   Content,
-  Node,
-  History
+  Node
 } from './mocks/uprtcl.mock';
 import { sampleData } from './mocks/data.mock';
 import { Commit, TextNode } from '../types';
@@ -213,15 +212,15 @@ export class UptrclTestUtils {
     return [perspectiveId, nodes];
   }
 
-  async getCommitHistory(commitId: string): Promise<History> {
+  async getCommitHistory(commitId: string): Promise<Node> {
     const commit = await this.uprtcl.getCommit(commitId);
     const promises = commit.parentsIds.map(id => this.getCommitHistory(id));
     const histories = await Promise.all(promises);
 
-    return [commit, histories];
+    return [commit.id, histories];
   }
 
-  async getHistory(perspectiveId: string): Promise<History> {
+  async getHistory(perspectiveId: string): Promise<Node> {
     const headId = await this.uprtcl.getHead(perspectiveId);
     return this.getCommitHistory(headId);
   }
@@ -232,15 +231,14 @@ export class UptrclTestUtils {
     nodeText: string
   ): Promise<void> {
     return this.recursePerspectiveTree(rootPerspectiveId, async content => {
-      const index = content.data.links.findIndex(
-        link => link.link === perspectiveId
-      );
+      const data = { ...content.data };
+      const index = data.links.findIndex(link => link.link === perspectiveId);
       if (index !== -1) {
         const result = await this.initPerspective(
           sampleData(nodeText, '', [{ link: perspectiveId }])
         );
-        content.data.links[index].link = result.perspectiveId;
-        await this.createCommitIn(content.perspective.id, content.data);
+        data.links[index].link = result.perspectiveId;
+        await this.createCommitIn(content.perspective.id, data);
       }
     });
   }

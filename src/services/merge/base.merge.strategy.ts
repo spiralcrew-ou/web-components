@@ -31,6 +31,7 @@ export class BaseMergeStrategy<T> implements MergeStrategy<T> {
     const headsIds = await Promise.all(commitsIds);
 
     const toHeadId = headsIds.shift();
+
     // Check for fast-forward
     if (
       headsIds.length === 1 &&

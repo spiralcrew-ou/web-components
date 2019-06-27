@@ -1,37 +1,40 @@
-import { Perspective } from '../../types';
-import { UprtclMultiplatform } from '../multiplatform/uprtcl.multiplatform';
+import { Perspective, TextNode, Commit } from '../../types';
 import { SimpleMergeStrategy } from './simple.merge.strategy';
 
 type Dictionary<T> = { [key: string]: T };
 
 export class RecursiveContextMergeStrategy extends SimpleMergeStrategy {
-  contextPerspectives: Dictionary<{
+  perspectivesByContext: Dictionary<{
     to: string;
     from: string[];
   }>;
 
+  allPerspectives: Dictionary<Perspective>;
+
   setPerspective(perspective: Perspective, to: boolean): void {
-    if (!this.contextPerspectives[perspective.contextId]) {
-      this.contextPerspectives[perspective.contextId] = {
+    if (!this.perspectivesByContext[perspective.contextId]) {
+      this.perspectivesByContext[perspective.contextId] = {
         to: null,
         from: []
       };
     }
 
     if (to) {
-      this.contextPerspectives[perspective.contextId].to = perspective.id;
+      this.perspectivesByContext[perspective.contextId].to = perspective.id;
     } else {
-      this.contextPerspectives[perspective.contextId].from.push(perspective.id);
+      this.perspectivesByContext[perspective.contextId].from.push(
+        perspective.id
+      );
     }
+
+    this.allPerspectives[perspective.id] = perspective;
   }
 
   async readPerspective(perspectiveId: string, to: boolean): Promise<void> {
     const perspective = await this.uprtcl.getPerspective(perspectiveId);
     this.setPerspective(perspective, to);
 
-    const headId = await (<UprtclMultiplatform>this.uprtcl).getHead(
-      perspectiveId
-    );
+    const headId = await this.uprtcl.getHead(perspectiveId);
     const head = await this.uprtcl.getCommit(headId);
     const data = await this.data.getData(head.dataId);
 
@@ -58,9 +61,10 @@ export class RecursiveContextMergeStrategy extends SimpleMergeStrategy {
     fromPerspectivesIds: string[]
   ): Promise<string> {
     let root = false;
-    if (!this.contextPerspectives) {
+    if (!this.perspectivesByContext) {
       root = true;
-      this.contextPerspectives = {};
+      this.perspectivesByContext = {};
+      this.allPerspectives = {};
       await this.readAllSubcontexts(toPerspectiveId, fromPerspectivesIds);
     }
 
@@ -70,7 +74,8 @@ export class RecursiveContextMergeStrategy extends SimpleMergeStrategy {
     );
 
     if (root) {
-      this.contextPerspectives = null;
+      this.perspectivesByContext = null;
+      this.allPerspectives = null;
     }
     return headId;
   }
@@ -79,35 +84,84 @@ export class RecursiveContextMergeStrategy extends SimpleMergeStrategy {
     originalLinks: string[],
     modificationsLinks: string[][]
   ): Promise<string[]> {
-    const links = await super.mergeLinks(originalLinks, modificationsLinks);
+    const pIdToCid = (perspectiveId: string) =>
+      this.allPerspectives[perspectiveId].contextId;
 
-    const promises = links.map(link => this.uprtcl.getPerspective(link));
-    const perspectives = await Promise.all(promises);
+    const originalContexts = originalLinks.map(pIdToCid);
+    const modificationsContexts = modificationsLinks.map(links =>
+      links.map(pIdToCid)
+    );
 
-    const dictionary = this.contextPerspectives;
+    const contextIdLinks = await super.mergeLinks(
+      originalContexts,
+      modificationsContexts
+    );
 
-    for (let i = 0; i < links.length; i++) {
-      const contextPerspectives = dictionary[perspectives[i].contextId];
+    const dictionary = this.perspectivesByContext;
 
-      // HERE THE BUG
+    const promises = contextIdLinks.map(async contextId => {
+      const perspectivesByContext = dictionary[contextId];
+
       const needsSubperspectiveMerge =
-        contextPerspectives &&
-        contextPerspectives.to &&
-        contextPerspectives.from &&
-        contextPerspectives.from.length > 0;
+        perspectivesByContext &&
+        perspectivesByContext.to &&
+        perspectivesByContext.from &&
+        perspectivesByContext.from.length > 0;
 
       if (needsSubperspectiveMerge) {
         // We need to merge the new perspectives with the original perspective
         await this.mergePerspectives(
-          contextPerspectives.to,
-          contextPerspectives.from
+          perspectivesByContext.to,
+          perspectivesByContext.from
         );
 
         // The final perspective has not changed
-        links[i] = contextPerspectives.to;
+        return perspectivesByContext.to;
+      } else {
+        const finalPerspectiveId = perspectivesByContext.to
+          ? perspectivesByContext.to
+          : perspectivesByContext.from[0];
+
+        await this.mergePerspectiveChildren(finalPerspectiveId);
+
+        return finalPerspectiveId;
       }
-    }
+    });
+
+    const links = await Promise.all(promises);
 
     return links;
+  }
+
+  private async mergePerspectiveChildren(
+    perspectiveId: string
+  ): Promise<string> {
+    const perspective = this.allPerspectives[perspectiveId];
+    let headId = await this.uprtcl.getHead(perspectiveId);
+    const commit = await this.uprtcl.getCommit(headId);
+    const data = await this.data.getData(commit.dataId);
+
+    const rawLinks = data.links.map(link => link.link);
+
+    const mergedLinks = await this.mergeLinks(rawLinks, [rawLinks]);
+
+    if (!rawLinks.every((link, index) => link !== mergedLinks[index])) {
+      const node: TextNode = {
+        ...data,
+        links: mergedLinks.map(link => ({ link }))
+      };
+      const newDataId = await this.data.createData(node);
+      const commit: Commit = {
+        creatorId: 'anon',
+        dataId: newDataId,
+        parentsIds: [headId],
+        message: 'merge commits',
+        timestamp: Date.now()
+      };
+      headId = await this.uprtcl.createCommit(commit);
+      await this.uprtcl.updateHead(perspective.id, headId);
+    }
+
+    return headId;
   }
 }

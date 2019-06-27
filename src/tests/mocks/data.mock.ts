@@ -24,7 +24,7 @@ export class MockData extends BaseMock implements DataService {
     return this.get(this.datas[dataId]);
   }
   createData(data: any): Promise<string> {
-    const id = 'data' + Object.keys(this.datas).length + 1;
+    const id = 'data' + (Object.keys(this.datas).length + 1);
     this.datas[id] = { ...data, id };
     this.log('[DATA] Created data: ', this.datas[id]);
     return Promise.resolve(id);

@@ -1,3 +1,5 @@
+import * as _ from 'lodash';
+
 export class BaseMock {
   logEnabled = false;
 
@@ -10,6 +12,6 @@ export class BaseMock {
   }
 
   get<O>(object: O): Promise<O> {
-    return Promise.resolve({...object});
+    return Promise.resolve(_.cloneDeep(object));
   }
 }

@@ -70,15 +70,16 @@ describe('Merge service tests', () => {
     const perspectives = await utils.getPerspectivesNode(perspectiveId);
 
     await utils.createCommitIn(perspectives[1][0][0], 'change');
-    console.log((await utils.getNode(documentPerspectiveId))[1]);
-    console.log(await utils.getNode(perspectiveId));
+
     await merge.mergePerspectives(documentPerspectiveId, [perspectiveId]);
     const mergeResult = await utils.getNode(documentPerspectiveId);
-    console.log(await utils.getPerspectivesNode(documentPerspectiveId));
 
     expect(mergeResult).toEqual([
-      '1proposal',
-      [['1proposal', [['1proposal', []], ['1proposal', []]]], ['1proposal', []]]
+      'Document',
+      [
+        ['new parent', [['change', [['Paragraph1', []], ['Paragraph2', []]]]]],
+        ['Section2', []]
+      ]
     ]);
   });
 });

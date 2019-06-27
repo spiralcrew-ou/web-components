@@ -10,7 +10,7 @@ import {
   TextNodeTree
 } from './../types';
 import { NodeType } from './../actions';
-import { MergeService } from './merge/merge.service';
+import { MergeService } from './merge/simple.merge.strategy';
 
 export class UprtclData {
   uprtcl = uprtclMultiplatform;
