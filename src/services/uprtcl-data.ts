@@ -25,7 +25,7 @@ export class UprtclData {
   public initEmptyTextNode(_content: string): TextNode {
     return {
       text: _content,
-      type: 'paragraph',
+      type: NodeType.paragraph,
       links: []
     };
   }

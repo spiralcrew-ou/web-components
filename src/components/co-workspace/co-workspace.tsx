@@ -5,7 +5,7 @@ import {
 import { Store, Action } from '@stencil/redux';
 import { configureStore } from '../../store.js';
 import { UprtclData } from '../../services/uprtcl-data';
-import {setSelectedProvider,initTree,reloadTree} from '../../actions';
+import {setSelectedProvider,initTree,reloadTree, NodeType} from '../../actions';
 
 const enableInit = false;
 const defaultPerspective = 'zb2rhXZDw7XambraZisF7Z689DxoJDAXanqngg9JdNcqeSS1p';
@@ -37,8 +37,12 @@ export class COWorkspace {
   async initDocument (perspectiveId) {
     console.log('[WORKSPACE] creating a document' )
     /** init an empty document as subcontext of the root perspective */
-    await this.uprtclData.initContextUnder(
+    let docPerspectiveId = await this.uprtclData.initContextUnder(
       this.defaultService, perspectiveId, -1, '');
+
+    let draft = await this.uprtclData.getDraft(docPerspectiveId);
+    draft.type = NodeType.title;
+    await this.uprtclData.setDraft(docPerspectiveId, draft);
   
     /** commit this change to the root perspective */
     await this.uprtclData.commit(
