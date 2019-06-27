@@ -782,7 +782,7 @@ const reducers = combineReducers({
 });
 const configureStore = () => createStore(reducers, composeEnhancer(applyMiddleware(thunk, logger)));
 
-const enableInit = true;
+const enableInit = false;
 const defaultPerspective = 'zb2rhksTeHa1kFpbeyXNqnQ2vhDXn3s8VXWfrFE4GB3rTqkDe';
 class COWorkspace {
     constructor(_defaultServiceId) {
