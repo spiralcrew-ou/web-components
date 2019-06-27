@@ -19,7 +19,8 @@ const initialState = {
   },
   support: {
     availableProviders: [],
-    selectedProvider: []
+    selectedProvider: [],
+    ethAccount: ''
   }
 }
 
@@ -77,7 +78,9 @@ export const supportReducer = (state ={...initialState.support}, action) => {
     case 'SET_AVAILABLE_PROVIDERS':
       return {...state,...action}
     case 'SET_SELECTED_PROVIDER':
-        return {...state,...action}
+      return {...state,...action}
+    case 'SET_ETH_ACCOUNT':
+      return {...state,...action}
     default:
       return state 
   }

@@ -450,8 +450,14 @@ export const setAvailableProviders = (availableProviders: string[]) => {
 
 export const setSelectedProvider = (selectedProvider: string) => {
   return (dispatch) => {         
-  dispatch({type: 'SET_SELECTED_PROVIDER', selectedProvider})
- }
+    dispatch({type: 'SET_SELECTED_PROVIDER', selectedProvider})
+  }
+}
+
+export const setEthAccount = (ethAccount: string) => {
+  return (dispatch) => {         
+    dispatch({type: 'SET_ETH_ACCOUNT', ethAccount})
+  }
 }
        
 export const renderingWorkpad = (value: boolean) => {
