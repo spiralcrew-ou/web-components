@@ -43,10 +43,11 @@ export class EthereumConnection {
   public send(funcName: string, pars: any[]): Promise<any> {
     return new Promise(async (resolve, reject) => {
       
-      let gasEstimated = await this.uprtclInstance.methods[funcName](...pars).estimateGas()
+      // let gasEstimated = await this.uprtclInstance.methods[funcName](...pars).estimateGas()
+
       let sendPars = { 
         from: this.account,
-        gas: Math.ceil(gasEstimated * 1.1)
+        gas: 750000
       }
       console.log(`[ETH] CALLING ${funcName}`, pars, sendPars);
       

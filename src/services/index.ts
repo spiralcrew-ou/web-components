@@ -19,7 +19,7 @@ import { TextNode } from './../types';
 
 export const holochainEnabled = false;
 export const c1Enabled = true;
-export const ethEnabled = false;
+export const ethEnabled = true;
 
 export const holochainServiceProvider =
   'holochain://QmTxSxPovQyWBkTRrM1gFAbtVZUAcS1oMvzkGqihbufKSs';

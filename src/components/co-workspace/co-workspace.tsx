@@ -7,7 +7,8 @@ import { configureStore } from '../../store.js';
 import { UprtclData } from '../../services/uprtcl-data';
 import {setSelectedProvider,initTree,reloadTree} from '../../actions';
 
-const enableInit = true;
+const enableInit = false;
+const defaultPerspective = 'zb2rhXZDw7XambraZisF7Z689DxoJDAXanqngg9JdNcqeSS1p';
 
 @Component({
   tag: 'co-workspace',
@@ -54,7 +55,7 @@ export class COWorkspace {
       reloadTree,
     })
     await this.setSelectedProvider(this.defaultService)
-
+    
     let pid = new URLSearchParams(window.location.search).get("pid")
     
     if (!pid) {
@@ -101,7 +102,7 @@ export class COWorkspace {
         }
       } else {
         console.log('[WORKSPACE] using default doc id' )
-        this.documentPerspectiveId = 'HARDCODED VALUE';
+        window.location.href = `/?pid=${defaultPerspective}`
       }
     } else {
       console.log(`[WORKSPACE] PID found. Going to document ${pid}`)

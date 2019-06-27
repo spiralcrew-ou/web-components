@@ -7,7 +7,7 @@ export class UserServiceImp implements UserService {
     this.username = _username;
   }
   getUsername(): string {
-    return this.username ? this.username : 'anonymous'
+    return this.username ? this.username : 'anonymous:02'
   }
 }
 

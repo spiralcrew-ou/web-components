@@ -12,8 +12,6 @@ import { UprtclLocal } from '../local/uprtcl.local';
 import { ipldService } from '../ipld';
 import { userService } from '../user/user.service.imp';
 
-const currentAuthorId = userService.getUsername();
-
 export class UprtclMultiplatform extends CachedMultiplatform<UprtclService>
   implements UprtclService {
 
@@ -47,11 +45,14 @@ export class UprtclMultiplatform extends CachedMultiplatform<UprtclService>
 
   /** The multiplatform service is the one who knows the current author DID */
   async getRootContextId(serviceProvider: string): Promise<string> {
+    const userName = userService.getUsername();
     let userContext: Context = {
-      creatorId: currentAuthorId,
+      creatorId: userName,
       timestamp: 0,
       nonce: 0
     };
+
+    console.log(`[MULTIPLATFORM] Root context for user ${userName}`);
 
     const cidConfig = this.getServiceProvider(serviceProvider).getCidConfig();
 

@@ -1,6 +1,9 @@
 import { Component, State, Listen, Method } from '@stencil/core';
 import { c1ServiceProvider, ethServiceProvider } from '../../services';
 
+
+import { uprtclMultiplatform } from '../../services/index'
+
 @Component({
     tag: 'co-workspace-selector',
     styleUrl: 'co-workspace-selector.scss',
@@ -9,7 +12,7 @@ import { c1ServiceProvider, ethServiceProvider } from '../../services';
   export class COWorkspaceSelector {
 
     @State() isStarting: boolean
-    @State() defaultServiceProvider: string = c1ServiceProvider;
+    @State() defaultServiceProvider: string = ethServiceProvider;
 
     availableServiceProviders: string[] = [
         c1ServiceProvider,
@@ -33,8 +36,9 @@ import { c1ServiceProvider, ethServiceProvider } from '../../services';
         this.selectWorkspaceType(e.target['selectedOptions'][0].value);
     }
 
-    componentWillLoad() {
+    async componentWillLoad() {
         console.log(`[WORSPACE SELECTOR] Avaliable services:`, this.availableServiceProviders);
+        await uprtclMultiplatform.serviceProviders[ethServiceProvider].service['ethereum'].ready();
     }
 
     renderWorkpad() {
