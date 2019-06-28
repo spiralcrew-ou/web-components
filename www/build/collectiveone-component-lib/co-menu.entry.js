@@ -1,6 +1,6 @@
 const h = window.CollectiveoneComponentLib.h;
 
-import { n as global$1, o as setStyle, b as renderingWorkpad, p as pullPerspective, q as setPerspectiveToAct, r as setPerspectiveToActAndUpdateContextPerspectives, s as NodeType } from './chunk-44f5cfa7.js';
+import { n as global$1, o as setStyle, b as renderingWorkpad, p as pullPerspective, q as setPerspectiveToAct, r as setPerspectiveToActAndUpdateContextPerspectives, s as NodeType } from './chunk-6b8fe4e1.js';
 import './chunk-84ac4f31.js';
 
 /**!
@@ -2604,6 +2604,7 @@ var Popper = function () {
 Popper.Utils = (typeof window !== 'undefined' ? window : global$1).PopperUtils;
 Popper.placements = placements;
 Popper.Defaults = Defaults;
+//# sourceMappingURL=popper.js.map
 
 class COMenu {
     componentWillLoad() {
@@ -2655,9 +2656,9 @@ class COMenu {
                         !isRootDocument ? h("div", { class: 'block my-1' }, " This is a title") : '',
                         !isRootDocument ? h("img", { class: 'w-8 h-8 ', src: './assets/img/uppercase.svg' }) : ''),
                     h("div", { class: 'row pb-2 border-b' + (this.canWrite() ? '' : ' disabled'), onClick: () => { this.setBlockStyle(NodeType.paragraph); } },
-                        !isRootDocument ? h("div", { class: 'my-1' }, "this is a paragraph") : '',
+                        !isRootDocument ? h("div", { class: 'my-1' }, "This is a paragraph") : '',
                         !isRootDocument ? h("img", { class: 'w-8 h-8 ', src: './assets/img/lowercase.svg' }) : ''),
-                    h("div", { class: 'row pt-2' + (this.canWrite() ? '' : ' disabled'), onClick: () => {
+                    h("div", { class: 'row pt-2', onClick: () => {
                             this.callPull();
                             this.close();
                         } },

@@ -33,7 +33,7 @@ export class COWorkspaceSelector {
   @Listen('isStarting')
   handleLoding(event: CustomEvent) {
     this.isStarting = event.detail
-    console.log(event.detail)
+    console.log(`[WORKSPACE SELECTOR] isLoading set to ${event.detail}`)
   }
 
   @Method()
@@ -64,14 +64,13 @@ export class COWorkspaceSelector {
   }
 
   renderWorkpad() {
-    return <div class='waiting'>
+    return <div class=''>
       {(this.isStarting || this.ethLoading) ? 
-        <co-waiting-app class="center-loading"></co-waiting-app>
-       : ''}
-      <co-workspace
-        default-service={this.defaultServiceProvider}
-        avaialable-services={this.availableServiceProviders}>
-      </co-workspace>
+        <div class="center-loading"><co-waiting-app></co-waiting-app></div> 
+       : <co-workspace
+          default-service={this.defaultServiceProvider}
+          avaialable-services={this.availableServiceProviders}>
+        </co-workspace>}
     </div>
   }
 
