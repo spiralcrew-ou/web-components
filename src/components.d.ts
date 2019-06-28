@@ -91,6 +91,7 @@ export namespace Components {
     'perspectives': Perspective[];
   }
   interface CoPerspectiveSelectorAttributes extends StencilHTMLAttributes {
+    'onPerspectiveSelected'?: (event: CustomEvent) => void;
     'perspectives'?: Perspective[];
   }
 

@@ -1,4 +1,4 @@
-import { Component, Prop} from '@stencil/core';
+import { Component, Prop, Event, EventEmitter} from '@stencil/core';
 import { Perspective } from '../../types';
 
 @Component({
@@ -9,12 +9,15 @@ import { Perspective } from '../../types';
 export class COPerspectiveSelector {
 
   @Prop() perspectives: Perspective[];
+
+  @Event({ eventName: 'perspectiveSelected', bubbles: true })
+  perspectiveSelected: EventEmitter;
   
   componentWillLoad() {
   }
 
-  perspectiveSelected(perspectiveId: string) {
-    console.log(perspectiveId);
+  perspectiveClicked(perspectiveId: string) {
+    this.perspectiveSelected.emit(perspectiveId)
   }
 
   renderInput() {
@@ -22,7 +25,7 @@ export class COPerspectiveSelector {
         {this.perspectives.map(perspective => { return (
           <div class="perspective-info">
             <co-perspective-info 
-              onClick={() => this.perspectiveSelected(perspective.id)}
+              onClick={() => this.perspectiveClicked(perspective.id)}
               perspective={perspective}>
             </co-perspective-info>
           </div>

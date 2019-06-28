@@ -1,6 +1,9 @@
 @import '../../globals/style.css';
 
-.container {
-    padding: 6px 0px;
-    margin-bottom: 6px;
+.perspective-info {
+    cursor: pointer;
+}
+
+.perspective-info:hover {
+    border: solid 1px red;
 }

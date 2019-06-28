@@ -40,8 +40,11 @@ export class COInputChangePerspective {
     })
   }
 
-  perspectiveSelected(perspectiveId: string) {
-    console.log('perspectiveId: ' + perspectiveId)
+  @Listen('perspectiveSelected')
+  onPerspectiveSelected(perspectiveId: string) {
+    event.stopPropagation();
+    this.newPerspectiveId = perspectiveId;
+    this.checkout()
   }
 
   async checkout() {
