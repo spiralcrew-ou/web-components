@@ -125,11 +125,11 @@ export class COMenu {
             </div>
 
             <div class={'row pb-2 border-b' + (this.canWrite() ? '' : ' disabled')} onClick={() => { this.setBlockStyle(NodeType.paragraph)}}>
-              {!isRootDocument ? <div class='my-1' >this is a paragraph</div> : ''}
+              {!isRootDocument ? <div class='my-1' >This is a paragraph</div> : ''}
               {!isRootDocument ? <img class='w-8 h-8 ' src='./assets/img/lowercase.svg'></img> : ''}
             </div>
 
-            <div class={'row pt-2' + (this.canWrite() ? '' : ' disabled')} onClick={() => {
+            <div class='row pt-2' onClick={() => {
                 this.callPull()
                 this.close()
               }}>
