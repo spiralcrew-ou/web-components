@@ -42,19 +42,16 @@ export class COInputInfo {
       <h2 class='text-3xl m-2'>Perspective Info</h2>
       <content class='ml-2'>
           <b>name:</b><p>{this.perspective.name}</p>
-          <b>id:</b><p>{this.perspective.id}</p>
-          <b>origin:</b><p>{this.perspective.origin}</p>
-          <b>context id:</b><p>{this.perspective.context.id}</p>
-          <b>owner:</b><p>{this.perspective.creatorId}</p>
-          <b>head id:</b><p>{this.perspective.head ? this.perspective.head.id : null}</p>
-          <b>data id:</b><p>{this.perspective.head ? this.perspective.head.data.id : null}</p>
+          <b>id:</b><p class="hash-id">{this.perspective.id}</p>
+          <b>origin:</b><p class="hash-id">{this.perspective.origin}</p>
+          <b>context id:</b><p class="hash-id">{this.perspective.context.id}</p>
+          <b>owner:</b><p class="hash-id">{this.perspective.creatorId}</p>
+          <b>head id:</b><p class="hash-id">{this.perspective.head ? this.perspective.head.id : null}</p>
+          <b>data id:</b><p class="hash-id">{this.perspective.head ? this.perspective.head.data.id : null}</p>
           <b>other perspectives:</b><br/>
       </content>
       {this.contextPerspectives.filter(p => p.id != this.perspective.id).map(perspective => {
-            return (<div class='otherPerspectives break-words'>
-                      <span class='ml-2'>{perspective.id}</span>
-                      <span >{perspective.name} - {perspective.origin}- {perspective.creatorId}</span>
-                    </div>)
+            return (<co-perspective-info perspective={perspective}></co-perspective-info>)
           })}
       <footer class='flex text-red-700 justify-end'>
         <button class='uppercase m-2 font-thin object-none ' onClick={() => this.showInputInfo.emit(false)}>Close</button>

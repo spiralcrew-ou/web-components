@@ -80,6 +80,20 @@ export namespace Components {
     'temp'?: string;
   }
 
+  interface CoPerspectiveInfo {
+    'perspective': Perspective;
+  }
+  interface CoPerspectiveInfoAttributes extends StencilHTMLAttributes {
+    'perspective'?: Perspective;
+  }
+
+  interface CoPerspectiveSelector {
+    'perspectives': Perspective[];
+  }
+  interface CoPerspectiveSelectorAttributes extends StencilHTMLAttributes {
+    'perspectives'?: Perspective[];
+  }
+
   interface CoSourceCode {}
   interface CoSourceCodeAttributes extends StencilHTMLAttributes {}
 
@@ -149,6 +163,8 @@ declare global {
     'CoLogin': Components.CoLogin;
     'CoMenu': Components.CoMenu;
     'CoNode': Components.CoNode;
+    'CoPerspectiveInfo': Components.CoPerspectiveInfo;
+    'CoPerspectiveSelector': Components.CoPerspectiveSelector;
     'CoSourceCode': Components.CoSourceCode;
     'CoWaitingApp': Components.CoWaitingApp;
     'CoWorkpad': Components.CoWorkpad;
@@ -168,6 +184,8 @@ declare global {
     'co-login': Components.CoLoginAttributes;
     'co-menu': Components.CoMenuAttributes;
     'co-node': Components.CoNodeAttributes;
+    'co-perspective-info': Components.CoPerspectiveInfoAttributes;
+    'co-perspective-selector': Components.CoPerspectiveSelectorAttributes;
     'co-source-code': Components.CoSourceCodeAttributes;
     'co-waiting-app': Components.CoWaitingAppAttributes;
     'co-workpad': Components.CoWorkpadAttributes;
@@ -232,6 +250,18 @@ declare global {
     new (): HTMLCoNodeElement;
   };
 
+  interface HTMLCoPerspectiveInfoElement extends Components.CoPerspectiveInfo, HTMLStencilElement {}
+  var HTMLCoPerspectiveInfoElement: {
+    prototype: HTMLCoPerspectiveInfoElement;
+    new (): HTMLCoPerspectiveInfoElement;
+  };
+
+  interface HTMLCoPerspectiveSelectorElement extends Components.CoPerspectiveSelector, HTMLStencilElement {}
+  var HTMLCoPerspectiveSelectorElement: {
+    prototype: HTMLCoPerspectiveSelectorElement;
+    new (): HTMLCoPerspectiveSelectorElement;
+  };
+
   interface HTMLCoSourceCodeElement extends Components.CoSourceCode, HTMLStencilElement {}
   var HTMLCoSourceCodeElement: {
     prototype: HTMLCoSourceCodeElement;
@@ -284,6 +314,8 @@ declare global {
     'co-login': HTMLCoLoginElement
     'co-menu': HTMLCoMenuElement
     'co-node': HTMLCoNodeElement
+    'co-perspective-info': HTMLCoPerspectiveInfoElement
+    'co-perspective-selector': HTMLCoPerspectiveSelectorElement
     'co-source-code': HTMLCoSourceCodeElement
     'co-waiting-app': HTMLCoWaitingAppElement
     'co-workpad': HTMLCoWorkpadElement
@@ -303,6 +335,8 @@ declare global {
     'co-login': HTMLCoLoginElement;
     'co-menu': HTMLCoMenuElement;
     'co-node': HTMLCoNodeElement;
+    'co-perspective-info': HTMLCoPerspectiveInfoElement;
+    'co-perspective-selector': HTMLCoPerspectiveSelectorElement;
     'co-source-code': HTMLCoSourceCodeElement;
     'co-waiting-app': HTMLCoWaitingAppElement;
     'co-workpad': HTMLCoWorkpadElement;

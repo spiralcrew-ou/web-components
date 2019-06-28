@@ -131,4 +131,4 @@ function createComponentOnReadyPrototype(win, namespace, HTMLElementPrototype) {
 
   init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCoreSsr, appCorePolyfilled, hydratedCssClass, components);
 
-  })(window, document, "CollectiveoneComponentLib","collectiveone-component-lib",0,"collectiveone-component-lib.core.js","es5-build-disabled.js","hydrated","co-input-change-perspective,co-input-commit,co-input-info,co-input-merge,co-input-new-perspective,co-loading,co-login,co-menu,co-node,co-source-code,co-waiting-app,co-workpad,co-workspace,co-workspace-selector,text-block,uprtcl-toolbar",HTMLElement.prototype);
+  })(window, document, "CollectiveoneComponentLib","collectiveone-component-lib",0,"collectiveone-component-lib.core.js","es5-build-disabled.js","hydrated","co-input-change-perspective,co-input-commit,co-input-info,co-input-merge,co-input-new-perspective,co-loading,co-login,co-menu,co-node,co-perspective-info,co-perspective-selector,co-source-code,co-waiting-app,co-workpad,co-workspace,co-workspace-selector,text-block,uprtcl-toolbar",HTMLElement.prototype);

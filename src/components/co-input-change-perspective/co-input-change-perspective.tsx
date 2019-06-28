@@ -26,10 +26,6 @@ export class COInputChangePerspective {
   checkoutPerspective: Action
   renderingWorkpad: Action
 
-  handleSelected(event) {
-    this.newPerspectiveId = event.target.value
-  }
-
   componentWillLoad() {
     this.store.mapDispatchToProps(this, {
       checkoutPerspective,
@@ -44,6 +40,10 @@ export class COInputChangePerspective {
     })
   }
 
+  perspectiveSelected(perspectiveId: string) {
+    console.log('perspectiveId: ' + perspectiveId)
+  }
+
   async checkout() {
     this.renderingWorkpad(true);
     window.location.href = `./?pid=${this.newPerspectiveId}`;
@@ -51,16 +51,11 @@ export class COInputChangePerspective {
   }
 
   renderInput() {
-    return <div class='container m-4 w-1/2 h-1/2 border-2 shadow-md p-2 rounded-lg font-thin z-10 fixed bg-white form text-gray-800 text-sm  '>
+    return <div class='container m-4 w-auto h-auto border-2 shadow-md p-2 rounded-lg font-thin z-10 fixed bg-white text-gray-800 text-sm '>
       <h2 class='text-3xl m-2'>Changes Perspective</h2>
-      <content>
-        <select onChange={event => this.handleSelected(event)}>
-          <option value="">select</option>
-          {this.contextPerspectives.filter(p => p.id != this.perspective.id).map(perspective => {
-            return (<option value={perspective.id}>{perspective.name} - {perspective.origin} - {perspective.creatorId}</option>)
-          })}
-        </select>
-      </content>
+      <co-perspective-selector 
+        perspectives={this.contextPerspectives.filter(p => p.id != this.perspective.id)}>
+      </co-perspective-selector>
       <footer class='flex text-red-700 justify-end'>
         <button class='uppercase m-2 font-thin object-none ' onClick={() => this.showInputChangePerspective.emit(false)}>Cancel</button>
         <button class='uppercase m-2 font-thin object-none ' onClick={() => this.checkout()}>Accept</button>
