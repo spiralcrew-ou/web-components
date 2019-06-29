@@ -1,6 +1,6 @@
 const h = window.CollectiveoneComponentLib.h;
 
-import { a as checkoutPerspective, b as renderingWorkpad, c as commitGlobal, d as mergePerspective, e as c1ServiceProvider, f as newPerspective, g as ethServiceProvider, h as holochainServiceProvider, i as newBlock, j as removeBlock, k as indentLeft, l as reloadTree, m as setContent, n as openMenu } from './chunk-c4158ce4.js';
+import { h as checkoutPerspective, c as renderingWorkpad, i as commitGlobal, j as mergePerspective, k as c1ServiceProvider, l as newPerspective, m as ethServiceProvider, n as holochainServiceProvider, o as newBlock, p as removeBlock, q as indentLeft, r as reloadTree, s as setContent, t as openMenu } from './chunk-c4158ce4.js';
 import './chunk-84ac4f31.js';
 
 class COInputChangePerspective {
@@ -525,6 +525,7 @@ class CONode {
 class Workpad {
     constructor() {
         this.isRunning = false;
+        this.loading = true;
         this.pendingTasks = false;
         this.ethAccount = '';
     }
@@ -536,6 +537,10 @@ class Workpad {
             newBlock
         });
         this.store.mapStateToProps(this, state => {
+            if (Object.keys(state.workpad.tree).length > 0) {
+                this.isStarting.emit(false);
+                this.loading = false;
+            }
             return {
                 tree: state.workpad.tree,
                 rootDocumentId: state.workpad.rootId,
@@ -546,7 +551,6 @@ class Workpad {
                 block: state.workpad.tree[this.documentId]
             };
         });
-        this.isStarting.emit(false);
     }
     onKeyUp(event) {
         event.stopPropagation();
@@ -576,7 +580,7 @@ class Workpad {
                 || this.ethAccount === this.block.creatorId);
     }
     render() {
-        if (this.isRunning)
+        if (this.isRunning || this.loading)
             return (h("co-loading", null));
         return (h("div", { class: 'workpad' },
             h("header", { class: 'bg-red-700 mb-4 h-12 pl-2', onBlur: event => { if (this.titleHasChange)
@@ -610,6 +614,9 @@ class Workpad {
             "state": true
         },
         "isRunning": {
+            "state": true
+        },
+        "loading": {
             "state": true
         },
         "openInputChangePerspective": {

@@ -1,6 +1,6 @@
 const h = window.CollectiveoneComponentLib.h;
 
-import { o as global$1, u as uprtclMultiplatform, v as uprtclData, t as NodeType, w as watchTasks, x as setSelectedProvider, y as initTree, l as reloadTree, g as ethServiceProvider, e as c1ServiceProvider, h as holochainServiceProvider, z as setEthAccount } from './chunk-c4158ce4.js';
+import { a as global$1, u as uprtclMultiplatform, v as uprtclData, g as NodeType, w as watchTasks, x as setSelectedProvider, y as initTree, r as reloadTree, m as ethServiceProvider, k as c1ServiceProvider, n as holochainServiceProvider, z as setEthAccount } from './chunk-c4158ce4.js';
 import { a as createCommonjsModule, b as commonjsGlobal, c as unwrapExports } from './chunk-84ac4f31.js';
 
 class COWaitingMessage {
@@ -820,6 +820,8 @@ class COWorkspace {
             initTree,
             reloadTree,
         });
+    }
+    async componentDidLoad() {
         this.watchTasks();
         await this.setSelectedProvider(this.defaultService);
         let pid = new URLSearchParams(window.location.search).get("pid");
@@ -931,10 +933,11 @@ class COWorkspaceSelector {
         console.log(`[WORSPACE SELECTOR] Ethereum ready`);
         this.setEthAccount(ethConnection.account);
         this.ethLoading = false;
-        this.isStarting = false;
     }
     renderWorkpad() {
-        return (h("div", { class: "waiting" }, this.isStarting || this.ethLoading ? (h("co-waiting-message", { class: "center-loading" })) : (h("co-workspace", { "default-service": this.defaultServiceProvider, "avaialable-services": this.availableServiceProviders }))));
+        return (h("div", { class: "waiting" },
+            this.isStarting || this.ethLoading ? (h("co-waiting-message", { class: "center-loading" })) : '',
+            h("co-workspace", { class: this.isStarting || this.ethLoading ? 'hidden' : '', "default-service": this.defaultServiceProvider, "avaialable-services": this.availableServiceProviders })));
     }
     renderWelcome() {
         return (h("div", null,
