@@ -1,6 +1,6 @@
 const h = window.CollectiveoneComponentLib.h;
 
-import { o as global$1, p as setStyle, b as renderingWorkpad, q as pullPerspective, r as setPerspectiveToAct, s as setPerspectiveToActAndUpdateContextPerspectives, t as NodeType } from './chunk-07b6d4b7.js';
+import { a as global$1, b as setStyle, c as renderingWorkpad, d as pullPerspective, e as setPerspectiveToAct, f as setPerspectiveToActAndUpdateContextPerspectives, g as NodeType } from './chunk-07b6d4b7.js';
 import './chunk-84ac4f31.js';
 
 /**!
