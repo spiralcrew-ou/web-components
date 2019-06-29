@@ -18,6 +18,7 @@ export class Workpad {
   @Prop() documentId: string
   @State() showMenuOption: boolean
   @State() isRunning: boolean = false
+  @State() loading: boolean = true
   @State() pendingTasks: boolean = false
   @State() ethAccount: string = ''
   @State() block: Block
@@ -54,6 +55,10 @@ export class Workpad {
     })
    
     this.store.mapStateToProps(this, state => {
+      if (Object.keys(state.workpad.tree).length > 0) {
+        this.isStarting.emit(false);
+        this.loading = false;
+      }
       return {
         tree: state.workpad.tree,
         rootDocumentId: state.workpad.rootId,
@@ -65,7 +70,6 @@ export class Workpad {
       }
     })
     
-    this.isStarting.emit(false)
   }
 
   @Listen('keyup')
@@ -111,7 +115,7 @@ export class Workpad {
   }
 
   render() {
-    if (this.isRunning)
+    if (this.isRunning || this.loading)
       return (<co-loading></co-loading>)
 
     return (
