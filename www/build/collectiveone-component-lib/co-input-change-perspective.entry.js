@@ -1,6 +1,6 @@
 const h = window.CollectiveoneComponentLib.h;
 
-import { h as checkoutPerspective, c as renderingWorkpad, i as commitGlobal, j as mergePerspective, k as c1ServiceProvider, l as newPerspective, m as ethServiceProvider, n as holochainServiceProvider, o as newBlock, p as removeBlock, q as indentLeft, r as reloadTree, s as setContent, t as openMenu } from './chunk-c4158ce4.js';
+import { a as checkoutPerspective, b as renderingWorkpad, c as commitGlobal, d as mergePerspective, e as c1ServiceProvider, f as newPerspective, g as ethServiceProvider, h as holochainServiceProvider, i as newBlock, j as removeBlock, k as indentLeft, l as reloadTree, m as setContent, n as openMenu } from './chunk-c4158ce4.js';
 import './chunk-84ac4f31.js';
 
 class COInputChangePerspective {
