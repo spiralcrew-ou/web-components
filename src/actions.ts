@@ -498,10 +498,9 @@ export const setAvailableProviders = (availableProviders: string[]) => {
 };
 
 export const setSelectedProvider = (selectedProvider: string) => {
-  return (dispatch, getState) => {
+  return (dispatch) => {
     dispatch({ type: 'SET_SELECTED_PROVIDER',
-      selectedProvider: selectedProvider, 
-      ethAccount: getState().support.ethAccount 
+      selectedProvider: selectedProvider 
     });
   };
 };
