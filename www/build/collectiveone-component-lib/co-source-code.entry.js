@@ -1,6 +1,6 @@
 const h = window.CollectiveoneComponentLib.h;
 
-import { a as createCommonjsModule } from './chunk-84ac4f31.js';
+import { b as createCommonjsModule } from './chunk-84ac4f31.js';
 
 var highlight = createCommonjsModule(function (module, exports) {
 /*

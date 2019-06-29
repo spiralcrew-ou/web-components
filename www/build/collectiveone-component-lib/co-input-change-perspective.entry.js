@@ -1,6 +1,6 @@
 const h = window.CollectiveoneComponentLib.h;
 
-import { a as checkoutPerspective, b as renderingWorkpad, c as commitGlobal, d as mergePerspective, e as c1ServiceProvider, f as newPerspective, g as ethServiceProvider, h as newBlock, i as removeBlock, j as indentLeft, k as reloadTree, l as setContent, m as openMenu } from './chunk-3b1c9822.js';
+import { a as checkoutPerspective, b as renderingWorkpad, c as commitGlobal, d as mergePerspective, e as c1ServiceProvider, f as newPerspective, g as ethServiceProvider, h as holochainServiceProvider, i as newBlock, j as removeBlock, k as indentLeft, l as reloadTree, m as setContent, n as openMenu } from './chunk-f2fd9d87.js';
 import './chunk-84ac4f31.js';
 
 class COInputChangePerspective {
@@ -314,7 +314,8 @@ class COInputNewPerspective {
                 h("input", { value: this.name, onChange: event => this.handleMessage(event), class: 'ml-2 px-2 w-11/12 my-2 py-2 border-gray-600 border-b', placeholder: 'name (required)' }),
                 h("select", { onChange: event => this.handleProviderSelected(event) },
                     h("option", { value: c1ServiceProvider }, "CollectiveOne"),
-                    h("option", { value: ethServiceProvider }, "ETH/IPFS"))),
+                    h("option", { value: ethServiceProvider }, "ETH/IPFS"),
+                    h("option", { value: holochainServiceProvider }, "Holochain"))),
             h("footer", { class: 'flex text-red-700 justify-end' },
                 h("button", { class: 'uppercase m-2 font-thin object-none ', onClick: () => this.showInputNewPerspective.emit(false) }, "Cancel"),
                 h("button", { class: 'uppercase m-2 font-thin object-none ', onClick: () => this.createNewPerspective() }, "Accept")));
