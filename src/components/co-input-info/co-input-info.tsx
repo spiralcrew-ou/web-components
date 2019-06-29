@@ -38,22 +38,22 @@ export class COInputInfo {
   }
 
   renderInput() {
-    return <div class='container m-4 w-auto h-auto border-2 shadow-md p-2 rounded-lg font-thin z-10 fixed bg-white form text-gray-800 text-sm  '>
-      <h2 class='text-3xl m-2'>Perspective Info</h2>
+    return <div class='container m-4 w-auto h-auto border-2 shadow-md p-2 rounded-lg font-thin z-10 fixed bg-white form text-gray-800 text-sm break-words '>
+      <h2 class='text-3xl m-2'>{this.perspective.name}</h2>
       <content class='ml-2'>
-          <b>name:</b><p>{this.perspective.name}</p>
-          <b>id:</b><p>{this.perspective.id}</p>
-          <b>origin:</b><p>{this.perspective.origin}</p>
-          <b>context id:</b><p>{this.perspective.context.id}</p>
-          <b>owner:</b><p>{this.perspective.creatorId}</p>
-          <b>head id:</b><p>{this.perspective.head ? this.perspective.head.id : null}</p>
-          <b>data id:</b><p>{this.perspective.head ? this.perspective.head.data.id : null}</p>
-          <b>other perspectives:</b><br/>
+          <b class='font-medium'>id</b><p  class='font-mono text-xs'>{this.perspective.id}</p>
+          <b class='font-medium'>origin</b><p  class='font-mono text-xs'>{this.perspective.origin}</p>
+          <b class='font-medium'>context id</b><p  class='font-mono text-xs'>{this.perspective.context.id}</p>
+          <b class='font-medium'>owner</b><p  class='font-mono text-xs'>{this.perspective.creatorId}</p>
+          <b class='font-medium'>head id</b><p  class='font-mono text-xs'>{this.perspective.head ? this.perspective.head.id : null}</p>
+          <b class='font-medium'>data id</b><p  class='font-mono text-xs'>{this.perspective.head ? this.perspective.head.data.id : null}</p>
+         
       </content>
+      <h2 class='text-2xl m-2'>Other perspectives</h2>
       {this.contextPerspectives.filter(p => p.id != this.perspective.id).map(perspective => {
-            return (<div class='otherPerspectives break-words'>
+            return (<div class='otherPerspectives break-words font-mono text-xs py-2 border-b'>
+                      <span class='ml-2'><b class='font-bold'>{perspective.name}</b> - {perspective.origin}- {perspective.creatorId}</span>
                       <span class='ml-2'>{perspective.id}</span>
-                      <span >{perspective.name} - {perspective.origin}- {perspective.creatorId}</span>
                     </div>)
           })}
       <footer class='flex text-red-700 justify-end'>

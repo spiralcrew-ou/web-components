@@ -54,10 +54,10 @@ export class COInputChangePerspective {
     return <div class='container m-4 w-1/2 h-1/2 border-2 shadow-md p-2 rounded-lg font-thin z-10 fixed bg-white form text-gray-800 text-sm  '>
       <h2 class='text-3xl m-2'>Changes Perspective</h2>
       <content>
-        <select onChange={event => this.handleSelected(event)}>
+        <select class='break-words w-11/12' onChange={event => this.handleSelected(event)}>
           <option value="">select</option>
           {this.contextPerspectives.filter(p => p.id != this.perspective.id).map(perspective => {
-            return (<option value={perspective.id}>{perspective.name} - {perspective.origin} - {perspective.creatorId}</option>)
+            return (<option class='break-workds' value={perspective.id}>{perspective.name} - {perspective.origin} - {perspective.creatorId}</option>)
           })}
         </select>
       </content>
