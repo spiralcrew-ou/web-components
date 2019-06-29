@@ -86,6 +86,9 @@ export namespace Components {
   interface CoWaitingApp {}
   interface CoWaitingAppAttributes extends StencilHTMLAttributes {}
 
+  interface CoWaitingMessage {}
+  interface CoWaitingMessageAttributes extends StencilHTMLAttributes {}
+
   interface CoWorkpad {
     'documentId': string;
   }
@@ -151,6 +154,7 @@ declare global {
     'CoNode': Components.CoNode;
     'CoSourceCode': Components.CoSourceCode;
     'CoWaitingApp': Components.CoWaitingApp;
+    'CoWaitingMessage': Components.CoWaitingMessage;
     'CoWorkpad': Components.CoWorkpad;
     'CoWorkspaceSelector': Components.CoWorkspaceSelector;
     'CoWorkspace': Components.CoWorkspace;
@@ -170,6 +174,7 @@ declare global {
     'co-node': Components.CoNodeAttributes;
     'co-source-code': Components.CoSourceCodeAttributes;
     'co-waiting-app': Components.CoWaitingAppAttributes;
+    'co-waiting-message': Components.CoWaitingMessageAttributes;
     'co-workpad': Components.CoWorkpadAttributes;
     'co-workspace-selector': Components.CoWorkspaceSelectorAttributes;
     'co-workspace': Components.CoWorkspaceAttributes;
@@ -244,6 +249,12 @@ declare global {
     new (): HTMLCoWaitingAppElement;
   };
 
+  interface HTMLCoWaitingMessageElement extends Components.CoWaitingMessage, HTMLStencilElement {}
+  var HTMLCoWaitingMessageElement: {
+    prototype: HTMLCoWaitingMessageElement;
+    new (): HTMLCoWaitingMessageElement;
+  };
+
   interface HTMLCoWorkpadElement extends Components.CoWorkpad, HTMLStencilElement {}
   var HTMLCoWorkpadElement: {
     prototype: HTMLCoWorkpadElement;
@@ -286,6 +297,7 @@ declare global {
     'co-node': HTMLCoNodeElement
     'co-source-code': HTMLCoSourceCodeElement
     'co-waiting-app': HTMLCoWaitingAppElement
+    'co-waiting-message': HTMLCoWaitingMessageElement
     'co-workpad': HTMLCoWorkpadElement
     'co-workspace-selector': HTMLCoWorkspaceSelectorElement
     'co-workspace': HTMLCoWorkspaceElement
@@ -305,6 +317,7 @@ declare global {
     'co-node': HTMLCoNodeElement;
     'co-source-code': HTMLCoSourceCodeElement;
     'co-waiting-app': HTMLCoWaitingAppElement;
+    'co-waiting-message': HTMLCoWaitingMessageElement;
     'co-workpad': HTMLCoWorkpadElement;
     'co-workspace-selector': HTMLCoWorkspaceSelectorElement;
     'co-workspace': HTMLCoWorkspaceElement;
