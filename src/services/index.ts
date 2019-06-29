@@ -19,7 +19,7 @@ import { DataIpfs } from './data.ipfs';
 import { DraftLocal } from './local/draft.local';
 import { TextNode } from './../types';
 
-export const holochainEnabled = false;
+export const holochainEnabled = true;
 export const c1Enabled = true;
 export const ethEnabled = true;
 
