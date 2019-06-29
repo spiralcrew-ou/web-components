@@ -498,13 +498,17 @@ export const setAvailableProviders = (availableProviders: string[]) => {
 };
 
 export const setSelectedProvider = (selectedProvider: string) => {
-  return dispatch => {
-    dispatch({ type: 'SET_SELECTED_PROVIDER', selectedProvider });
+  return (dispatch, getState) => {
+    dispatch({ type: 'SET_SELECTED_PROVIDER',
+      selectedProvider: selectedProvider, 
+      ethAccount: getState().support.ethAccount 
+    });
   };
 };
 
 export const setEthAccount = (ethAccount: string) => {
   return dispatch => {
+    console.log(`[REDUX] Set account to ${ethAccount}`)
     dispatch({ type: 'SET_ETH_ACCOUNT', ethAccount });
   };
 };
