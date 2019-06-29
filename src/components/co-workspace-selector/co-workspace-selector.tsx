@@ -66,7 +66,7 @@ export class COWorkspaceSelector {
   renderWorkpad() {
     return <div class='waiting'>
       {(this.isStarting || this.ethLoading) ? 
-        <co-waiting-app class="center-loading"></co-waiting-app>
+        <co-waiting-message class="center-loading"></co-waiting-message>
        : ''}
       <co-workspace
         default-service={this.defaultServiceProvider}

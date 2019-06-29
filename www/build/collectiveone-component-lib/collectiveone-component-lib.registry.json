@@ -68,7 +68,13 @@
     },
     "co-waiting-app": {
       "bundleIds": {
-        "$": "co-waiting-app"
+        "$": "co-input-change-perspective"
+      },
+      "encapsulation": "shadow"
+    },
+    "co-waiting-message": {
+      "bundleIds": {
+        "$": "co-waiting-message"
       },
       "encapsulation": "shadow"
     },
@@ -80,13 +86,13 @@
     },
     "co-workspace": {
       "bundleIds": {
-        "$": "co-workspace"
+        "$": "co-waiting-message"
       },
       "encapsulation": "shadow"
     },
     "co-workspace-selector": {
       "bundleIds": {
-        "$": "co-workspace"
+        "$": "co-waiting-message"
       },
       "encapsulation": "shadow"
     },
