@@ -67,7 +67,6 @@ export class COWorkspaceSelector {
     console.log(`[WORSPACE SELECTOR] Ethereum ready`);
     this.setEthAccount(ethConnection.account);
     this.ethLoading = false;
-    this.isStarting = false;
   }
 
   renderWorkpad() {
@@ -75,12 +74,13 @@ export class COWorkspaceSelector {
       <div class="waiting">
         {this.isStarting || this.ethLoading ? (
           <co-waiting-message class="center-loading" />
-        ) : (
+        ) : ''}
           <co-workspace
+            class={this.isStarting || this.ethLoading ? 'hidden' : ''}
             default-service={this.defaultServiceProvider}
             avaialable-services={this.availableServiceProviders}
           />
-        )}
+
       </div>
     );
   }

@@ -56,6 +56,8 @@ export class COWorkspace {
       initTree,
       reloadTree,
     })
+  }
+  async componentDidLoad() {
     this.watchTasks();
     await this.setSelectedProvider(this.defaultService)
     
