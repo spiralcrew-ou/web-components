@@ -1,6 +1,6 @@
 const h = window.CollectiveoneComponentLib.h;
 
-import { a as checkoutPerspective, b as renderingWorkpad, c as commitGlobal, d as mergePerspective, e as c1ServiceProvider, f as newPerspective, g as ethServiceProvider, h as newBlock, i as removeBlock, j as indentLeft, k as reloadTree, l as setContent, m as openMenu } from './chunk-6b8fe4e1.js';
+import { a as checkoutPerspective, b as renderingWorkpad, c as commitGlobal, d as mergePerspective, e as c1ServiceProvider, f as newPerspective, g as ethServiceProvider, h as newBlock, i as removeBlock, j as indentLeft, k as reloadTree, l as setContent, m as openMenu } from './chunk-f2fd9d87.js';
 import './chunk-84ac4f31.js';
 
 class COInputChangePerspective {
@@ -29,7 +29,7 @@ class COInputChangePerspective {
         this.showInputChangePerspective.emit(false);
     }
     renderInput() {
-        return h("div", { class: 'container m-4 w-1/2 h-1/2 border-2 shadow-md p-2 rounded-lg font-thin z-10 fixed bg-white form text-gray-800 text-sm  ' },
+        return h("div", { class: 'container m-4 w-auto h-auto border-2 shadow-md p-2 rounded-lg font-thin z-10 fixed bg-white form text-gray-800 text-sm  ' },
             h("h2", { class: 'text-3xl m-2' }, "Changes Perspective"),
             h("content", null,
                 h("select", { class: 'break-words w-11/12', onChange: event => this.handleSelected(event) },
@@ -233,10 +233,10 @@ class COInputMerge {
         this.showInputMerge.emit(false);
     }
     renderInput() {
-        return h("div", { class: 'container m-4 w-1/2 h-1/2 border-2 shadow-md p-2 rounded-lg font-thin z-10 fixed bg-white form text-gray-800 text-sm  ' },
+        return h("div", { class: 'container m-4 w-auto h-auto border-2 shadow-md p-2 rounded-lg font-thin z-10 fixed bg-white form text-gray-800 text-sm  ' },
             h("h2", { class: 'text-3xl m-2' }, "Merge Perspective"),
             h("content", null,
-                h("select", { onChange: event => this.handleSelected(event) },
+                h("select", { class: 'w-11/12', onChange: event => this.handleSelected(event) },
                     h("option", { value: "" }, "select"),
                     this.contextPerspectives.filter(p => p.id != this.rootId).map(perspective => {
                         return (h("option", { value: perspective.id },

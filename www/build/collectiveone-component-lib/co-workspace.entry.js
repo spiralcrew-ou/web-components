@@ -1,6 +1,6 @@
 const h = window.CollectiveoneComponentLib.h;
 
-import { n as global$1, t as uprtclMultiplatform, u as uprtclData, s as NodeType, v as watchTasks, w as setSelectedProvider, x as initTree, k as reloadTree, g as ethServiceProvider, e as c1ServiceProvider, y as holochainServiceProvider, z as setEthAccount } from './chunk-6b8fe4e1.js';
+import { n as global$1, t as uprtclMultiplatform, u as uprtclData, s as NodeType, v as watchTasks, w as setSelectedProvider, x as initTree, k as reloadTree, g as ethServiceProvider, e as c1ServiceProvider, y as holochainServiceProvider, z as setEthAccount } from './chunk-f2fd9d87.js';
 import { b as createCommonjsModule, c as commonjsGlobal, d as unwrapExports } from './chunk-84ac4f31.js';
 
 function symbolObservablePonyfill(root) {
