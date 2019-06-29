@@ -17,7 +17,6 @@ export class CONode {
   @Prop() nodeid: string;
   @Prop() parentid: string;
   @Prop() indexinparent: number;
-
   block : Block;
   @State() tree
   @State() isFocused: boolean = false;
