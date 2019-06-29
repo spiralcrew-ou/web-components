@@ -1,6 +1,6 @@
 const h = window.CollectiveoneComponentLib.h;
 
-import { a as getCjsExportFromNamespace, b as createCommonjsModule, c as commonjsGlobal, d as unwrapExports } from './chunk-84ac4f31.js';
+import { a as createCommonjsModule, b as commonjsGlobal, c as unwrapExports } from './chunk-84ac4f31.js';
 
 const PropertyOrder = {
     Context: ['creatorId', 'timestamp', 'nonce'],
@@ -4495,7 +4495,6 @@ dbNamesDB.version(1).stores({ dbnames: 'name' });
     }
     catch (_e) { }
 })();
-//# sourceMappingURL=dexie.es.js.map
 
 class ExtensionsLocal extends Dexie {
     constructor() {
@@ -7010,12 +7009,10 @@ var bufferEs6 = /*#__PURE__*/Object.freeze({
     isBuffer: isBuffer
 });
 
-var buffer = getCjsExportFromNamespace(bufferEs6);
-
 var safeBuffer = createCommonjsModule(function (module, exports) {
 /* eslint-disable node/no-deprecated-api */
 
-var Buffer = buffer.Buffer;
+var Buffer = bufferEs6.Buffer;
 
 // alternative to using Object.keys for old browsers
 function copyProps (src, dst) {
@@ -7024,10 +7021,10 @@ function copyProps (src, dst) {
   }
 }
 if (Buffer.from && Buffer.alloc && Buffer.allocUnsafe && Buffer.allocUnsafeSlow) {
-  module.exports = buffer;
+  module.exports = bufferEs6;
 } else {
   // Copy properties from require('buffer')
-  copyProps(buffer, exports);
+  copyProps(bufferEs6, exports);
   exports.Buffer = SafeBuffer;
 }
 
@@ -7073,7 +7070,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
   if (typeof size !== 'number') {
     throw new TypeError('Argument must be a number')
   }
-  return buffer.SlowBuffer(size)
+  return bufferEs6.SlowBuffer(size)
 };
 });
 var safeBuffer_1 = safeBuffer.Buffer;
@@ -12346,7 +12343,7 @@ var murmurhash3jsRevisited = murmurHash3js;
 
 'use strict';
 
-const { Buffer: Buffer$2 } = buffer;
+const { Buffer: Buffer$2 } = bufferEs6;
 
 const crypto = self.crypto || self.msCrypto;
 
@@ -12377,7 +12374,7 @@ var sha_browser = (algorithm) => {
 
 'use strict';
 
-const { Buffer: Buffer$3 } = buffer;
+const { Buffer: Buffer$3 } = bufferEs6;
 
 const fromNumberTo32BitBuf = (number) => {
   const bytes = new Array(4);
@@ -12981,7 +12978,7 @@ var blakejs_10 = blakejs.blake2sFinal;
 
 'use strict';
 
-const { Buffer: Buffer$4 } = buffer;
+const { Buffer: Buffer$4 } = bufferEs6;
 
 
 const minB = 0xb201;
@@ -13019,7 +13016,7 @@ var blake_1 = (table) => {
 
 'use strict';
 
-const { Buffer: Buffer$5 } = buffer;
+const { Buffer: Buffer$5 } = bufferEs6;
 
 
 
@@ -13099,7 +13096,7 @@ var crypto_17 = crypto$1.addBlake;
 
 'use strict';
 
-const { Buffer: Buffer$6 } = buffer;
+const { Buffer: Buffer$6 } = bufferEs6;
 
 
 
@@ -13458,7 +13455,7 @@ var ieee754 = {
 	write: write$1
 };
 
-var buffer$1 = createCommonjsModule(function (module, exports) {
+var buffer = createCommonjsModule(function (module, exports) {
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -15237,10 +15234,10 @@ function numberIsNaN (obj) {
   return obj !== obj // eslint-disable-line no-self-compare
 }
 });
-var buffer_1 = buffer$1.Buffer;
-var buffer_2 = buffer$1.SlowBuffer;
-var buffer_3 = buffer$1.INSPECT_MAX_BYTES;
-var buffer_4 = buffer$1.kMaxLength;
+var buffer_1 = buffer.Buffer;
+var buffer_2 = buffer.SlowBuffer;
+var buffer_3 = buffer.INSPECT_MAX_BYTES;
+var buffer_4 = buffer.kMaxLength;
 
 class CidConfig {
     constructor(_base, _version, _codec, _type) {
@@ -15274,7 +15271,7 @@ class IpldService {
         if (typeof object !== 'object')
             throw new Error('Object expected, not the stringified string!');
         /** other clients should hash the stringified object directly  */
-        const b = buffer$1.Buffer.from(JSON.stringify(object));
+        const b = buffer.Buffer.from(JSON.stringify(object));
         const encoded = await src$4(b, cidConfig.type);
         // TODO check if raw or dag-pb
         const cid = new src$3(cidConfig.version, cidConfig.codec, encoded, cidConfig.base);
@@ -36882,7 +36879,6 @@ var PatchOperation = /** @class */ (function () {
     };
     return PatchOperation;
 }());
-//# sourceMappingURL=patch-operation.class.js.map
 
 /**
  * DiffMatchPatch has been derived from diff_match_patch in diff-match-patch by Neil Fraser
@@ -38931,9 +38927,6 @@ var DiffMatchPatch = /** @class */ (function () {
     };
     return DiffMatchPatch;
 }());
-//# sourceMappingURL=diff-match-patch.class.js.map
-
-//# sourceMappingURL=index.js.map
 
 const diff = new DiffMatchPatch();
 class DiffUtils {

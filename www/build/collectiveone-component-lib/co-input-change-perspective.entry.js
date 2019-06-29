@@ -1,6 +1,6 @@
 const h = window.CollectiveoneComponentLib.h;
 
-import { a as checkoutPerspective, b as renderingWorkpad, c as commitGlobal, d as mergePerspective, e as c1ServiceProvider, f as newPerspective, g as ethServiceProvider, h as holochainServiceProvider, i as newBlock, j as removeBlock, k as indentLeft, l as reloadTree, m as setContent, n as openMenu } from './chunk-29eeb9f4.js';
+import { a as checkoutPerspective, b as renderingWorkpad, c as commitGlobal, d as mergePerspective, e as c1ServiceProvider, f as newPerspective, g as ethServiceProvider, h as holochainServiceProvider, i as newBlock, j as removeBlock, k as indentLeft, l as reloadTree, m as setContent, n as openMenu } from './chunk-07b6d4b7.js';
 import './chunk-84ac4f31.js';
 
 class COInputChangePerspective {
@@ -441,9 +441,6 @@ class CONode {
         }
     }
     canWrite() {
-        console.log('prov:' + this.block.serviceProvider);
-        console.log('acco:' + this.ethAccount);
-        console.log('crea:' + this.block.creatorId);
         return !this.block.serviceProvider.startsWith('eth://') || this.ethAccount === this.block.creatorId;
     }
     render() {
