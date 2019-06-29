@@ -68,7 +68,7 @@
     },
     "co-waiting-app": {
       "bundleIds": {
-        "$": "co-input-change-perspective"
+        "$": "co-waiting-app"
       },
       "encapsulation": "shadow"
     },
