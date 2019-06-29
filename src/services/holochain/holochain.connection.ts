@@ -6,7 +6,7 @@ export interface EntryResult<T = any> {
   type: string;
 }
 
-const host = 'wss://3.130.73.99:80';
+const host = 'wss://ws-proxy.herokuapp.com';
 // const host = 'ws://localhost:8888';
 
 export class HolochainConnection {
@@ -46,7 +46,7 @@ export class HolochainConnection {
         if (!this.connection) {
           reject();
         }
-      }, 3000);
+      }, 10000);
     });
   }
 
