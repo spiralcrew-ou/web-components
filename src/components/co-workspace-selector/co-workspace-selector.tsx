@@ -56,22 +56,23 @@ export class COWorkspaceSelector {
     console.log(`[WORSPACE SELECTOR] Avaliable services:`, this.availableServiceProviders);
     await ethConnection.ready();
     console.log(`[WORSPACE SELECTOR] Ethereum ready`);
-    this.ethLoading = false
-  }
-
-  async componentDidLoad() {
-    this.setEthAccount(ethConnection.account);
+    setTimeout(() => {
+      console.log(this.store)
+      this.setEthAccount(ethConnection.account);
+      this.ethLoading = false
+    }, 2000)
+    
   }
 
   renderWorkpad() {
     return <div class='waiting'>
       {(this.isStarting || this.ethLoading) ? 
         <co-waiting-message class="center-loading"></co-waiting-message>
-       : ''}
-      <co-workspace
-        default-service={this.defaultServiceProvider}
-        avaialable-services={this.availableServiceProviders}>
-      </co-workspace>
+        : <co-workspace
+            default-service={this.defaultServiceProvider}
+            avaialable-services={this.availableServiceProviders}>
+          </co-workspace>}
+      
     </div>
   }
 
