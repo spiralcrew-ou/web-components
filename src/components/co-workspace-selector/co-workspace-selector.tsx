@@ -1,12 +1,18 @@
 import { Component, State, Listen, Method, Prop } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
-import { c1ServiceProvider, ethServiceProvider, holochainServiceProvider } from '../../services';
+import {
+  c1ServiceProvider,
+  ethServiceProvider,
+  holochainServiceProvider
+} from '../../services';
 import { setEthAccount } from '../../actions';
 
-import { uprtclMultiplatform } from '../../services/index'
+import { uprtclMultiplatform } from '../../services/index';
 import { EthereumConnection } from '../../services/eth/eth.connection';
+import { configureStore } from '../../store';
 
-const ethConnection: EthereumConnection = uprtclMultiplatform.serviceProviders[ethServiceProvider].service['ethereum'];
+const ethConnection: EthereumConnection =
+  uprtclMultiplatform.serviceProviders[ethServiceProvider].service['ethereum'];
 
 @Component({
   tag: 'co-workspace-selector',
@@ -14,13 +20,12 @@ const ethConnection: EthereumConnection = uprtclMultiplatform.serviceProviders[e
   shadow: true
 })
 export class COWorkspaceSelector {
-
   @Prop({ context: 'store' }) store: Store;
-  @State() isStarting: boolean = true
-  @State() ethLoading: boolean = true
+  @State() isStarting: boolean = true;
+  @State() ethLoading: boolean = true;
   @State() defaultServiceProvider: string = ethServiceProvider;
 
-  setEthAccount: Action
+  setEthAccount: Action;
 
   selectorEnabled: boolean = false;
 
@@ -28,18 +33,18 @@ export class COWorkspaceSelector {
     c1ServiceProvider,
     ethServiceProvider,
     holochainServiceProvider
-  ]
+  ];
 
   @Listen('isStarting')
   handleLoding(event: CustomEvent) {
-    this.isStarting = event.detail
-    console.log(event.detail)
+    this.isStarting = event.detail;
+    console.log(event.detail);
   }
 
   @Method()
   selectWorkspaceType(type: string): void {
-    this.defaultServiceProvider = type
-    this.isStarting = true
+    this.defaultServiceProvider = type;
+    this.isStarting = true;
   }
 
   @Method()
@@ -48,52 +53,59 @@ export class COWorkspaceSelector {
   }
 
   async componentWillLoad() {
+    this.store.setStore(configureStore());
 
     this.store.mapDispatchToProps(this, {
       setEthAccount
-    })
+    });
 
-    console.log(`[WORSPACE SELECTOR] Avaliable services:`, this.availableServiceProviders);
+    console.log(
+      `[WORSPACE SELECTOR] Avaliable services:`,
+      this.availableServiceProviders
+    );
     await ethConnection.ready();
     console.log(`[WORSPACE SELECTOR] Ethereum ready`);
-    setTimeout(() => {
-      console.log(this.store)
-      this.setEthAccount(ethConnection.account);
-      this.ethLoading = false
-    }, 2000)
-    
+    this.setEthAccount(ethConnection.account);
+    this.ethLoading = false;
+    this.isStarting = false;
   }
 
   renderWorkpad() {
-    return <div class='waiting'>
-      {(this.isStarting || this.ethLoading) ? 
-        <co-waiting-message class="center-loading"></co-waiting-message>
-        : <co-workspace
+    return (
+      <div class="waiting">
+        {this.isStarting || this.ethLoading ? (
+          <co-waiting-message class="center-loading" />
+        ) : (
+          <co-workspace
             default-service={this.defaultServiceProvider}
-            avaialable-services={this.availableServiceProviders}>
-          </co-workspace>}
-      
-    </div>
+            avaialable-services={this.availableServiceProviders}
+          />
+        )}
+      </div>
+    );
   }
 
   renderWelcome() {
-    return <div>Please select a workspace type
-            <select id="select-provider"
-        onInput={e => this.providerSelected(e)}>
-        <option>select provider</option>
-        {this.availableServiceProviders.map(service => (
-          <option value={service}>{service}</option>
-        ))}
-      </select>
-    </div>
+    return (
+      <div>
+        Please select a workspace type
+        <select id="select-provider" onInput={e => this.providerSelected(e)}>
+          <option>select provider</option>
+          {this.availableServiceProviders.map(service => (
+            <option value={service}>{service}</option>
+          ))}
+        </select>
+      </div>
+    );
   }
 
   render = () => {
     if (this.selectorEnabled) {
-      return !this.defaultServiceProvider ? this.renderWelcome() : this.renderWorkpad()
+      return !this.defaultServiceProvider
+        ? this.renderWelcome()
+        : this.renderWorkpad();
     } else {
-      return this.renderWorkpad()
+      return this.renderWorkpad();
     }
-  }
+  };
 }
-

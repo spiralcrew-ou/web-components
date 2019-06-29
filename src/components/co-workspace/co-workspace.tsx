@@ -7,7 +7,7 @@ import { configureStore } from '../../store.js';
 import { uprtclData } from '../../services/uprtcl-data';
 import {setSelectedProvider,initTree,reloadTree, NodeType, watchTasks} from '../../actions';
 
-const enableInit = true;
+const enableInit = false;
 const defaultPerspective = 'zb2rhbyDC8ZnYnmSNNYHzbmGrmFVFn91qsETDH1pdwhDLXPSw';
 
 @Component({
