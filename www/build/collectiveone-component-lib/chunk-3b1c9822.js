@@ -18810,7 +18810,7 @@ var holochainclient = { connect: exports.connect };
 unwrapExports(lib);
 var lib_1 = lib.connect;
 
-const host = 'wss://3.130.73.99:80';
+const host = 'wss://ws-proxy.herokuapp.com';
 // const host = 'ws://localhost:8888';
 class HolochainConnection {
     constructor(instanceId, zome) {
@@ -18841,7 +18841,7 @@ class HolochainConnection {
                 if (!this.connection) {
                     reject();
                 }
-            }, 3000);
+            }, 10000);
         });
     }
     async call(funcName, params) {
@@ -19583,7 +19583,7 @@ class DraftLocal {
     }
 }
 
-const holochainEnabled = false;
+const holochainEnabled = true;
 const c1Enabled = true;
 const ethEnabled = true;
 const holochainServiceProvider = 'holochain://QmTxSxPovQyWBkTRrM1gFAbtVZUAcS1oMvzkGqihbufKSs';
