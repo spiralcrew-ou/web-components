@@ -40118,4 +40118,4 @@ const watchTasks = () => {
     };
 };
 
-export { checkoutPerspective as a, renderingWorkpad as b, commitGlobal as c, mergePerspective as d, c1ServiceProvider as e, newPerspective as f, ethServiceProvider as g, holochainServiceProvider as h, newBlock as i, removeBlock as j, indentLeft as k, reloadTree as l, setContent as m, openMenu as n, global$1 as o, setStyle as p, pullPerspective as q, setPerspectiveToAct as r, setPerspectiveToActAndUpdateContextPerspectives as s, NodeType as t, uprtclMultiplatform as u, uprtclData as v, watchTasks as w, setSelectedProvider as x, initTree as y, setEthAccount as z };
+export { checkoutPerspective as a, renderingWorkpad as b, commitGlobal as c, mergePerspective as d, c1ServiceProvider as e, newPerspective as f, ethServiceProvider as g, holochainServiceProvider as h, newBlock as i, removeBlock as j, indentLeft as k, reloadTree as l, setContent as m, openMenu as n, global$1 as o, setStyle as p, pullPerspective as q, setPerspectiveToAct as r, setPerspectiveToActAndUpdateContextPerspectives as s, NodeType as t, uprtclMultiplatform as u, uprtclData as v, watchTasks as w, initTree as x, setEthAccount as y };
