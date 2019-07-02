@@ -1,6 +1,6 @@
 const h = window.CollectiveoneComponentLib.h;
 
-import { o as global$1, p as setStyle, b as renderingWorkpad, q as pullPerspective, r as setPerspectiveToAct, s as setPerspectiveToActAndUpdateContextPerspectives, t as NodeType } from './chunk-0ecb7952.js';
+import { o as global$1, p as setStyle, b as renderingWorkpad, q as pullPerspective, r as setPerspectiveToAct, s as setPerspectiveToActAndUpdateContextPerspectives, t as NodeType } from './chunk-5e34e6e6.js';
 import './chunk-84ac4f31.js';
 
 /**!
@@ -2604,7 +2604,6 @@ var Popper = function () {
 Popper.Utils = (typeof window !== 'undefined' ? window : global$1).PopperUtils;
 Popper.placements = placements;
 Popper.Defaults = Defaults;
-//# sourceMappingURL=popper.js.map
 
 class COMenu {
     componentWillLoad() {
