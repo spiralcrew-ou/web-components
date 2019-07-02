@@ -123,16 +123,6 @@ export const createCommit: ActionCreator<ThunkResult<Promise<string>>> = (
   return commitId;
 };
 
-export const initPerspective: ActionCreator<ThunkResult<Promise<{contextId: string, perspectiveId: string}>>> = (
-  commit: Commit
-) => async dispatch => {
-  const commitId = await uprtcl.createContext(commit);
-
-  commit.id = commitId;
-  await dispatch({ type: GET_COMMIT, commit: commit });
-  return commitId;
-}; 
-
 export const updateHead: ActionCreator<ThunkResult<Promise<void>>> = (
   perspectiveId: string,
   headId: string

@@ -90,3 +90,17 @@ export class TextNodeTree {
   links: Array<TextNodeTree> = [];
 }
 
+
+export enum NodeType {
+  title = 'title',
+  paragraph = 'paragraph'
+}
+export interface Block {
+  id: string;
+  children: string[];
+  status: string;
+  content: string;
+  style: NodeType;
+  serviceProvider: string;
+  creatorId: string;
+}
