@@ -52,11 +52,13 @@ const merge: MergeStrategy<TextNode> = new RecursiveContextMergeStrategy(
 export const getContext: ActionCreator<ThunkResult<Promise<Context>>> = (
   contextId: string
 ) => async (dispatch, getState) => {
-  const context = await uprtcl.getContext(contextId);
+  let context = contexts.selectById(contextId)(getState());
 
-  if (!contexts.selectById(contextId)(getState())) {
+  if (!context) {
+    context = await uprtcl.getContext(contextId);
     await dispatch({ type: GET_CONTEXT, context: context });
   }
+  
   return context;
 };
 
@@ -74,22 +76,26 @@ export const getContextPerspectives: ActionCreator<
 export const getPerspective: ActionCreator<
   ThunkResult<Promise<Perspective>>
 > = (perspectiveId: string) => async (dispatch, getState) => {
-  const perspective = await uprtcl.getPerspective(perspectiveId);
+  let perspective = perspectives.selectById(perspectiveId)(getState());
 
-  if (!perspectives.selectById(perspectiveId)(getState())) {
+  if (!perspective) {
+    perspective = await uprtcl.getPerspective(perspectiveId);
     await dispatch({ type: GET_PERSPECTIVE, perspective: perspective });
   }
+
   return perspective;
 };
 
 export const getCommit: ActionCreator<ThunkResult<Promise<Commit>>> = (
   commitId: string
 ) => async (dispatch, getState) => {
-  const commit = await uprtcl.getCommit(commitId);
+  let commit = commits.selectById(commitId)(getState());
 
-  if (!commits.selectById(commitId)(getState())) {
+  if (!commit) {
+    commit = await uprtcl.getCommit(commitId);
     await dispatch({ type: GET_COMMIT, commit: commit });
   }
+
   return commit;
 };
 
