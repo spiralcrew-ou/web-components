@@ -60,7 +60,6 @@ export class CONodeContent {
           this.updateBlockContent(event, event['path'][0].innerText);
         }}
         class={classes}
-
         data-placeholder={'empty'}
         id={this.block.id}
         contentEditable={this.canWrite}>
