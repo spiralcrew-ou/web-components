@@ -12,7 +12,7 @@ export class CONodeContent {
   @Prop({ context: 'store' }) store: Store;
   @Prop() block: Block;
   @Prop() level: number;
-  @Prop() canWrite: boolean;
+  @Prop() canwrite: boolean;
 
   @Event({ eventName: 'isFocused', bubbles: true })
   isFocused: EventEmitter;

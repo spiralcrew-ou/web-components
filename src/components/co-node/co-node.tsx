@@ -132,7 +132,7 @@ export class CONode {
             <co-node-content 
               block={this.block} 
               level={this.level} 
-              canWrite={this.canWrite()}>
+              canwrite={this.canWrite()}>
             </co-node-content>
           </div>
           
