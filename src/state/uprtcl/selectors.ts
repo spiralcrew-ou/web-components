@@ -19,3 +19,8 @@ export const selectContextPerspectives = (contextId: string) => (
 
 export const selectHead = (perspectiveId: string) => (state: UprtclState) =>
   state.heads[perspectiveId];
+
+export default {
+  contexts: contexts,
+  perspectives: perspectives
+};

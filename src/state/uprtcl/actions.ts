@@ -1,12 +1,12 @@
 import { Action, ActionCreator } from 'redux';
 import { ThunkAction } from 'redux-thunk';
-import { Context, Perspective, Commit, TextNode } from '../../types';
+import { Context, Perspective, Commit, Dictionary } from '../../types';
 import { UprtclState } from './reducer';
-import { uprtclMultiplatform, dataMultiplatform } from '../../services';
 import { contexts, perspectives, commits } from './selectors';
 import { UprtclService } from '../../services/uprtcl.service';
 import { MergeStrategy } from '../../services/merge/merge.strategy';
-import { RecursiveContextMergeStrategy } from '../../services/merge/recursive-context.merge.strategry';
+import { TypedActionCreator } from '../types';
+import { Uprtcl } from '../../services/uprtcl';
 
 export const GET_CONTEXT = 'GET_CONTEXT';
 export const GET_CONTEXT_PERSPECTIVES = 'GET_CONTEXT_PERSPECTIVES';
@@ -43,128 +43,159 @@ export type UprtclAction =
 
 type ThunkResult<T> = ThunkAction<T, UprtclState, undefined, UprtclAction>;
 
-const uprtcl: UprtclService = uprtclMultiplatform;
-const merge: MergeStrategy<TextNode> = new RecursiveContextMergeStrategy(
-  uprtcl,
-  dataMultiplatform
-);
+export type UprtclActionCreators = {
+  getContext: TypedActionCreator<ThunkResult<Promise<Context>>, {contextId: string}>;
+  getContextPerspectives: TypedActionCreator<ThunkResult<Promise<Perspective[]>>>;
+  getPerspective: TypedActionCreator<ThunkResult<Promise<Perspective>>>;
+  getCommit: TypedActionCreator<ThunkResult<Promise<Commit>>>;
+  createContext: TypedActionCreator<ThunkResult<Promise<string>>>;
+  createPerspective: TypedActionCreator<ThunkResult<Promise<string>>>;
+  createCommit: TypedActionCreator<ThunkResult<Promise<string>>>;
+  updateHead: TypedActionCreator<ThunkResult<Promise<void>>>;
+  getHead: TypedActionCreator<ThunkResult<Promise<string>>>;
+  mergePerspectives: TypedActionCreator<ThunkResult<Promise<string>>>;
+}
 
-export const getContext: ActionCreator<ThunkResult<Promise<Context>>> = (
-  contextId: string
-) => async (dispatch, getState) => {
-  let context = contexts.selectById(contextId)(getState());
+export function configureActions<D>(
+  uprtcl: Uprtcl,
+  merge: MergeStrategy<D>
+): UprtclActionCreators {
+  const getContext = (
+    args: {contextId: string}
+  ) => async (dispatch, getState) => {
+    let context = contexts.selectById(args.contextId)(getState());
 
-  if (!context) {
-    context = await uprtcl.getContext(contextId);
+    if (!context) {
+      context = await uprtcl.getContext(args.contextId);
+      await dispatch({ type: GET_CONTEXT, context: context });
+    }
+
+    return context;
+  };
+
+  const getContextPerspectives: ActionCreator<
+    ThunkResult<Promise<Perspective[]>>
+  > = (contextId: string) => async dispatch => {
+    const perspectives = await uprtcl.getContextPerspectives(contextId);
+    await dispatch({
+      type: GET_CONTEXT_PERSPECTIVES,
+      perspectives: perspectives
+    });
+    return perspectives;
+  };
+
+  const getPerspective: ActionCreator<ThunkResult<Promise<Perspective>>> = (
+    perspectiveId: string
+  ) => async (dispatch, getState) => {
+    let perspective = perspectives.selectById(perspectiveId)(getState());
+
+    if (!perspective) {
+      perspective = await uprtcl.getPerspective(perspectiveId);
+      await dispatch({ type: GET_PERSPECTIVE, perspective: perspective });
+    }
+
+    return perspective;
+  };
+
+  const getCommit: ActionCreator<ThunkResult<Promise<Commit>>> = (
+    commitId: string
+  ) => async (dispatch, getState) => {
+    let commit = commits.selectById(commitId)(getState());
+
+    if (!commit) {
+      commit = await uprtcl.getCommit(commitId);
+      await dispatch({ type: GET_COMMIT, commit: commit });
+    }
+
+    return commit;
+  };
+
+  const createContext: ActionCreator<ThunkResult<Promise<string>>> = (
+    context: Context
+  ) => async dispatch => {
+    const contextId = await uprtcl.createContext(context);
+
+    context.id = contextId;
     await dispatch({ type: GET_CONTEXT, context: context });
-  }
-  
-  return context;
-};
+    return contextId;
+  };
 
-export const getContextPerspectives: ActionCreator<
-  ThunkResult<Promise<Perspective[]>>
-> = (contextId: string) => async dispatch => {
-  const perspectives = await uprtcl.getContextPerspectives(contextId);
-  await dispatch({
-    type: GET_CONTEXT_PERSPECTIVES,
-    perspectives: perspectives
-  });
-  return perspectives;
-};
-
-export const getPerspective: ActionCreator<
-  ThunkResult<Promise<Perspective>>
-> = (perspectiveId: string) => async (dispatch, getState) => {
-  let perspective = perspectives.selectById(perspectiveId)(getState());
-
-  if (!perspective) {
-    perspective = await uprtcl.getPerspective(perspectiveId);
+  const createPerspective: ActionCreator<ThunkResult<Promise<string>>> = (
+    perspective: Perspective
+  ) => async dispatch => {
+    const perspectiveId = await uprtcl.createPerspective(perspective);
+    
+    perspective.id = perspectiveId;
     await dispatch({ type: GET_PERSPECTIVE, perspective: perspective });
+    return perspectiveId;
+  };
+  
+  const fork = () => async dispatch => {
+    
+        uprtcl.fork('')
+
   }
 
-  return perspective;
-};
+  const createCommit: ActionCreator<ThunkResult<Promise<string>>> = (
+    commit: Commit
+  ) => async dispatch => {
+    const commitId = await uprtcl.createCommit(commit);
 
-export const getCommit: ActionCreator<ThunkResult<Promise<Commit>>> = (
-  commitId: string
-) => async (dispatch, getState) => {
-  let commit = commits.selectById(commitId)(getState());
-
-  if (!commit) {
-    commit = await uprtcl.getCommit(commitId);
+    commit.id = commitId;
     await dispatch({ type: GET_COMMIT, commit: commit });
-  }
+    return commitId;
+  };
 
-  return commit;
-};
+  const updateHead: ActionCreator<ThunkResult<Promise<void>>> = (
+    perspectiveId: string,
+    headId: string
+  ) => async dispatch => {
+    await uprtcl.updateHead(perspectiveId, headId);
 
-export const createContext: ActionCreator<ThunkResult<Promise<string>>> = (
-  context: Context
-) => async dispatch => {
-  const contextId = await uprtcl.createContext(context);
+    await dispatch({
+      type: GET_HEAD,
+      perspectiveId: perspectiveId,
+      headId: headId
+    });
+  };
 
-  context.id = contextId;
-  await dispatch({ type: GET_CONTEXT, context: context });
-  return contextId;
-};
+  const getHead: ActionCreator<ThunkResult<Promise<string>>> = (
+    perspectiveId: string
+  ) => async dispatch => {
+    const headId = await uprtcl.getHead(perspectiveId);
 
-export const createPerspective: ActionCreator<ThunkResult<Promise<string>>> = (
-  perspective: Perspective
-) => async dispatch => {
-  const perspectiveId = await uprtcl.createPerspective(perspective);
+    await dispatch({
+      type: GET_HEAD,
+      perspectiveId: perspectiveId,
+      headId: headId
+    });
+    return headId;
+  };
 
-  perspective.id = perspectiveId;
-  await dispatch({ type: GET_PERSPECTIVE, perspective: perspective });
-  return perspectiveId;
-};
+  const mergePerspectives: ActionCreator<ThunkResult<Promise<string>>> = (
+    toPerspectiveId: string,
+    fromPerspectives: string[]
+  ) => async dispatch => {
+    const headId = await merge.mergePerspectives(
+      toPerspectiveId,
+      fromPerspectives
+    );
+    if (headId) {
+      await dispatch(getHead(headId));
+    }
+    return headId;
+  };
 
-export const createCommit: ActionCreator<ThunkResult<Promise<string>>> = (
-  commit: Commit
-) => async dispatch => {
-  const commitId = await uprtcl.createCommit(commit);
-
-  commit.id = commitId;
-  await dispatch({ type: GET_COMMIT, commit: commit });
-  return commitId;
-};
-
-export const updateHead: ActionCreator<ThunkResult<Promise<void>>> = (
-  perspectiveId: string,
-  headId: string
-) => async dispatch => {
-  await uprtcl.updateHead(perspectiveId, headId);
-
-  await dispatch({
-    type: GET_HEAD,
-    perspectiveId: perspectiveId,
-    headId: headId
-  });
-};
-
-export const getHead: ActionCreator<ThunkResult<Promise<string>>> = (
-  perspectiveId: string
-) => async dispatch => {
-  const headId = await uprtcl.getHead(perspectiveId);
-
-  await dispatch({
-    type: GET_HEAD,
-    perspectiveId: perspectiveId,
-    headId: headId
-  });
-  return headId;
-};
-
-export const mergePerspectives: ActionCreator<ThunkResult<Promise<string>>> = (
-  toPerspectiveId: string,
-  fromPerspectives: string[]
-) => async dispatch => {
-  const headId = await merge.mergePerspectives(
-    toPerspectiveId,
-    fromPerspectives
-  );
-  if (headId) {
-    await dispatch(getHead(headId));
-  }
-  return headId;
-};
+  return {
+    getContext,
+    getContextPerspectives,
+    getPerspective,
+    getCommit,
+    createContext,
+    createPerspective,
+    createCommit,
+    updateHead,
+    getHead,
+    mergePerspectives
+  };
+}

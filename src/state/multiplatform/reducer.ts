@@ -1,23 +1,23 @@
 import { Reducer } from 'redux';
 import {
-  ProvidersAction,
   SET_AVAILABLE_PROVIDERS,
-  SET_SELECTED_PROVIDER
+  SET_SELECTED_PROVIDER,
+  MultiplatformAction
 } from './actions';
 
-export interface ProvidersState {
+export interface MultiplatformState {
   availableProviders: string[];
   selectedProvider: string;
 }
 
-const initialState: ProvidersState = {
+const initialState: MultiplatformState = {
   availableProviders: [],
   selectedProvider: null
 };
 
-export const providersReducer: Reducer<ProvidersState, ProvidersAction> = (
-  state: ProvidersState = initialState,
-  action: ProvidersAction
+export const multiplatformReducer: Reducer<MultiplatformState, MultiplatformAction> = (
+  state: MultiplatformState = initialState,
+  action: MultiplatformAction
 ) => {
   switch (action.type) {
     case SET_AVAILABLE_PROVIDERS:

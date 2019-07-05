@@ -13,6 +13,7 @@ import { ipldService } from '../ipld';
 import { CidConfig } from '../cid.config';
 
 import { userService } from '../user/user.service.imp';
+import { EntityRegistry } from 'src/entities/entity.registry';
 
 export class UprtclMultiplatform extends CachedMultiplatform<UprtclService>
   implements UprtclService {
