@@ -62,7 +62,8 @@
     "co-node-content": {
       "bundleIds": {
         "$": "co-input-change-perspective"
-      }
+      },
+      "encapsulation": "shadow"
     },
     "co-source-code": {
       "bundleIds": {

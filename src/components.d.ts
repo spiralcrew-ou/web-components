@@ -71,12 +71,12 @@ export namespace Components {
 
   interface CoNodeContent {
     'block': Block;
-    'canWrite': boolean;
+    'canwrite': boolean;
     'level': number;
   }
   interface CoNodeContentAttributes extends StencilHTMLAttributes {
     'block'?: Block;
-    'canWrite'?: boolean;
+    'canwrite'?: boolean;
     'level'?: number;
     'onIsFocused'?: (event: CustomEvent) => void;
   }

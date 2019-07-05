@@ -1,6 +1,6 @@
 const h = window.CollectiveoneComponentLib.h;
 
-import { a as getCjsExportFromNamespace, b as createCommonjsModule, c as commonjsGlobal, d as unwrapExports } from './chunk-84ac4f31.js';
+import { a as createCommonjsModule, b as commonjsGlobal, c as unwrapExports } from './chunk-84ac4f31.js';
 
 const PropertyOrder = {
     Context: ['creatorId', 'timestamp', 'nonce'],
@@ -4495,7 +4495,6 @@ dbNamesDB.version(1).stores({ dbnames: 'name' });
     }
     catch (_e) { }
 })();
-//# sourceMappingURL=dexie.es.js.map
 
 class ExtensionsLocal extends Dexie {
     constructor() {
@@ -7010,12 +7009,10 @@ var bufferEs6 = /*#__PURE__*/Object.freeze({
     isBuffer: isBuffer
 });
 
-var buffer = getCjsExportFromNamespace(bufferEs6);
-
 var safeBuffer = createCommonjsModule(function (module, exports) {
 /* eslint-disable node/no-deprecated-api */
 
-var Buffer = buffer.Buffer;
+var Buffer = bufferEs6.Buffer;
 
 // alternative to using Object.keys for old browsers
 function copyProps (src, dst) {
@@ -7024,10 +7021,10 @@ function copyProps (src, dst) {
   }
 }
 if (Buffer.from && Buffer.alloc && Buffer.allocUnsafe && Buffer.allocUnsafeSlow) {
-  module.exports = buffer;
+  module.exports = bufferEs6;
 } else {
   // Copy properties from require('buffer')
-  copyProps(buffer, exports);
+  copyProps(bufferEs6, exports);
   exports.Buffer = SafeBuffer;
 }
 
@@ -7073,7 +7070,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
   if (typeof size !== 'number') {
     throw new TypeError('Argument must be a number')
   }
-  return buffer.SlowBuffer(size)
+  return bufferEs6.SlowBuffer(size)
 };
 });
 var safeBuffer_1 = safeBuffer.Buffer;
@@ -12346,7 +12343,7 @@ var murmurhash3jsRevisited = murmurHash3js;
 
 'use strict';
 
-const { Buffer: Buffer$2 } = buffer;
+const { Buffer: Buffer$2 } = bufferEs6;
 
 const crypto = self.crypto || self.msCrypto;
 
@@ -12377,7 +12374,7 @@ var sha_browser = (algorithm) => {
 
 'use strict';
 
-const { Buffer: Buffer$3 } = buffer;
+const { Buffer: Buffer$3 } = bufferEs6;
 
 const fromNumberTo32BitBuf = (number) => {
   const bytes = new Array(4);
@@ -12981,7 +12978,7 @@ var blakejs_10 = blakejs.blake2sFinal;
 
 'use strict';
 
-const { Buffer: Buffer$4 } = buffer;
+const { Buffer: Buffer$4 } = bufferEs6;
 
 
 const minB = 0xb201;
@@ -13019,7 +13016,7 @@ var blake_1 = (table) => {
 
 'use strict';
 
-const { Buffer: Buffer$5 } = buffer;
+const { Buffer: Buffer$5 } = bufferEs6;
 
 
 
@@ -13099,7 +13096,7 @@ var crypto_17 = crypto$1.addBlake;
 
 'use strict';
 
-const { Buffer: Buffer$6 } = buffer;
+const { Buffer: Buffer$6 } = bufferEs6;
 
 
 
@@ -13458,7 +13455,7 @@ var ieee754 = {
 	write: write$1
 };
 
-var buffer$1 = createCommonjsModule(function (module, exports) {
+var buffer = createCommonjsModule(function (module, exports) {
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -15237,10 +15234,10 @@ function numberIsNaN (obj) {
   return obj !== obj // eslint-disable-line no-self-compare
 }
 });
-var buffer_1 = buffer$1.Buffer;
-var buffer_2 = buffer$1.SlowBuffer;
-var buffer_3 = buffer$1.INSPECT_MAX_BYTES;
-var buffer_4 = buffer$1.kMaxLength;
+var buffer_1 = buffer.Buffer;
+var buffer_2 = buffer.SlowBuffer;
+var buffer_3 = buffer.INSPECT_MAX_BYTES;
+var buffer_4 = buffer.kMaxLength;
 
 class CidConfig {
     constructor(_base, _version, _codec, _type) {
@@ -15274,7 +15271,7 @@ class IpldService {
         if (typeof object !== 'object')
             throw new Error('Object expected, not the stringified string!');
         /** other clients should hash the stringified object directly  */
-        const b = buffer$1.Buffer.from(JSON.stringify(object));
+        const b = buffer.Buffer.from(JSON.stringify(object));
         const encoded = await src$4(b, cidConfig.type);
         // TODO check if raw or dag-pb
         const cid = new src$3(cidConfig.version, cidConfig.codec, encoded, cidConfig.base);
@@ -19202,7 +19199,7 @@ var legacyAST = {"absolutePath":"/home/pepo/ethworkspace/uprtcl-eth/contracts/Up
 var compiler = {"name":"solc","version":"0.5.0+commit.1d4f565a.Emscripten.clang"};
 var networks = {"4":{"events":{},"links":{},"address":"0x71ABb6Dbf02a568Eafb25E638836434E507E09a8","transactionHash":"0x86b40f2798dd3cdf443e4faed8ca9160031cdff463d8e2cdf24a65106d8418ba"},"3333":{"events":{},"links":{},"address":"0xCfEB869F69431e42cdB54A4F4f105C19C080A601","transactionHash":"0xc980d82f5a17edcc1b548b71e1db7085b2f112fb5eaad19638b6095e0648a8fb"},"1561878994069":{"events":{},"links":{},"address":"0x8A19fDf7cbc2659C96eB95398e64724AeeD51e48","transactionHash":"0x6b7bc581148cec542e777d3d01c26bff58a49094f436334448ad8ca4f1c14c74"}};
 var schemaVersion = "3.0.9";
-var updatedAt = "2019-07-05T08:08:53.858Z";
+var updatedAt = "2019-07-05T18:49:03.862Z";
 var devdoc = {"methods":{}};
 var userdoc = {"methods":{"addPerspective(bytes32,bytes32,string,address,string)":{"notice":"Adds a new perspective to the mapping and sets the owner. The head pointer is initialized as null and should be updated independently using updateHead(). The contextId is not persisted but emited in the PerspectiveAdded event to enable filtering. Validation of the perspectiveId to contextId should be done externally using any\tcontent addressable\tstorage solution for the perspectiveId. The perspectiveCid is emited to help perspectiveHash reverse mapping "},"changeOwner(bytes32,address)":{"notice":"Changes the owner of a given perspective. Available only to the current owner of that perspective. "},"getPerspective(bytes32)":{"notice":"Get the perspective owner and head from its ID "},"updateHead(bytes32,string)":{"notice":"Updates the head pointer of a given perspective. Available only to the owner of that perspective. "}},"notice":"Underscore Protocol Ethereum Service used to store the content of _Prtcl perspectives "};
 ({
@@ -36887,7 +36884,6 @@ var PatchOperation = /** @class */ (function () {
     };
     return PatchOperation;
 }());
-//# sourceMappingURL=patch-operation.class.js.map
 
 /**
  * DiffMatchPatch has been derived from diff_match_patch in diff-match-patch by Neil Fraser
@@ -38936,9 +38932,6 @@ var DiffMatchPatch = /** @class */ (function () {
     };
     return DiffMatchPatch;
 }());
-//# sourceMappingURL=diff-match-patch.class.js.map
-
-//# sourceMappingURL=index.js.map
 
 const diff = new DiffMatchPatch();
 class DiffUtils {
@@ -39840,15 +39833,11 @@ const reloadTree = () => {
  * @param block
  *
  */
-const setContent$1 = (blockId, content) => {
-    return async (dispatch, getState) => {
+const setContent = (blockId, content) => {
+    return async (dispatch) => {
         await uprtclData.setDraftText(blockId, content);
-        const perspectiveFull = await uprtclData.getPerspectiveFull(blockId, 0);
-        let block = getState().workpad.tree[blockId];
-        block = mapPerspectiveToBlock(perspectiveFull);
-        const tree = Object.assign({}, getState().workpad.tree);
-        tree[blockId] = block;
-        dispatch({ type: 'SET_CONTENT', tree });
+        dispatch({ type: 'SET_CONTENT' });
+        dispatch(reloadTree());
     };
 };
 const newBlock = (blockId, _content, parentId, index) => {
@@ -40130,4 +40119,4 @@ const watchTasks = () => {
     };
 };
 
-export { checkoutPerspective as a, renderingWorkpad as b, commitGlobal as c, mergePerspective as d, c1ServiceProvider as e, newPerspective as f, ethServiceProvider as g, holochainServiceProvider as h, global$1 as i, setStyle as j, pullPerspective as k, setPerspectiveToAct as l, setPerspectiveToActAndUpdateContextPerspectives as m, NodeType as n, newBlock as o, removeBlock as p, indentLeft as q, reloadTree as r, setContent$1 as s, openMenu as t, uprtclMultiplatform as u, uprtclData as v, watchTasks as w, initTree as x, setEthAccount as y };
+export { checkoutPerspective as a, renderingWorkpad as b, commitGlobal as c, mergePerspective as d, c1ServiceProvider as e, newPerspective as f, ethServiceProvider as g, holochainServiceProvider as h, global$1 as i, setStyle as j, pullPerspective as k, setPerspectiveToAct as l, setPerspectiveToActAndUpdateContextPerspectives as m, NodeType as n, newBlock as o, removeBlock as p, indentLeft as q, reloadTree as r, openMenu as s, setContent as t, uprtclMultiplatform as u, uprtclData as v, watchTasks as w, initTree as x, setEthAccount as y };

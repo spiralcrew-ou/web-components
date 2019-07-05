@@ -1,14 +1,15 @@
 import {
-  Component, Prop, Event, EventEmitter } from '@stencil/core';
+  Component, Prop, Event, EventEmitter, Element } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
 import { Block, setContent } from '../../actions';
 
 @Component({
   tag: 'co-node-content',
   styleUrl: 'co-node-content.scss',
-  shadow: false
+  shadow: true
 })
 export class CONodeContent {
+  @Element() _element: HTMLElement;
   @Prop({ context: 'store' }) store: Store;
   @Prop() block: Block;
   @Prop() level: number;
@@ -26,6 +27,8 @@ export class CONodeContent {
   }
 
   componentDidLoad() {
+    const element = this._element.shadowRoot.getElementById(this.block.id);
+    if (element) element.innerHTML = this.block.content
   }
 
   async updateBlockContent(_event: FocusEvent, _newContent) {
@@ -37,8 +40,6 @@ export class CONodeContent {
   }
 
   render() {
-    console.log('rendering', this.block);
-
     const blockClasses = 'text-gray-800 node-content-container'
     const contentClasses = this.block.style === 'title' ? `title-${this.level + 1}` : 'paragraph'
     const classes = [
@@ -50,6 +51,7 @@ export class CONodeContent {
     return (
     <div class={containerClasses}>
       <div
+        id={this.block.id}
         onFocus={() => { 
           this.isFocused.emit(true)
         }}
@@ -61,7 +63,7 @@ export class CONodeContent {
         }}
         class={classes}
         data-placeholder={'empty'}
-        contentEditable={this.canWrite}>
+        contentEditable={this.canwrite}>
         {this.block.content}
       </div>
     </div>
