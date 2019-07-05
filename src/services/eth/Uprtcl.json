@@ -5948,10 +5948,16 @@
       "links": {},
       "address": "0xCfEB869F69431e42cdB54A4F4f105C19C080A601",
       "transactionHash": "0xc980d82f5a17edcc1b548b71e1db7085b2f112fb5eaad19638b6095e0648a8fb"
+    },
+    "1561878994069": {
+      "events": {},
+      "links": {},
+      "address": "0x8A19fDf7cbc2659C96eB95398e64724AeeD51e48",
+      "transactionHash": "0x6b7bc581148cec542e777d3d01c26bff58a49094f436334448ad8ca4f1c14c74"
     }
   },
   "schemaVersion": "3.0.9",
-  "updatedAt": "2019-06-26T11:13:45.515Z",
+  "updatedAt": "2019-07-05T08:08:53.858Z",
   "devdoc": {
     "methods": {}
   },

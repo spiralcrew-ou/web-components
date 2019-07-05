@@ -106,10 +106,7 @@ export class COMenu {
   }
 
   canWrite(): boolean {
-    return (
-      !this.block.serviceProvider.startsWith('eth://') ||
-      this.ethAccount === this.block.creatorId
-    );
+    return true;
   }
 
   render() {
@@ -169,7 +166,7 @@ export class COMenu {
               class='row pb-2'>
               <div
                 class={
-                  (this.canWrite() && !this.anyDraft ? '' : ' disabled')
+                  (this.canWrite() && !this.anyDraft ? '' : '')
                 }
                 onClick={async () => {
                   await this.setPerspectiveToActAndUpdateContextPerspectives(

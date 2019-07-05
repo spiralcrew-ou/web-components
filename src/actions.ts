@@ -109,15 +109,10 @@ export const reloadTree = () => {
  *
  */
 export const setContent = (blockId: string, content: string) => {
-  return async (dispatch, getState) => {
+  return async (dispatch) => {
     await uprtclData.setDraftText(blockId, content);
-    const perspectiveFull = await uprtclData.getPerspectiveFull(blockId, 0);
-
-    let block = getState().workpad.tree[blockId];
-    block = mapPerspectiveToBlock(perspectiveFull);
-    const tree = Object.assign({}, getState().workpad.tree);
-    tree[blockId] = block;
-    dispatch({ type: 'SET_CONTENT', tree });
+    dispatch({ type: 'SET_CONTENT' });
+    dispatch(reloadTree());
   };
 };
 

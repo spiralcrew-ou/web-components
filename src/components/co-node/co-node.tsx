@@ -2,12 +2,12 @@ import {
   Component, State, Prop, Element, Listen, Event, EventEmitter
 } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
-import { newBlock, removeBlock, indentLeft, reloadTree, setContent, openMenu, Block, renderingWorkpad } from '../../actions';
+import { newBlock, removeBlock, indentLeft, reloadTree, openMenu, Block, renderingWorkpad } from '../../actions';
 
 @Component({
   tag: 'co-node',
   styleUrl: 'co-node.scss',
-  shadow: true
+  shadow: false
 })
 export class CONode {
   @Element() _element: HTMLElement;
@@ -15,26 +15,25 @@ export class CONode {
   @Prop({ context: 'store' }) store: Store;
   @Prop() temp: string
   @Prop() nodeid: string;
+  @Prop() level: number;
   @Prop() parentid: string;
   @Prop() indexinparent: number;
-  block : Block;
+  
+  @State() block: Block;
   @State() tree
   @State() isFocused: boolean = false;
   @State() ethAccount: string = '';
   @Event({ eventName: 'isRunning', bubbles: true }) isRunning: EventEmitter
-  
 
-  rootId; 
+  rootId;
   emptyOnce = false;
-  
+
   newBlock: Action
   removeBlock: Action
   indentLeft: Action
   reloadTree: Action
-  setContent: Action
   openMenu: Action
   renderingWorkpad: Action
- 
 
   componentWillLoad() {
     this.store.mapDispatchToProps(this, {
@@ -42,28 +41,20 @@ export class CONode {
       removeBlock,
       indentLeft,
       reloadTree,
-      setContent,
       openMenu,
       renderingWorkpad
     })
-    this.store.mapStateToProps(this,(state) => {
+    this.store.mapStateToProps(this, (state) => {
       return {
-        tree: Object.assign({},state.workpad.tree),
+        tree: Object.assign({}, state.workpad.tree),
         rootId: state.workpad.rootId,
         block: state.workpad.tree[this.nodeid],
         ethAccount: state.support.ethAccount
       }
     })
-    
   }
 
-
   componentDidLoad() {
-    const conode = this._element.shadowRoot.getElementById(this.block.id);
-    if (conode) conode.focus();
-
-    const element = this._element.shadowRoot.getElementById(this.nodeid);
-    if (element) element.innerHTML = this.block.content
   }
 
   @Listen('keydown')
@@ -71,13 +62,13 @@ export class CONode {
     if (event.key === 'Enter') {
       event.preventDefault();
       event.stopPropagation();
-      console.log(this.rootId,this.nodeid)
-      if (this.rootId!=this.nodeid) { 
+      console.log(this.rootId, this.nodeid)
+      if (this.rootId != this.nodeid) {
         this.newBlock(
-          this.nodeid, 
-          '', 
-          this.parentid, 
-          this.indexinparent);  
+          this.nodeid,
+          '',
+          this.parentid,
+          this.indexinparent);
       }
     }
   }
@@ -92,7 +83,7 @@ export class CONode {
       sel['modify']("extend", "backward", "paragraphboundary");
       var pos = sel.toString().length;
       sel.collapseToEnd();
-  
+
       if (event['path'][0].innerText === '') {
         if (!this.emptyOnce) {
           this.emptyOnce = true;
@@ -107,21 +98,12 @@ export class CONode {
             /** indentn left up to level 1 */
             console.log('Indent Left')
             this.indentLeft(this.block.id, this.parentid, this.indexinparent);
-          }          
+          }
         }
       }
 
     } else {
       this.emptyOnce = false;
-    }
-
-  }
-
-  async updateBlockContent(_event:FocusEvent, _newContent) { 
-    _event.stopPropagation()   
-    if (this.block) {
-      if (_newContent != this.block.content)
-        await this.setContent(this.block.id, _newContent)
     }
   }
 
@@ -129,58 +111,49 @@ export class CONode {
     return !this.block.serviceProvider.startsWith('eth://') || this.ethAccount === this.block.creatorId; 
   }
 
+  @Listen('isFocused')
+  isFocusedHandler(event: CustomEvent) {
+    event.stopPropagation();
+    this.isFocused = event.detail
+  }
+  
   render() {
-    
-    
-    this.block = this.tree[this.nodeid]
-    const isDocTitle = this.block.id === this.rootId
-    const blockClasses = 'text-gray-800 p-2 leading-relaxed'
+
     const focusClasses = this.isFocused ? 'bg-gray-200' :  ''
-    const titleClasses = this.block.style === 'title' ? 'text-2xl' : ''
-    const paragraphClasses =  this.block.style ==='paragraph' ? 'font-light px-2 py-2 ' : ''
-    const commitedClasses = this.block.status === 'DRAFT' ? 'border-l border-red-800' : ''
-    const classes = [
-      blockClasses, 
-      commitedClasses,
-      titleClasses,
-      paragraphClasses].join(" ")
-
-    const containerClasses = [focusClasses].join(" ")
-
-    const contentBlock = <div class='row min-h-2 ml-2'>
-                            <div 
-                              key={this.nodeid}
-                              onFocus={() => {this.isFocused = true}}
-                              class= {classes} 
-                              onBlur={event => {
-                                this.isFocused = false;
-                                this.updateBlockContent(event,event['path'][0].innerText)
-                              }}
-                              data-placeholder = {'Please write here '}
-                              id={this.nodeid} 
-                              contentEditable={this.canWrite()}>
-                             {this.block.content}
-                            </div>
-                            
-                            <co-menu  
-                              show
-                              class={`menu ${this.nodeid}`}  
-                              reference={this.nodeid} 
-                              parent-id={this.parentid}
-                              index={this.indexinparent} >
-                            </co-menu>
-                            
-                          </div>
+    const commitedClasses = this.block.status === 'DRAFT' ? 'draft-block' : ''
     
+    const nodeRowClasses = [commitedClasses].concat(["node-row"]).join(" ")
+    const containerClasses = [focusClasses].concat(["node-row"]).join(" ")
 
-    return ( 
+    return (
       <div class={containerClasses}>
-        {!isDocTitle ? contentBlock : ''}        
+        <div class={nodeRowClasses}>
+          <div class="node-content">
+            <co-node-content 
+              block={this.block} 
+              level={this.level} 
+              canWrite={this.canWrite()}>
+            </co-node-content>
+          </div>
+          
+          <div class="node-menu">
+            <co-menu
+              show
+              class={`menu ${this.nodeid}`}
+              reference={this.nodeid}
+              parent-id={this.parentid}
+              index={this.indexinparent} >
+            </co-menu>
+          </div>
+          
+        </div>
+        
         {this.block.children.map((childId, index) => {
-           return(
-            <co-node 
-              nodeid={childId} 
-              parentid={this.block.id} 
+          return (
+            <co-node
+              level={this.level + 1}
+              nodeid={childId}
+              parentid={this.block.id}
               indexinparent={index}>
             </co-node>
           )

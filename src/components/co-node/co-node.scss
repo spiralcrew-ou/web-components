@@ -22,3 +22,26 @@
 .menu { 
   margin: auto
 }
+
+.node-row {
+  position: relative;
+  padding: 0px 0px 0px 0px;
+}
+
+.node-content {
+  padding-left: 10px; 
+}
+
+.node-menu {
+  width: 30px;
+  position: absolute;
+  top: 12px;
+  right: 0px;
+  cursor: pointer;
+}
+
+.draft-block {
+  border-left-style: solid;
+  border-left-width: 2px;
+  border-left-color: #ff7733;
+}

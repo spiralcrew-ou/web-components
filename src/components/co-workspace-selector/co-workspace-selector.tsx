@@ -23,7 +23,7 @@ export class COWorkspaceSelector {
   @Prop({ context: 'store' }) store: Store;
   @State() isStarting: boolean = true;
   @State() ethLoading: boolean = true;
-  @State() defaultServiceProvider: string = ethServiceProvider;
+  @State() defaultServiceProvider: string = c1ServiceProvider;
 
   setEthAccount: Action;
 
@@ -71,7 +71,7 @@ export class COWorkspaceSelector {
 
   renderWorkpad() {
     return (
-      <div class="waiting">
+      <div>
         {this.isStarting || this.ethLoading ? (
           <co-waiting-message class="center-loading" />
         ) : ''}

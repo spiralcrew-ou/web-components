@@ -50,15 +50,19 @@
     },
     "co-menu": {
       "bundleIds": {
-        "$": "co-menu"
+        "$": "co-input-change-perspective"
       },
       "encapsulation": "shadow"
     },
     "co-node": {
       "bundleIds": {
         "$": "co-input-change-perspective"
-      },
-      "encapsulation": "shadow"
+      }
+    },
+    "co-node-content": {
+      "bundleIds": {
+        "$": "co-input-change-perspective"
+      }
     },
     "co-source-code": {
       "bundleIds": {
@@ -74,7 +78,7 @@
     },
     "co-waiting-message": {
       "bundleIds": {
-        "$": "co-waiting-message"
+        "$": "co-waiting-app"
       },
       "encapsulation": "shadow"
     },
@@ -86,13 +90,13 @@
     },
     "co-workspace": {
       "bundleIds": {
-        "$": "co-waiting-message"
+        "$": "co-waiting-app"
       },
       "encapsulation": "shadow"
     },
     "co-workspace-selector": {
       "bundleIds": {
-        "$": "co-waiting-message"
+        "$": "co-waiting-app"
       },
       "encapsulation": "shadow"
     },

@@ -9,6 +9,9 @@ import '@stencil/core';
 
 import '@stencil/redux';
 import {
+  Block,
+} from './actions';
+import {
   Perspective,
 } from './types';
 
@@ -66,14 +69,28 @@ export namespace Components {
     'show'?: boolean;
   }
 
+  interface CoNodeContent {
+    'block': Block;
+    'canWrite': boolean;
+    'level': number;
+  }
+  interface CoNodeContentAttributes extends StencilHTMLAttributes {
+    'block'?: Block;
+    'canWrite'?: boolean;
+    'level'?: number;
+    'onIsFocused'?: (event: CustomEvent) => void;
+  }
+
   interface CoNode {
     'indexinparent': number;
+    'level': number;
     'nodeid': string;
     'parentid': string;
     'temp': string;
   }
   interface CoNodeAttributes extends StencilHTMLAttributes {
     'indexinparent'?: number;
+    'level'?: number;
     'nodeid'?: string;
     'onIsRunning'?: (event: CustomEvent) => void;
     'parentid'?: string;
@@ -151,6 +168,7 @@ declare global {
     'CoLoading': Components.CoLoading;
     'CoLogin': Components.CoLogin;
     'CoMenu': Components.CoMenu;
+    'CoNodeContent': Components.CoNodeContent;
     'CoNode': Components.CoNode;
     'CoSourceCode': Components.CoSourceCode;
     'CoWaitingApp': Components.CoWaitingApp;
@@ -171,6 +189,7 @@ declare global {
     'co-loading': Components.CoLoadingAttributes;
     'co-login': Components.CoLoginAttributes;
     'co-menu': Components.CoMenuAttributes;
+    'co-node-content': Components.CoNodeContentAttributes;
     'co-node': Components.CoNodeAttributes;
     'co-source-code': Components.CoSourceCodeAttributes;
     'co-waiting-app': Components.CoWaitingAppAttributes;
@@ -229,6 +248,12 @@ declare global {
   var HTMLCoMenuElement: {
     prototype: HTMLCoMenuElement;
     new (): HTMLCoMenuElement;
+  };
+
+  interface HTMLCoNodeContentElement extends Components.CoNodeContent, HTMLStencilElement {}
+  var HTMLCoNodeContentElement: {
+    prototype: HTMLCoNodeContentElement;
+    new (): HTMLCoNodeContentElement;
   };
 
   interface HTMLCoNodeElement extends Components.CoNode, HTMLStencilElement {}
@@ -294,6 +319,7 @@ declare global {
     'co-loading': HTMLCoLoadingElement
     'co-login': HTMLCoLoginElement
     'co-menu': HTMLCoMenuElement
+    'co-node-content': HTMLCoNodeContentElement
     'co-node': HTMLCoNodeElement
     'co-source-code': HTMLCoSourceCodeElement
     'co-waiting-app': HTMLCoWaitingAppElement
@@ -314,6 +340,7 @@ declare global {
     'co-loading': HTMLCoLoadingElement;
     'co-login': HTMLCoLoginElement;
     'co-menu': HTMLCoMenuElement;
+    'co-node-content': HTMLCoNodeContentElement;
     'co-node': HTMLCoNodeElement;
     'co-source-code': HTMLCoSourceCodeElement;
     'co-waiting-app': HTMLCoWaitingAppElement;

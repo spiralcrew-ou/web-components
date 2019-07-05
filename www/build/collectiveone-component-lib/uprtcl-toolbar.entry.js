@@ -1,6 +1,6 @@
 const h = window.CollectiveoneComponentLib.h;
 
-import { u as uprtclMultiplatform, v as uprtclData } from './chunk-5e34e6e6.js';
+import { u as uprtclMultiplatform, v as uprtclData } from './chunk-9210d74b.js';
 import './chunk-84ac4f31.js';
 
 class UptrclToolbar {

@@ -1,6 +1,6 @@
 const h = window.CollectiveoneComponentLib.h;
 
-import { o as global$1, p as setStyle, b as renderingWorkpad, q as pullPerspective, r as setPerspectiveToAct, s as setPerspectiveToActAndUpdateContextPerspectives, t as NodeType } from './chunk-5e34e6e6.js';
+import { o as global$1, p as setStyle, b as renderingWorkpad, q as pullPerspective, r as setPerspectiveToAct, s as setPerspectiveToActAndUpdateContextPerspectives, t as NodeType } from './chunk-f662339a.js';
 import './chunk-84ac4f31.js';
 
 /**!
@@ -2604,6 +2604,7 @@ var Popper = function () {
 Popper.Utils = (typeof window !== 'undefined' ? window : global$1).PopperUtils;
 Popper.placements = placements;
 Popper.Defaults = Defaults;
+//# sourceMappingURL=popper.js.map
 
 class COMenu {
     componentWillLoad() {
@@ -2643,8 +2644,7 @@ class COMenu {
         this.close();
     }
     canWrite() {
-        return (!this.block.serviceProvider.startsWith('eth://') ||
-            this.ethAccount === this.block.creatorId);
+        return true;
     }
     render() {
         const isRootDocument = this.block.id === this.rootId;
@@ -2685,7 +2685,7 @@ class COMenu {
                         h("div", { class: 'py-1' }, " Change Perspective"),
                         h("img", { class: 'w-6 h-6 inline-block ', src: './assets/img/switch.svg' })),
                     h("div", { title: this.canWrite() && !this.anyDraft ? '' : 'Please commit your changes before merging', class: 'row pb-2' },
-                        h("div", { class: (this.canWrite() && !this.anyDraft ? '' : ' disabled'), onClick: async () => {
+                        h("div", { class: (this.canWrite() && !this.anyDraft ? '' : ''), onClick: async () => {
                                 await this.setPerspectiveToActAndUpdateContextPerspectives(this.block.id);
                                 this.showInputMerge.emit(true);
                                 this.close();

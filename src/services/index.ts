@@ -33,11 +33,16 @@ export const ethServiceProvider =
   'eth://71ABb6Dbf02a568Eafb25E638836434E507E09a8';
 
 
-const ethLocation = null;//'ws://127.0.0.1:8545';
+const ethLocation = 'ws://127.0.0.1:8545';
+// const ipfsConfig = {
+//   host: 'ipfs.infura.io',
+//   port: 5001,
+//   protocol: 'https'
+// };
 const ipfsConfig = {
-  host: 'ipfs.infura.io',
+  host: '127.0.0.1',
   port: 5001,
-  protocol: 'https'
+  protocol: 'http'
 };
 
 let uprtclConfig = {};
