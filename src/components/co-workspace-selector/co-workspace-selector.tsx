@@ -38,7 +38,6 @@ export class COWorkspaceSelector {
   @Listen('isStarting')
   handleLoding(event: CustomEvent) {
     this.isStarting = event.detail;
-    console.log(event.detail);
   }
 
   @Method()

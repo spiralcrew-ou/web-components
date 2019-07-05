@@ -912,7 +912,6 @@ class COWorkspaceSelector {
     }
     handleLoding(event) {
         this.isStarting = event.detail;
-        console.log(event.detail);
     }
     selectWorkspaceType(type) {
         this.defaultServiceProvider = type;

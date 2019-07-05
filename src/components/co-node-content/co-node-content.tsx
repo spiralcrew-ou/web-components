@@ -1,5 +1,5 @@
 import {
-  Component, Prop, Element, Event, EventEmitter } from '@stencil/core';
+  Component, Prop, Event, EventEmitter } from '@stencil/core';
 import { Store, Action } from '@stencil/redux';
 import { Block, setContent } from '../../actions';
 
@@ -9,8 +9,6 @@ import { Block, setContent } from '../../actions';
   shadow: false
 })
 export class CONodeContent {
-  @Element() _element: HTMLElement;
-  
   @Prop({ context: 'store' }) store: Store;
   @Prop() block: Block;
   @Prop() level: number;
@@ -39,7 +37,7 @@ export class CONodeContent {
   }
 
   render() {
-    console.log('rendegin', this.block);
+    console.log('rendering', this.block);
 
     const blockClasses = 'text-gray-800 node-content-container'
     const contentClasses = this.block.style === 'title' ? `title-${this.level + 1}` : 'paragraph'
@@ -52,16 +50,17 @@ export class CONodeContent {
     return (
     <div class={containerClasses}>
       <div
-        key={this.block.id}
-        onFocus={() => { this.isFocused.emit(true)}}
+        onFocus={() => { 
+          this.isFocused.emit(true)
+        }}
         onBlur={event => {
           this.isFocused.emit(false);
           this.block.content = '';
+          console.log('[BLUR EVENT]', event)
           this.updateBlockContent(event, event['path'][0].innerText);
         }}
         class={classes}
         data-placeholder={'empty'}
-        id={this.block.id}
         contentEditable={this.canWrite}>
         {this.block.content}
       </div>
