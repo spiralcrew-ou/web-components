@@ -120,20 +120,23 @@ export const newBlock = (
   blockId: string,
   _content: string,
   parentId: string,
-  index: number
+  index: number,
+  last: boolean = false // used for new block under title
 ) => {
   return async (dispatch, getState) => {
     const tree = getState().workpad.tree;
     const initNode: Block = tree[blockId];
 
+    debugger
+
     switch (initNode.style) {
       case 'title':
         /** An enter on a title will create an empty subcontext *
          *  as the first subcontext of the title context.       */
-        uprtclData.initContextUnder(
+        await uprtclData.initContextUnder(
           initNode.serviceProvider,
           initNode.id,
-          0,
+          last ? -1 : 0,
           _content,
           NodeType.paragraph
         );

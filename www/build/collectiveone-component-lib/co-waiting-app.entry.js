@@ -1,6 +1,6 @@
 const h = window.CollectiveoneComponentLib.h;
 
-import { u as uprtclMultiplatform, v as uprtclData, n as NodeType, w as watchTasks, x as initTree, r as reloadTree, i as global$1, g as ethServiceProvider, e as c1ServiceProvider, h as holochainServiceProvider, y as setEthAccount } from './chunk-0bf597de.js';
+import { u as uprtclMultiplatform, v as uprtclData, n as NodeType, w as watchTasks, x as initTree, r as reloadTree, i as global$1, g as ethServiceProvider, e as c1ServiceProvider, h as holochainServiceProvider, y as setEthAccount } from './chunk-68037ba8.js';
 import { b as createCommonjsModule, c as commonjsGlobal, d as unwrapExports } from './chunk-84ac4f31.js';
 
 class COWaitingApp {

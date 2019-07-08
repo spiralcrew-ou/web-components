@@ -285,7 +285,7 @@ export class UprtclData {
     let draft = await this.getOrCreateDraft(onPerspectiveId);
 
     if (index != -1) {
-      if (0 < index && index < draft.links.length) {
+      if (0 <= index && index < draft.links.length) {
         draft.links.splice(index, 0, { link: perspectiveId });
       } else if (index == draft.links.length) {
         /* accept length as index and interpret as push */
