@@ -118,7 +118,7 @@ export class CONode {
   }
   
   render() {
-
+    console.log('[RENDER]', this.block)
     const focusClasses = this.isFocused ? 'bg-gray-200' :  ''
     const commitedClasses = this.block.status === 'DRAFT' ? 'draft-block' : ''
     
@@ -137,13 +137,14 @@ export class CONode {
           </div>
           
           <div class="node-menu">
-            <co-menu
-              show
-              class={`menu ${this.nodeid}`}
-              reference={this.nodeid}
-              parent-id={this.parentid}
-              index={this.indexinparent} >
-            </co-menu>
+            {true ? (
+              <co-menu
+                show
+                class={`menu ${this.nodeid}`}
+                reference={this.nodeid}
+                parent-id={this.parentid}
+                index={this.indexinparent} >
+              </co-menu>) : ''}
           </div>
           
         </div>

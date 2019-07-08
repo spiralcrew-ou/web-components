@@ -28,14 +28,26 @@ export class CONodeContent {
 
   componentDidLoad() {
     const element = this._element.shadowRoot.getElementById(this.block.id);
-    if (element) element.innerHTML = this.block.content
+    if (element) {
+      element.focus();
+      element.innerHTML = this.block.content
+    }
   }
 
   async updateBlockContent(_event: FocusEvent, _newContent) {
     _event.stopPropagation()
     if (this.block) {
-      if (_newContent != this.block.content)
+      if (_newContent !== this.block.content)
         await this.setContent(this.block.id, _newContent)
+    }
+  }
+
+  componentWillRender() {
+    console.log('[WILL RENDER]', this.block)
+    /** force reactivity */
+    const element = this._element.shadowRoot.getElementById(this.block.id);
+    if (element) {
+      element.innerHTML = this.block.content
     }
   }
 
@@ -57,9 +69,7 @@ export class CONodeContent {
         }}
         onBlur={event => {
           this.isFocused.emit(false);
-          this.block.content = '';
-          console.log('[BLUR EVENT]', event)
-          this.updateBlockContent(event, event['path'][0].innerText);
+          this.updateBlockContent(event, event['path'][0].innerHTML);
         }}
         class={classes}
         data-placeholder={'empty'}
