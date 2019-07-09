@@ -23,12 +23,41 @@
   margin: auto
 }
 
+.context-menu {
+  width: 300px;
+  height: 35px;
+  padding: 10px;
+  display: none;
+  position: absolute;
+  top: 16px;
+  left: 10px;
+}
+
+.context-menu input {
+  width: 170px;
+  float: left;
+  padding: 5px;
+}
+
+.context-menu button {
+  width: 50px;
+  float: left;
+  text-align: center;
+  padding: 5px;
+}
+
 .node-content-container {
   padding: 0px 0px 0px 0px;
 }
 
 .paragraph {
   padding: 5px 0px;
+}
+
+.paragraph a {
+  font-weight: bolder;
+  text-decoration: underline;
+  color: #4299E1;
 }
 
 .title-1 {

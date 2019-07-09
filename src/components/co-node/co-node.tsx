@@ -118,7 +118,6 @@ export class CONode {
   }
   
   render() {
-    console.log('[RENDER BLOCK]', this.block);
     const focusClasses = this.isFocused ? 'bg-gray-200' :  ''
     const commitedClasses = this.block.status === 'DRAFT' ? 'draft-block' : ''
     

@@ -39852,12 +39852,11 @@ const newBlock = (blockId, _content, parentId, index, last = false // used for n
     return async (dispatch, getState) => {
         const tree = getState().workpad.tree;
         const initNode = tree[blockId];
-        debugger;
         switch (initNode.style) {
             case 'title':
                 /** An enter on a title will create an empty subcontext *
                  *  as the first subcontext of the title context.       */
-                uprtclData.initContextUnder(initNode.serviceProvider, initNode.id, last ? -1 : 0, _content, NodeType.paragraph);
+                await uprtclData.initContextUnder(initNode.serviceProvider, initNode.id, last ? -1 : 0, _content, NodeType.paragraph);
                 break;
             case 'paragraph':
                 /** An enter on a paragraph will create an empty context *

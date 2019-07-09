@@ -127,8 +127,6 @@ export const newBlock = (
     const tree = getState().workpad.tree;
     const initNode: Block = tree[blockId];
 
-    debugger
-
     switch (initNode.style) {
       case 'title':
         /** An enter on a title will create an empty subcontext *
