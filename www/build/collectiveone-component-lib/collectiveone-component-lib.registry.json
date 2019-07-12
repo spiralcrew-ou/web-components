@@ -79,7 +79,7 @@
     },
     "co-waiting-message": {
       "bundleIds": {
-        "$": "co-waiting-app"
+        "$": "co-waiting-message"
       },
       "encapsulation": "shadow"
     },
@@ -91,13 +91,13 @@
     },
     "co-workspace": {
       "bundleIds": {
-        "$": "co-waiting-app"
+        "$": "co-waiting-message"
       },
       "encapsulation": "shadow"
     },
     "co-workspace-selector": {
       "bundleIds": {
-        "$": "co-waiting-app"
+        "$": "co-waiting-message"
       },
       "encapsulation": "shadow"
     },

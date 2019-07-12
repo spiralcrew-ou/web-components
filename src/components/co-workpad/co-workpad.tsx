@@ -134,6 +134,10 @@ export class Workpad {
           <div class='clickZone h-16' onClick={() => this.newBlock(this.rootDocumentId, '', null, -1, true)}/>
 
         </div>
+
+        {true ? ( 
+          <co-waiting-app class="pending-tasks-indicator"></co-waiting-app>
+        ) : '' }
        
       </div>
     )

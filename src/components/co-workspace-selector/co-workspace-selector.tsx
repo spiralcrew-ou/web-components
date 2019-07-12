@@ -7,12 +7,7 @@ import {
 } from '../../services';
 import { setEthAccount } from '../../actions';
 
-import { uprtclMultiplatform } from '../../services/index';
-import { EthereumConnection } from '../../services/eth/eth.connection';
 import { configureStore } from '../../store';
-
-const ethConnection: EthereumConnection =
-  uprtclMultiplatform.serviceProviders[ethServiceProvider].service['ethereum'];
 
 @Component({
   tag: 'co-workspace-selector',
@@ -62,9 +57,7 @@ export class COWorkspaceSelector {
       `[WORSPACE SELECTOR] Avaliable services:`,
       this.availableServiceProviders
     );
-    await ethConnection.ready();
-    console.log(`[WORSPACE SELECTOR] Ethereum ready`);
-    this.setEthAccount(ethConnection.account);
+    
     this.ethLoading = false;
   }
 

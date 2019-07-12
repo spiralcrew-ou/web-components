@@ -20,7 +20,7 @@ export class CONode {
   @Prop() indexinparent: number;
   
   @State() block: Block;
-  @State() tree
+  @State() children: string[];
   @State() isFocused: boolean = false;
   @State() ethAccount: string = '';
   @Event({ eventName: 'isRunning', bubbles: true }) isRunning: EventEmitter
@@ -45,10 +45,11 @@ export class CONode {
       renderingWorkpad
     })
     this.store.mapStateToProps(this, (state) => {
+      const children = state.workpad.tree[this.nodeid] ? state.workpad.tree[this.nodeid].children : [];
       return {
-        tree: Object.assign({}, state.workpad.tree),
         rootId: state.workpad.rootId,
         block: state.workpad.tree[this.nodeid],
+        children: [...children],
         ethAccount: state.support.ethAccount
       }
     })
@@ -118,6 +119,9 @@ export class CONode {
   }
   
   render() {
+    // console.log('[CO-NODE RENDER]', this.block)
+    // console.log('[CO-NODE CHILDREN]', this.children)
+
     const focusClasses = this.isFocused ? 'bg-gray-200' :  ''
     const commitedClasses = this.block.status === 'DRAFT' ? 'draft-block' : ''
     
@@ -148,7 +152,7 @@ export class CONode {
           
         </div>
         
-        {this.block.children.map((childId, index) => {
+        {this.children.map((childId, index) => {
           return (
             <co-node
               level={this.level + 1}
