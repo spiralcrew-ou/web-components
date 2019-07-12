@@ -37,9 +37,6 @@ class COWorkspace {
             initTree,
             reloadTree,
         });
-        setInterval(() => {
-            /** check if ethereum is connected */
-        }, 5000);
     }
     async componentDidLoad() {
         this.watchTasks();
