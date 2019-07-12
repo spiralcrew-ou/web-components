@@ -18,4 +18,4 @@ function getCjsExportFromNamespace (n) {
 	return n && n.default || n;
 }
 
-export { getCjsExportFromNamespace as a, createCommonjsModule as b, commonjsGlobal as c, unwrapExports as d };
+export { createCommonjsModule as a, commonjsGlobal as b, unwrapExports as c };

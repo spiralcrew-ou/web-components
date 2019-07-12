@@ -4785,9 +4785,7 @@ class TaskQueue {
             task.id = Math.random().toString();
         }
         this.finishedTasks[task.id] = false;
-        // if (navigator.onLine) {
-        console.error('TASK QUEUE FORCED');
-        if (true) {
+        if (navigator.onLine) {
             this.queue[task.id] = null;
             delete this.queue[task.id];
             log('[TASK QUEUE] Received task: we are online, run task', task, this.queue);
@@ -19584,7 +19582,7 @@ class DraftLocal {
 
 const holochainEnabled = false;
 const c1Enabled = true;
-const ethEnabled = true;
+const ethEnabled = false;
 const holochainServiceProvider = 'holochain://QmTxSxPovQyWBkTRrM1gFAbtVZUAcS1oMvzkGqihbufKSs';
 const c1ServiceProvider = 'https://www.collectiveone.org/uprtcl/1';
 const ethServiceProvider = 'eth://71ABb6Dbf02a568Eafb25E638836434E507E09a8';
