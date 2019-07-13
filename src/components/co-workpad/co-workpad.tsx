@@ -68,8 +68,12 @@ export class Workpad {
         ethAccount: state.support.ethAccount,
         block: state.workpad.tree[this.documentId]
       }
-    })
-    
+    })    
+  }
+
+  componentDidLoad() {
+    const element = this._element.shadowRoot.getElementById('document-header');
+    if (element) element.innerHTML = this.tree[this.rootDocumentId].content
   }
 
   @Listen('keyup')
@@ -122,11 +126,11 @@ export class Workpad {
       <div class='workpad'>
         
         <header class='bg-red-700 mb-4 h-12 pl-2'
+          id='document-header'
           onBlur={event => { if (this.titleHasChange) this.updateDocumentTitle(event['path'][0].innerText) }}
           contentEditable={this.canWrite()}>
             <div class='py-4 px-2  text-white mb-8 w-full'>
               {this.tree[this.rootDocumentId].content}
-            
             </div>
             
             {this.pendingTasks ? ( 
